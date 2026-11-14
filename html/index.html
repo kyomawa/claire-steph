@@ -1471,6 +1471,13 @@
     .dance-msg.good { color: var(--gulf-blue); }
     .dance-msg.miss { color: #FF8C7A; }
 
+    .confirm-modal { z-index: 70; }
+    .confirm-card { padding: 18px 16px 16px; max-width: 340px; }
+    .confirm-card p { margin: 0 0 14px; font-weight: 700; color: var(--navy); font-size: 14px; line-height: 1.4; }
+    .confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .confirm-actions .btn { flex-direction: row; justify-content: center; padding: 10px 6px; font-size: 13px; }
+    #confirmOk.danger { background: var(--low); }
+
     @media (prefers-reduced-motion: reduce) {
       .star, .btn.alert { animation: none; }
     }
@@ -1775,6 +1782,16 @@
         <p class="save-msg" id="saveMsg" role="status"></p>
         <button class="btn wide-btn" id="restoreBackup" hidden>↩️ Revenir à la sauvegarde d'hier</button>
         <button class="btn wide-btn danger" id="resetGame">🗑️ Recommencer à zéro</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal confirm-modal" id="confirmBox" hidden role="alertdialog" aria-modal="true" aria-labelledby="confirmText">
+    <div class="modal-card confirm-card">
+      <p id="confirmText"></p>
+      <div class="confirm-actions">
+        <button class="btn" id="confirmNo">Annuler</button>
+        <button class="btn cloud-main" id="confirmOk">Oui</button>
       </div>
     </div>
   </div>
@@ -2158,6 +2175,24 @@
       heart.style.bottom = bottomPx;
       screenEl.appendChild(heart);
       setTimeout(() => heart.remove(), 1700);
+    }
+
+    // petite fenêtre de confirmation (remplace confirm(), bloqué dans certains navigateurs intégrés)
+    function askConfirm(text, okLabel, danger) {
+      return new Promise((resolve) => {
+        const box = document.getElementById('confirmBox');
+        document.getElementById('confirmText').textContent = text;
+        const ok = document.getElementById('confirmOk');
+        const no = document.getElementById('confirmNo');
+        ok.textContent = okLabel || 'Oui';
+        ok.classList.toggle('danger', !!danger);
+        box.hidden = false;
+        ok.focus();
+        const done = (v) => { box.hidden = true; ok.onclick = no.onclick = box.onclick = null; resolve(v); };
+        ok.onclick = () => done(true);
+        no.onclick = () => done(false);
+        box.onclick = (e) => { if (e.target === box) done(false); };
+      });
     }
 
     const toastQueue = [];
@@ -3773,7 +3808,7 @@
       if (!code.trim()) return setSaveMsg('Colle d’abord un code de sauvegarde ci-dessous.');
       try {
         const obj = decodeSave(code);
-        if (confirm('Remplacer la partie actuelle par cette sauvegarde ?')) restoreFrom(obj);
+        askConfirm('Remplacer la partie actuelle par cette sauvegarde ?', 'Remplacer').then((ok) => { if (ok) restoreFrom(obj); });
       } catch (e) { setSaveMsg('Ce code ne marche pas 😕'); }
     });
 
@@ -3785,7 +3820,7 @@
         try { obj = JSON.parse(txt); } catch (err) { obj = null; }
         if (!obj) { try { obj = decodeSave(txt); } catch (err) { obj = null; } }
         if (!obj || typeof obj.hunger !== 'number') return setSaveMsg('Ce fichier ne ressemble pas à une sauvegarde 😕');
-        if (confirm('Remplacer la partie actuelle par ce fichier ?')) restoreFrom(obj);
+        askConfirm('Remplacer la partie actuelle par ce fichier ?', 'Remplacer').then((ok) => { if (ok) restoreFrom(obj); });
       });
       e.target.value = '';
     });
@@ -3793,12 +3828,13 @@
     $('restoreBackup').addEventListener('click', () => {
       try {
         const obj = JSON.parse(localStorage.getItem(BACKUP_KEY));
-        if (confirm('Revenir à la sauvegarde de la veille ? La progression d’aujourd’hui sera perdue.')) restoreFrom(obj);
+        if (!obj) throw new Error('vide');
+        askConfirm('Revenir à la sauvegarde de la veille ? La progression d’aujourd’hui sera perdue.', 'Revenir à hier').then((ok) => { if (ok) restoreFrom(obj); });
       } catch (e) { setSaveMsg('Pas de sauvegarde de la veille.'); }
     });
 
-    $('resetGame').addEventListener('click', () => {
-      if (!confirm('Tout effacer et recommencer à zéro ? (une copie reste dans « sauvegarde d’hier »)')) return;
+    $('resetGame').addEventListener('click', async () => {
+      if (!(await askConfirm('Tout effacer et recommencer à zéro ? Une copie reste dans « sauvegarde d’hier ».', 'Tout effacer', true))) return;
       backupYesterday();
       try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignoré */ }
       saveRestoring = true;
@@ -3942,7 +3978,7 @@
         const r = await api('GET', '/api/saves/' + code);
         if (r.status === 404) return setSaveMsg('Code inconnu 😕');
         if (r.status !== 200) throw new Error();
-        if (!confirm('Récupérer la partie en ligne ? Elle remplace celle de cet appareil.')) return;
+        if (!(await askConfirm('Récupérer la partie en ligne ? Elle remplace celle de cet appareil.', 'Récupérer'))) return;
         localStorage.setItem(SYNC_KEY, code);
         applyRemote(r.data.save, 'Partie récupérée en ligne ☁️');
       } catch (e) { setSaveMsg('Impossible de joindre le serveur 😕'); }
@@ -3953,8 +3989,8 @@
       catch (e) { setSaveMsg('Code : ' + cloud.code); }
     });
 
-    $('cloudOff2').addEventListener('click', () => {
-      if (!confirm('Arrêter la sauvegarde en ligne sur cet appareil ? (la partie reste sur le téléphone et en ligne)')) return;
+    $('cloudOff2').addEventListener('click', async () => {
+      if (!(await askConfirm('Arrêter la sauvegarde en ligne sur cet appareil ? La partie reste sur le téléphone et en ligne.', 'Arrêter'))) return;
       try { localStorage.removeItem(SYNC_KEY); } catch (e) { /* ignoré */ }
       cloud.code = null;
       cloud.lastPush = 0;
