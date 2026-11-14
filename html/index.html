@@ -204,7 +204,21 @@
 
     .screen.dusk { background-color: #FFE6CC; background-image: linear-gradient(180deg, #FFC9A3 0%, #FFE9D6 55%, #fff 100%); }
     .screen.night { background-color: var(--night); background-image: linear-gradient(180deg, var(--night) 0%, var(--night-2) 100%); }
-    .screen.has-bg { background-image: var(--bg-img) !important; }
+    .backdrop {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 85%;
+      image-rendering: pixelated;
+      opacity: 0.6;
+      pointer-events: none;
+      transition: filter 1.5s ease;
+    }
+
+    .screen.dusk .backdrop { filter: sepia(0.35) saturate(1.2) brightness(0.95); }
+    .screen.night .sky { background: rgba(27, 37, 65, 0.82); }
 
     .sky {
       position: absolute;
@@ -452,8 +466,8 @@
       width: auto;
     }
 
-    .hug-visual img.hug-him { margin-right: -14px; transform: scaleX(-1); }
-    .hug-visual img.hug-her { margin-left: -14px; }
+    .hug-visual img.hug-scene { height: 180px; margin-bottom: 26px; image-rendering: auto; }
+    .action-visual img.scene { width: 100%; height: 100%; object-fit: contain; }
 
     .heart {
       position: absolute;
@@ -631,7 +645,7 @@
     }
 
     .btn-style {
-      grid-column: span 4;
+      grid-column: span 6;
       margin-top: 2px;
       flex-direction: row;
       justify-content: center;
@@ -640,7 +654,7 @@
     }
 
     .btn-hug {
-      grid-column: span 8;
+      grid-column: 1 / -1;
       margin-top: 2px;
       background: linear-gradient(135deg, #FFE0EA 0%, #FFF0F5 100%);
       border-color: var(--love-deep);
@@ -851,6 +865,35 @@
     .w-item.locked { opacity: 0.5; cursor: default; border-style: dashed; }
     .w-item.locked img { filter: grayscale(1) brightness(0.6); }
 
+    .moments, .album { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+
+    .m-card, .a-card {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 6px;
+      background: #fff;
+      border: 1.5px solid var(--gulf-blue-deep);
+      border-radius: 14px;
+      font-family: inherit;
+      color: var(--ink);
+      text-align: left;
+    }
+
+    .m-card { cursor: pointer; }
+    .m-card:hover { background: #FFF6EE; }
+    .m-card img, .a-card img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 9px; background: #fff; }
+    .m-card .m-name { font-weight: 800; font-size: 12px; }
+    .m-card .m-sub { font-size: 10.5px; color: var(--gulf-blue-deep); font-weight: 700; }
+    .m-card.locked { opacity: 0.55; cursor: default; }
+    .m-card.locked img { filter: grayscale(1); }
+    .a-card .t-title { font-size: 12px; font-weight: 800; }
+    .a-card .m-date { font-size: 10.5px; line-height: 1.25; color: var(--gulf-blue-deep); font-weight: 700; }
+    .a-card.locked img { filter: grayscale(1) blur(3px) brightness(1.1); }
+    .a-card.locked { border-style: dashed; }
+    .w-item img.w-decor { height: 46px; width: 40px; object-fit: cover; image-rendering: pixelated; border-radius: 6px; }
+    .preview { background-size: cover; background-position: center 85%; image-rendering: pixelated; }
+
     .stat-table { width: 100%; border-collapse: collapse; font-size: 13px; }
     .stat-table td { padding: 5px 0; border-bottom: 1px solid #eef3f5; }
     .stat-table td:last-child { text-align: right; font-weight: 800; }
@@ -891,6 +934,7 @@
 
     <div class="screen-wrap">
       <div class="screen" id="screen">
+        <img class="backdrop" id="backdrop" alt="" hidden>
         <div class="sky" id="sky"><div class="moon">🌙</div></div>
         <div class="scanlines"></div>
         <div class="floor"></div>
@@ -913,8 +957,7 @@
           <div class="action-caption" id="actionCaption"></div>
         </div>
         <div class="hug-visual" id="hugVisual">
-          <img id="hugHerImg" class="hug-her" alt="">
-          <img id="hugHimImg" class="hug-him" alt="">
+          <img id="hugImg" class="hug-scene" alt="">
           <div class="action-caption" id="hugCaption"></div>
         </div>
       </div>
@@ -949,6 +992,7 @@
       <button class="btn" id="btnHeal"><span class="emoji">💊</span>Soigner</button>
       <button class="btn" id="btnBook"><span class="emoji">📖</span>Carnet</button>
       <button class="btn btn-style" id="btnStyle"><span class="emoji">👕</span>Garde-robe</button>
+      <button class="btn btn-style" id="btnDuo"><span class="emoji">💑</span>À deux</button>
       <button class="btn btn-hug" id="btnHug"><span class="emoji">🥰</span>Câlin de ta copine</button>
     </div>
 
@@ -966,6 +1010,7 @@
       <div class="tabs" role="tablist">
         <button class="tab" role="tab" data-tab="trophies" aria-selected="true">🏆 Trophées</button>
         <button class="tab" role="tab" data-tab="memories" aria-selected="false">💌 Souvenirs</button>
+        <button class="tab" role="tab" data-tab="album" aria-selected="false">📸 Album</button>
         <button class="tab" role="tab" data-tab="stats" aria-selected="false">📊 Stats</button>
       </div>
       <div class="tab-body" id="bookBody"></div>
@@ -987,6 +1032,16 @@
     </div>
   </div>
 
+  <div class="modal" id="duo" hidden role="dialog" aria-modal="true" aria-labelledby="duoTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="duoTitle">💑 On fait quoi tous les deux ?</h2>
+        <button class="close" id="duoClose" aria-label="Fermer">✕</button>
+      </div>
+      <div class="tab-body"><div class="moments" id="duoGrid"></div></div>
+    </div>
+  </div>
+
   <script src="assets.js"></script>
   <script>
     // =====================================================================
@@ -1000,11 +1055,11 @@
       // Dates spéciales ('MM-JJ'). Le message s'affiche à sa visite ce jour-là
       // et rejoint le carnet de souvenirs.
       specialDates: {
-        '07-08': { msg: "Joyeux anniversaire Stéphane 🎂🎉", fx: ['icoCake', 'icoGift', '🎉'] }, // ⚠️ date à vérifier
+        '07-08': { msg: "Joyeux anniversaire Stéphane 🎂🎉", fx: ['icoCake', 'icoGift', '🎉'], scene: 'anniversaire' }, // ⚠️ date à vérifier
         // '05-20': { msg: "Joyeux anniversaire à nous deux 💑", fx: ['💑', 'icoLove', '💍'] },
-        '02-14': { msg: "Joyeuse Saint-Valentin mon amour 💘", fx: ['icoLove', '🌹', 'icoHeart'] },
-        '12-25': { msg: "Joyeux Noël mon cœur 🎄", fx: ['🎄', 'icoGift', '⭐'] },
-        '01-01': { msg: "Bonne année à nous deux 🥂", fx: ['🥂', '🎆', '✨'] }
+        '02-14': { msg: "Joyeuse Saint-Valentin mon amour 💘", fx: ['icoLove', '🌹', 'icoHeart'], scene: 'amour' },
+        '12-25': { msg: "Joyeux Noël mon cœur 🎄", fx: ['🎄', 'icoGift', '⭐'], scene: 'hiver' },
+        '01-01': { msg: "Bonne année à nous deux 🥂", fx: ['🥂', '🎆', '✨'], scene: 'fete' }
       },
 
       // Un « mot du jour » différent chaque jour, ajouté au carnet.
@@ -1092,8 +1147,9 @@
         sick: false, sulk: false, poops: [], digest: 0,
         xp: 0, bestScore: 0, streak: 0,
         bornAt: Date.now(), lastSeen: null, lastVisitDay: null,
-        counters: { hugs: 0, meals: 0, runs: 0, codes: 0, sleeps: 0, heals: 0, games: 0, kisses: 0, visits: 0, washes: 0, cleaned: 0 },
+        counters: { hugs: 0, meals: 0, runs: 0, codes: 0, sleeps: 0, heals: 0, games: 0, kisses: 0, visits: 0, washes: 0, cleaned: 0, moments: 0 },
         trophies: {}, journal: [], name: null,
+        album: {}, decor: 'auto',
         owned: {}, wear: { tete: null, yeux: null, visage: null, cou: null, dos: null, compagnon: null }
       };
     }
@@ -1127,6 +1183,7 @@
         state.journal = Array.isArray(d.journal) ? d.journal : [];
         state.poops = Array.isArray(d.poops) ? d.poops.slice(0, 3) : [];
         state.owned = (d.owned && typeof d.owned === 'object') ? d.owned : {};
+        state.album = (d.album && typeof d.album === 'object') ? d.album : {};
         state.wear = { ...base.wear, ...((d.wear && typeof d.wear === 'object') ? d.wear : {}) };
         if (d.name) petNameEl.textContent = d.name;
       } catch (e) { /* stockage indisponible */ }
@@ -1195,6 +1252,8 @@
       { id: 'washes_10', e: '🧼', t: 'Propre comme un sou neuf', d: '10 bains', ok: (s) => s.counters.washes >= 10 },
       { id: 'cleaned_20', e: '💩', t: 'Ramasse-crottes', d: '20 cacas ramassés', ok: (s) => s.counters.cleaned >= 20 },
       { id: 'style_4', e: '👕', t: 'Fashion week', d: 'Porter 4 accessoires à la fois', ok: (s) => Object.values(s.wear).filter(Boolean).length >= 4 },
+      { id: 'moments_10', e: '💑', t: 'Inséparables', d: '10 moments à deux', ok: (s) => s.counters.moments >= 10 },
+      { id: 'album_all', e: '📸', t: 'Album complet', d: "Tous les moments de l'album", ok: (s) => Object.keys(s.album).length >= 16 },
       { id: 'memories_10', e: '📖', t: 'Album souvenir', d: '10 souvenirs dans le carnet', ok: (s) => s.journal.length >= 10 }
     ];
 
@@ -1277,9 +1336,7 @@
       const ph = phase();
       screenEl.classList.toggle('night', ph === 'night');
       screenEl.classList.toggle('dusk', ph === 'dusk');
-      const bg = ph === 'night' ? A.nightBg : A.dayBg;
-      screenEl.classList.toggle('has-bg', !!bg);
-      if (bg) screenEl.style.setProperty('--bg-img', `url("${bg}")`);
+      applyDecor();
     }
 
     function makeStars() {
@@ -1583,7 +1640,7 @@
       }
     }
 
-    function doAction({ img, emoji, caption, delta, duration, xp, counter, after }) {
+    function doAction({ img, emoji, caption, delta, duration, xp, counter, after, scene }) {
       if (!canAct()) return;
       busy = true;
       stopHim();
@@ -1591,7 +1648,7 @@
 
       if (img) {
         actionImg.src = img; actionImg.hidden = false; actionEmoji.hidden = true;
-        actionImg.classList.toggle('bust', img === A.himSick);
+        actionImg.classList.toggle('scene', !!scene);
       } else {
         actionImg.hidden = true; actionEmoji.textContent = emoji || '✨'; actionEmoji.hidden = false;
       }
@@ -1662,21 +1719,23 @@
     });
 
     $('btnSleep').addEventListener('click', () => {
+      const night = isNight();
       doAction({
-        img: A.sleepBig, caption: 'Zzz... 💤',
-        delta: { energy: 32, happy: 6, hunger: -4 }, duration: 2000, xp: 2, counter: 'sleeps',
-        after: () => { awakeUntil = 0; }
+        img: night ? sceneOf('nuit') : A.sleepBig, scene: night, caption: night ? 'Bonne nuit mon cœur 💤' : 'Petite sieste… Zzz 💤',
+        delta: { energy: 32, happy: 6, hunger: -4, love: night ? 6 : 0 }, duration: night ? 2600 : 2000, xp: 2, counter: 'sleeps',
+        after: () => { awakeUntil = 0; if (night) addToAlbum('nuit'); }
       });
     });
 
     $('btnHeal').addEventListener('click', () => {
       if (!state.sick) return refuse('Il pète la forme, pas besoin 💪');
       doAction({
-        img: A.himSick, caption: 'Une tisane, un médoc, et au lit 🍵',
+        img: sceneOf('soins'), scene: true, caption: 'Une tisane, un plaid, et je veille sur toi 🍵',
         delta: { energy: 10, happy: 12, love: 6, hunger: 10 }, duration: 2200, xp: 4, counter: 'heals',
         after: () => {
           state.sick = false;
           state.hunger = Math.max(state.hunger, 20);
+          addToAlbum('soins');
           setTimeout(() => showBubble('Merci, ça va mieux 🥹', 2200), 2300);
         }
       });
@@ -1781,7 +1840,7 @@
         firstVisitDone = true;
         if (special) {
           if (isNewDay) toast('💌 Nouveau souvenir dans le carnet');
-          return { msg: special.msg, fx: special.fx, big: true };
+          return { msg: special.msg, fx: special.fx, big: true, scene: special.scene };
         }
         if (isNewDay) {
           const note = noteOfTheDay();
@@ -1805,6 +1864,16 @@
       const v = visitMessage();
       const herFace = state.sick ? A.herSad : (state.sulk ? A.herSurprised : A.herHappy);
       showBubble(v.msg, v.big ? 3600 : 2600, herFace);
+      if (v.scene && sceneOf(v.scene)) {
+        setTimeout(() => {
+          actionImg.src = sceneOf(v.scene); actionImg.hidden = false; actionEmoji.hidden = true;
+          actionImg.classList.add('scene');
+          actionCaption.textContent = v.msg;
+          actionVisual.classList.add('show');
+          if (MOMENT[v.scene] && MOMENT[v.scene].auto) addToAlbum(v.scene);
+          setTimeout(() => actionVisual.classList.remove('show'), 3000);
+        }, 1400);
+      }
       flashMood(state.sick ? A.himSick : A.himHappy, v.big ? 3400 : 2000);
       state.love = clamp(state.love + (v.big ? 24 : 10));
       state.happy = clamp(state.happy + (v.big ? 20 : 6));
@@ -1873,6 +1942,7 @@
       state.hunger = clamp(state.hunger + 4);
       state.energy = clamp(state.energy + 6);
       state.counters.hugs++;
+      addToAlbum('amour');
       const sulkBefore = state.sulk;
       afterCare();
       gainXp(6);
@@ -2104,6 +2174,23 @@
         }
       }
 
+      if (bookTab === 'album') {
+        const got = MOMENTS.filter((m) => state.album[m.id]).length;
+        bookBody.appendChild(el('p', 'empty', `${got} / ${MOMENTS.length} moments à deux`));
+        const grid = el('div', 'album');
+        for (const m of MOMENTS) {
+          const a = state.album[m.id];
+          const card = el('div', 'a-card' + (a ? '' : ' locked'));
+          const img = el('img');
+          img.src = sceneOf(m.id);
+          img.alt = '';
+          card.append(img, el('div', 't-title', a ? m.n : '???'),
+            el('div', 'm-date', a ? `${a.n} fois · depuis le ${formatDate(a.since)}` : (m.auto || 'Avec le bouton « À deux »')));
+          grid.appendChild(card);
+        }
+        bookBody.appendChild(grid);
+      }
+
       if (bookTab === 'stats') {
         const c = state.counters;
         const rows = [
@@ -2112,7 +2199,7 @@
           ['🔥 Série en cours', `${state.streak} j`],
           ['🎮 Record mini-jeu', state.bestScore],
           ['🥰 Câlins', c.hugs], ['💋 Bisous', c.kisses], ['🍽️ Repas', c.meals],
-          ['🧼 Bains', c.washes], ['💩 Cacas ramassés', c.cleaned],
+          ['🧼 Bains', c.washes], ['💩 Cacas ramassés', c.cleaned], ['💑 Moments à deux', c.moments],
           ['🏃 Runs', c.runs], ['💻 Sessions de code', c.codes], ['😴 Siestes', c.sleeps],
           ['💊 Soins', c.heals], ['🚶‍♀️ Visites', c.visits], ['🎮 Parties', c.games]
         ];
@@ -2137,7 +2224,8 @@
     // =====================================================================
     const SLOTS = [
       { id: 'tete', label: '🎩 Tête' }, { id: 'yeux', label: '🕶️ Yeux' }, { id: 'visage', label: '😊 Visage' },
-      { id: 'cou', label: '🧣 Cou' }, { id: 'dos', label: '🪽 Dos' }, { id: 'compagnon', label: '🐾 Ami' }
+      { id: 'cou', label: '🧣 Cou' }, { id: 'dos', label: '🪽 Dos' }, { id: 'compagnon', label: '🐾 Ami' },
+      { id: 'decor', label: '🏠 Décor' }
     ];
     const Lv = (n) => ({ type: 'level', n });
     const Tr = (id) => ({ type: 'trophy', id });
@@ -2368,6 +2456,19 @@
         return b;
       }));
       const grid = $('closetGrid');
+      applyDecor();
+      if (closetSlot === 'decor') {
+        grid.replaceChildren(...DECORS.map((d) => {
+          const b = el('button', 'w-item' + (state.decor === d.id ? ' on' : ''));
+          if (d.id === 'auto') b.append(el('span', 'w-none', '🗓️'));
+          else if (d.id === 'none') b.append(el('span', 'w-none', '∅'));
+          else { const img = el('img', 'w-decor'); img.src = A['decor_' + d.id]; img.alt = ''; b.append(img); }
+          b.append(el('span', 'w-name', d.n));
+          b.addEventListener('click', () => { state.decor = d.id; saveState(); renderCloset(); });
+          return b;
+        }));
+        return;
+      }
       const none = el('button', 'w-item' + (state.wear[closetSlot] ? '' : ' on'));
       none.append(el('span', 'w-none', '∅'), el('span', 'w-name', 'Rien'));
       none.addEventListener('click', () => equip(closetSlot, null));
@@ -2398,6 +2499,110 @@
     closet.addEventListener('click', (e) => { if (e.target === closet) closet.hidden = true; });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closet.hidden = true; });
 
+
+    // =====================================================================
+    //  Moments à deux + album
+    // =====================================================================
+    const MOMENTS = [
+      { id: 'maison', n: 'Soirée canapé', d: { happy: 12, love: 14, energy: 4 }, cap: 'Soirée canapé tous les deux 🛋️', u: Lv(1), calm: true },
+      { id: 'cafe', n: 'Pause café', d: { hunger: 10, energy: 12, love: 10, happy: 6 }, cap: 'Un petit café en terrasse ☕', u: Lv(1) },
+      { id: 'lecture', n: 'Lecture à deux', d: { happy: 10, love: 10, energy: 6 }, cap: 'Chacun son livre, collés-serrés 📚', u: Lv(1), calm: true },
+      { id: 'jeux', n: 'Soirée jeux vidéo', d: { happy: 20, love: 8, energy: -8, hunger: -6 }, cap: 'Allez, la revanche ! 🎮', u: Lv(2) },
+      { id: 'cuisine', n: 'On cuisine', d: { hunger: 34, happy: 10, love: 10, energy: -4 }, cap: 'Petits plats faits maison 🍲', u: Lv(2) },
+      { id: 'detente', n: 'Détente', d: { energy: 22, happy: 8, love: 8 }, cap: 'Poufs, plaids et zéro stress 😌', u: Lv(2), calm: true },
+      { id: 'sport', n: 'Sport ensemble', d: { happy: 14, love: 8, energy: -16, hunger: -12 }, cap: 'On se motive à deux 💪', u: Lv(3), effort: true },
+      { id: 'shopping', n: 'Shopping', d: { happy: 16, love: 6, energy: -10, hunger: -6 }, cap: 'Juste un dernier magasin… 🛍️', u: Lv(3), effort: true },
+      { id: 'fete', n: 'Soirée dansante', d: { happy: 22, love: 12, energy: -18, hunger: -8 }, cap: "On danse jusqu'au bout de la nuit 🪩", u: Lv(4), effort: true },
+      { id: 'voyage', n: 'Escapade', d: { happy: 26, love: 16, energy: -20, hunger: -10 }, cap: 'Valises prêtes, on part ! ✈️', u: Lv(5), effort: true },
+      { id: 'plage', n: 'Journée plage', d: { happy: 22, love: 14, energy: -8 }, cap: 'Sable chaud et crème solaire 🏖️', u: Mo(6, 7, 8) },
+      { id: 'hiver', n: 'Bonhomme de neige', d: { happy: 20, love: 12, energy: -12 }, cap: 'Un bonhomme de neige à deux ⛄', u: Mo(12, 1, 2), effort: true },
+      // ceux-là arrivent tout seuls
+      { id: 'amour', n: 'Gros câlin', auto: 'Faire un câlin' },
+      { id: 'nuit', n: 'Dodo à deux', auto: 'Le coucher la nuit' },
+      { id: 'soins', n: 'Prendre soin', auto: 'Le soigner quand il est malade' },
+      { id: 'anniversaire', n: 'Jour de fête', auto: 'Un jour de fête' }
+    ];
+    const MOMENT = Object.fromEntries(MOMENTS.map((m) => [m.id, m]));
+    const sceneOf = (id) => A['moment_' + id];
+
+    function addToAlbum(id) {
+      const first = !state.album[id];
+      if (first) state.album[id] = { since: dayKey(now()), n: 0 };
+      state.album[id].n++;
+      if (first) toast(`Nouveau moment dans l'album : ${MOMENT[id].n}`, sceneOf(id));
+      checkTrophies();
+    }
+
+    function momentAvailability(m) {
+      const u = m.u;
+      if (u.type === 'level' && levelFor(state.xp) < u.n) return { ok: false, why: `🔒 Niveau ${u.n}` };
+      if (u.type === 'season' && !u.months.includes(now().getMonth() + 1)) return { ok: false, why: '🔒 ' + unlockText(u) };
+      if (state.sick && !m.calm) return { ok: false, why: '🤒 Il est malade' };
+      if (m.effort && state.energy < 20) return { ok: false, why: '😪 Trop fatigué' };
+      return { ok: true };
+    }
+
+    function deltaText(d) {
+      const ico = { love: '💕', happy: '😊', energy: '⚡', hunger: '🍔' };
+      return Object.entries(d).map(([k, v]) => `${ico[k]}${v > 0 ? '+' : ''}${v}`).join(' ');
+    }
+
+    const duo = $('duo');
+    function renderDuo() {
+      $('duoGrid').replaceChildren(...MOMENTS.filter((m) => !m.auto).map((m) => {
+        const av = momentAvailability(m);
+        const b = el('button', 'm-card' + (av.ok ? '' : ' locked'));
+        const img = el('img');
+        img.src = sceneOf(m.id);
+        img.alt = '';
+        b.append(img, el('span', 'm-name', m.n), el('span', 'm-sub', av.ok ? deltaText(m.d) : av.why));
+        b.disabled = !av.ok;
+        b.addEventListener('click', () => { duo.hidden = true; doMoment(m); });
+        return b;
+      }));
+    }
+
+    function doMoment(m) {
+      doAction({
+        img: sceneOf(m.id), scene: true, caption: m.cap, delta: m.d, duration: 2800, xp: 6, counter: 'moments',
+        after: () => addToAlbum(m.id)
+      });
+    }
+
+    $('btnDuo').addEventListener('click', () => {
+      if (!canAct()) return;
+      renderDuo();
+      duo.hidden = false;
+      $('duoClose').focus();
+    });
+    $('duoClose').addEventListener('click', () => { duo.hidden = true; });
+    duo.addEventListener('click', (e) => { if (e.target === duo) duo.hidden = true; });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') duo.hidden = true; });
+
+    // ---- Décor de fond ----
+    const DECORS = [
+      { id: 'auto', n: 'Selon la saison' }, { id: 'none', n: 'Aucun' },
+      { id: 'salon', n: 'Salon' }, { id: 'cuisine', n: 'Cuisine' }, { id: 'parc', n: 'Parc' },
+      { id: 'ville', n: 'Ville' }, { id: 'plage', n: 'Plage' }, { id: 'neige', n: 'Neige' }
+    ];
+    function currentDecor() {
+      if (state.decor !== 'auto') return state.decor;
+      const m = now().getMonth() + 1;
+      if (m === 12 || m <= 2) return 'neige';
+      if (m <= 5) return 'parc';
+      if (m <= 8) return 'plage';
+      return 'salon';
+    }
+    function applyDecor() {
+      const d = currentDecor();
+      const src = d === 'none' ? null : A['decor_' + d];
+      const bd = $('backdrop');
+      bd.hidden = !src;
+      if (src && bd.getAttribute('src') !== src) bd.src = src;
+      const pv = $('preview');
+      pv.style.backgroundImage = src ? `url("${src}")` : '';
+    }
+
     // =====================================================================
     //  Démarrage
     // =====================================================================
@@ -2425,8 +2630,7 @@
     }
 
     makeStars();
-    $('hugHerImg').src = A.herStand;
-    $('hugHimImg').src = A.himStand;
+    $('hugImg').src = sceneOf('amour');
     spriteHerEl.src = A.herStand;
     document.querySelectorAll('[data-ico]').forEach((img) => { img.src = A[img.dataset.ico]; });
     loadState();
@@ -2444,7 +2648,6 @@
     for (const it of ITEMS) if (it.u.type === 'level' && it.u.n <= 1 && !state.owned[it.id]) state.owned[it.id] = dayKey(now());
     addWearHost(spriteEl, spriteEl.parentElement);
     addWearHost(catcherEl, gameEl);
-    addWearHost($('hugHimImg'), hugVisual, () => true);
     addWearHost($('previewHim'), $('preview'), () => false);
     $('previewHim').src = A.himStand;
     seasonDeco();

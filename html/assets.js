@@ -133,7 +133,31 @@ window.ASSETS = {
   decoHeart: 'img/deco/decoHeart.png',
   decoLeaf: 'img/deco/decoLeaf.png',
   decoPumpkin: 'img/deco/decoPumpkin.png',
-  decoSnow: 'img/deco/decoSnow.png'
+  decoSnow: 'img/deco/decoSnow.png',
+  // ---- Moments à deux ----
+  moment_amour: 'img/moments/amour.png',
+  moment_anniversaire: 'img/moments/anniversaire.png',
+  moment_cafe: 'img/moments/cafe.png',
+  moment_cuisine: 'img/moments/cuisine.png',
+  moment_detente: 'img/moments/detente.png',
+  moment_fete: 'img/moments/fete.png',
+  moment_hiver: 'img/moments/hiver.png',
+  moment_jeux: 'img/moments/jeux.png',
+  moment_lecture: 'img/moments/lecture.png',
+  moment_maison: 'img/moments/maison.png',
+  moment_nuit: 'img/moments/nuit.png',
+  moment_plage: 'img/moments/plage.png',
+  moment_shopping: 'img/moments/shopping.png',
+  moment_soins: 'img/moments/soins.png',
+  moment_sport: 'img/moments/sport.png',
+  moment_voyage: 'img/moments/voyage.png',
+  // ---- Décors de fond ----
+  decor_cuisine: 'img/decors/cuisine.png',
+  decor_neige: 'img/decors/neige.png',
+  decor_parc: 'img/decors/parc.png',
+  decor_plage: 'img/decors/plage.png',
+  decor_salon: 'img/decors/salon.png',
+  decor_ville: 'img/decors/ville.png'
 };
 
 // Repères de chaque pose (fractions de l'image) pour placer les accessoires :
