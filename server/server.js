@@ -36,6 +36,8 @@ const MIME = {
 fs.mkdirSync(DATA_DIR, { recursive: true });
 const PUSH_DIR = path.join(DATA_DIR, 'push');
 fs.mkdirSync(PUSH_DIR, { recursive: true });
+const NOTES_DIR = path.join(DATA_DIR, 'notes');
+fs.mkdirSync(NOTES_DIR, { recursive: true });
 const PUSH_SUBJECT = process.env.PUSH_SUBJECT || 'mailto:cheriotchi@example.invalid';
 
 // clés VAPID créées une fois puis gardées dans le volume
@@ -182,6 +184,15 @@ async function checkPushes() {
   } finally { pushRunning = false; }
 }
 
+// ---- Mots doux (boîte aux lettres par code) ----
+const notesFile = (code) => path.join(NOTES_DIR, code + '.json');
+function readNotes(code) { try { return JSON.parse(fs.readFileSync(notesFile(code), 'utf8')); } catch (e) { return []; } }
+function writeNotes(code, notes) {
+  const tmp = notesFile(code) + '.' + process.pid + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify(notes.slice(-50)));
+  fs.renameSync(tmp, notesFile(code));
+}
+
 function validSave(save) {
   return save && typeof save === 'object' && typeof save.hunger === 'number' && typeof save.lastSeen === 'number';
 }
@@ -211,6 +222,36 @@ async function handleApi(req, res, url) {
   }
 
   if (url.pathname === '/api/push/key' && req.method === 'GET') return send(res, 200, { publicKey: VAPID.publicKey });
+
+  const mn = url.pathname.match(/^\/api\/notes\/([A-Za-z0-9-]+)$/);
+  if (mn) {
+    const code = mn[1].toUpperCase();
+    if (!CODE_RE.test(code) || !readSave(code)) return send(res, 404, { error: 'Code inconnu' });
+    if (req.method === 'GET') {
+      const after = Number(url.searchParams.get('after')) || 0;
+      return send(res, 200, { notes: readNotes(code).filter((n) => n.id > after) });
+    }
+    if (req.method === 'POST') {
+      const body = await readBody(req);
+      const text = String(body.text || '').replace(/\s+/g, ' ').trim().slice(0, 200);
+      if (!text) return send(res, 400, { error: 'Message vide' });
+      const device = String(body.device || '').slice(0, 40);
+      const notes = readNotes(code);
+      const id = Math.max(Date.now(), (notes.length ? notes[notes.length - 1].id : 0) + 1);
+      notes.push({ id, text, device, at: Date.now() });
+      writeNotes(code, notes);
+      // notification aux autres téléphones reliés au même code
+      let sent = 0;
+      for (const entry of readSubs(code)) {
+        if (body.exclude && entry.sub.endpoint === body.exclude) continue;
+        try {
+          const st = await webpush.sendNotification(entry.sub, { title: '💌 Un mot doux pour toi', body: text.length > 90 ? text.slice(0, 88) + '…' : text, tag: 'note-' + id, url: './' }, VAPID, PUSH_SUBJECT);
+          if (st >= 200 && st < 300) sent++;
+        } catch (e) { /* ignoré */ }
+      }
+      return send(res, 201, { id, sent });
+    }
+  }
 
   if (url.pathname.startsWith('/api/push/') && req.method === 'POST') {
     const body = await readBody(req);

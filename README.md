@@ -40,6 +40,13 @@ la partie reste sauvegardée sur le téléphone, seule la sauvegarde en ligne es
   un appareil resté ouvert sans qu'on y touche n'écrase rien.
 - Le code sert de clé : ne le partage qu'avec la personne qui joue.
 
+## Mots doux
+
+Avec la même partie sur deux téléphones (même code de sauvegarde en ligne) :
+**À deux → 💌 Lui écrire un mot doux**. Le message arrive sur l'autre téléphone
+(notification si elles sont activées) et elle le lui apporte à sa prochaine visite dans le jeu.
+Les messages sont gardés dans `/data/notes/`.
+
 ## Notifications
 
 - 💾 → « 🔔 Activer » (active aussi la sauvegarde en ligne si besoin).
