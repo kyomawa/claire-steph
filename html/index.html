@@ -1290,6 +1290,100 @@
       font-size: 12.5px;
     }
 
+    .topbar-left { position: absolute; left: 0; top: 50%; transform: translateY(-50%); display: flex; gap: 6px; }
+    .topbar-left .icon-btn { position: static; transform: none; }
+    .topbar-left .icon-btn:active { transform: translateY(2px); }
+
+    .daily-chip {
+      border: 1.5px solid var(--gulf-orange);
+      background: rgba(242, 106, 33, 0.18);
+      color: #fff;
+      border-radius: 10px;
+      padding: 1px 7px;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: inherit;
+      cursor: pointer;
+    }
+    .daily-chip.done { background: var(--gulf-orange); }
+
+    .stat-row { position: relative; }
+    .delta {
+      position: absolute;
+      right: 2px;
+      top: -6px;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 0 6px;
+      border-radius: 8px;
+      background: #fff;
+      border: 2px solid currentColor;
+      pointer-events: none;
+      animation: deltaUp 1.5s ease-out forwards;
+    }
+    .delta.up { color: #2E8B3E; }
+    .delta.down { color: var(--low); }
+    @keyframes deltaUp {
+      0% { opacity: 0; transform: translateY(6px) scale(0.8); }
+      15% { opacity: 1; transform: translateY(0) scale(1.05); }
+      80% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(-14px); }
+    }
+
+    .ask {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      right: 56px;
+      z-index: 9;
+      background: #fff;
+      border: 2.5px solid var(--navy);
+      border-radius: 14px;
+      box-shadow: 0 3px 0 var(--navy);
+      padding: 6px 8px;
+      animation: wishPop 1.6s ease-in-out infinite;
+    }
+    .ask[hidden] { display: none; }
+    .ask:not([hidden]) ~ .bubble { top: 82px; }
+    .ask-q { display: flex; flex-direction: column; font-size: 12px; color: var(--navy); }
+    .ask-q span { font-size: 10px; font-weight: 800; color: var(--gulf-orange-deep); text-transform: uppercase; }
+    .ask-btns { display: flex; gap: 6px; margin-top: 5px; }
+    .ask-btn {
+      flex: 1;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 12px;
+      color: var(--navy);
+      background: var(--gulf-blue);
+      border: 2px solid var(--navy);
+      border-radius: 10px;
+      padding: 3px 4px;
+      cursor: pointer;
+    }
+    .ask-btn:active { transform: translateY(1px); }
+
+    .f-card img { aspect-ratio: 16 / 10; object-fit: contain; background: #F4FAFD; }
+    .f-card.fav { border-color: var(--gulf-orange); border-width: 2.5px; background: #FFF6EE; }
+
+    .d-row { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid #eef3f5; }
+    .d-title { font-weight: 800; font-size: 13px; color: var(--navy); }
+    .d-count { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--navy); grid-row: 1 / 3; grid-column: 2; }
+    .d-bar { height: 8px; background: #E8F2F8; border-radius: 6px; overflow: hidden; border: 1.5px solid var(--navy); }
+    .d-fill { height: 100%; background: var(--gulf-orange); transition: width 0.5s ease; }
+    .d-row.ok .d-fill { background: var(--good); }
+
+    .help-list { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+    .help-list li { display: flex; gap: 10px; align-items: center; font-size: 13px; color: var(--navy); }
+    .help-list li span { font-size: 20px; width: 28px; text-align: center; flex-shrink: 0; }
+
+    .memories li.answer { border-left-color: var(--gulf-blue-deep); background: #EEF7FC; }
+
+    @media (max-width: 420px) {
+      .brand { font-size: 12px; padding: 2px 8px; }
+      .icon-btn { width: 30px; height: 30px; font-size: 14px; }
+      .hud { gap: 4px; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .star, .btn.alert { animation: none; }
     }
@@ -1302,6 +1396,10 @@
     <div class="stripe"></div>
 
     <div class="topbar">
+      <div class="topbar-left">
+        <button class="icon-btn" id="btnHelp" aria-label="Comment jouer" title="Comment jouer">❓</button>
+        <button class="icon-btn" id="btnSound" aria-label="Couper le son" title="Son">🔊</button>
+      </div>
       <span class="brand">⛽ GULF · since 1901</span>
       <button class="icon-btn" id="btnSettings" aria-label="Sauvegarde et réglages" title="Sauvegarde">💾</button>
     </div>
@@ -1316,6 +1414,7 @@
       <span class="chip" id="hudLevel">⭐ Niv. 1</span>
       <div class="xp-track" title="Expérience"><div class="xp-fill" id="xpFill"></div></div>
       <span class="chip" id="hudStreak" title="Jours d'affilée">🔥 1</span>
+      <button class="chip daily-chip" id="hudDaily" title="Défis du jour">🎯 0/3</button>
     </div>
 
     <div class="screen-wrap">
@@ -1325,6 +1424,10 @@
         <div class="scanlines"></div>
         <div class="floor" style="pointer-events:none"></div>
         <img class="mood" id="mood" alt="humeur">
+        <div class="ask" id="ask" hidden>
+          <div class="ask-q"><span>💬 Question du jour</span><b id="askQ"></b></div>
+          <div class="ask-btns" id="askBtns"></div>
+        </div>
         <div class="bubble" id="bubble"><img class="bubble-face" id="bubbleFace" alt=""><span id="bubbleText"></span></div>
         <div id="poops"></div>
         <div class="sprite-layer">
@@ -1442,6 +1545,58 @@
         <button class="close" id="duoClose" aria-label="Fermer">✕</button>
       </div>
       <div class="tab-body"><div class="moments" id="duoGrid"></div></div>
+    </div>
+  </div>
+
+  <div class="modal" id="food" hidden role="dialog" aria-modal="true" aria-labelledby="foodTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="foodTitle">🍽️ Au menu</h2>
+        <button class="close" id="foodClose" aria-label="Fermer">✕</button>
+      </div>
+      <div class="tab-body">
+        <p class="empty" id="foodHint"></p>
+        <div class="moments" id="foodGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="dailyModal" hidden role="dialog" aria-modal="true" aria-labelledby="dailyTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="dailyTitle">🎯 Défis du jour</h2>
+        <button class="close" id="dailyClose" aria-label="Fermer">✕</button>
+      </div>
+      <div class="tab-body">
+        <div id="dailyList"></div>
+        <p class="empty" id="dailyFoot"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="help" hidden role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="helpTitle">❓ Comment jouer</h2>
+        <button class="close" id="helpClose" aria-label="Fermer">✕</button>
+      </div>
+      <div class="tab-body">
+        <ul class="help-list">
+          <li><span>💋</span><div><b>Tape sur lui</b> : un bisou</div></li>
+          <li><span>😂</span><div><b>Tape 3 fois vite</b> : chatouilles</div></li>
+          <li><span>🤲</span><div><b>Frotte-le avec le doigt</b> : caresses</div></li>
+          <li><span>🫂</span><div><b>Reste appuyé sur lui</b> : petit câlin</div></li>
+          <li><span>👆</span><div><b>Tape par terre</b> : il marche jusque-là</div></li>
+          <li><span>💭</span><div><b>Bulle au-dessus de lui</b> : une envie, à exaucer en 2 min</div></li>
+          <li><span>🙂</span><div><b>Tape sa tête en haut à droite</b> : il te dit ce qui ne va pas</div></li>
+          <li><span>💌</span><div><b>Tape-la quand elle passe</b> : bisou envoyé</div></li>
+          <li><span>💩</span><div><b>Tape un caca</b> pour le ramasser (ou 🧼 Laver)</div></li>
+          <li><span>🎯</span><div><b>Défis du jour</b> en haut, et une <b>question du jour</b></div></li>
+          <li><span>🌙</span><div>La nuit il dort : laisse-le… ou réveille-le</div></li>
+          <li><span>💾</span><div>Tout est sauvegardé tout seul</div></li>
+        </ul>
+        <button class="btn wide-btn cloud-main" id="helpOk">C'est parti ! 🏁</button>
+      </div>
     </div>
   </div>
 
@@ -1620,10 +1775,10 @@
         sick: false, sulk: false, poops: [], digest: 0,
         xp: 0, bestScore: 0, streak: 0,
         bornAt: Date.now(), lastSeen: null, lastVisitDay: null,
-        counters: { hugs: 0, meals: 0, runs: 0, codes: 0, sleeps: 0, heals: 0, games: 0, kisses: 0, visits: 0, washes: 0, cleaned: 0, moments: 0, strokes: 0, tickles: 0, wishes: 0 },
+        counters: { hugs: 0, meals: 0, runs: 0, codes: 0, sleeps: 0, heals: 0, games: 0, kisses: 0, visits: 0, washes: 0, cleaned: 0, moments: 0, strokes: 0, tickles: 0, wishes: 0, answers: 0, cuddles: 0, herKisses: 0, dailyDone: 0 },
         bestGuess: 0,
         trophies: {}, journal: [], name: null,
-        album: {}, decor: 'auto', playedAt: 0,
+        album: {}, decor: 'auto', playedAt: 0, sound: true, seenHelp: false, lastAsk: null, daily: null,
         owned: {}, wear: { tete: null, yeux: null, visage: null, cou: null, dos: null, compagnon: null }
       };
     }
@@ -1745,6 +1900,8 @@
       { id: 'tickles_20', e: '😂', t: 'Roi des chatouilles', d: '20 chatouilles (3 tapes rapides)', ok: (s) => s.counters.tickles >= 20 },
       { id: 'wishes_10', e: '🧞', t: 'Génie de la lampe', d: 'Exaucer 10 de ses envies', ok: (s) => s.counters.wishes >= 10 },
       { id: 'guess_5', e: '🔮', t: 'Télépathe', d: '5 / 5 à « Gauche ou droite »', ok: (s) => s.bestGuess >= 5 },
+      { id: 'daily_5', e: '🏁', t: 'Assidu', d: '5 journées de défis réussies', ok: (s) => s.counters.dailyDone >= 5 },
+      { id: 'answers_10', e: '💬', t: 'On se dit tout', d: 'Répondre à 10 questions du jour', ok: (s) => s.counters.answers >= 10 },
       { id: 'memories_10', e: '📖', t: 'Album souvenir', d: '10 souvenirs dans le carnet', ok: (s) => s.journal.length >= 10 }
     ];
 
@@ -1752,12 +1909,13 @@
       if (state.trophies[id]) return;
       state.trophies[id] = dayKey(now());
       const t = TROPHIES.find((x) => x.id === id);
-      if (t) toast(`Trophée débloqué : ${t.e} ${t.t}`, A.icoTrophy);
+      if (t) { toast(`Trophée débloqué : ${t.e} ${t.t}`, A.icoTrophy); try { sfx.coin(); } catch (e) { /* init */ } }
     }
     function checkTrophies() {
       for (const t of TROPHIES) if (!state.trophies[t.id] && t.ok(state)) unlock(t.id);
       checkUnlocks();
       if (typeof checkWish === 'function' && wish) setTimeout(checkWish, 0);
+      if (typeof checkDaily === 'function') checkDaily();
     }
 
     function gainXp(n) {
@@ -1767,6 +1925,7 @@
       const after = levelFor(state.xp);
       if (after > before) {
         toast(`Niveau ${after} ! Bravo 🎉`, A.icoGrow);
+        try { sfx.level(); buzz([30, 50, 30]); } catch (e) { /* init */ }
         setTimeout(() => {
           showBubble(`Niveau ${after} ! 🎉`, 2200);
           strikePose(A.himJump, 'pose-jump', 1400);
@@ -2118,6 +2277,7 @@
       refreshHim();
       checkWish();
       maybeWish();
+      maybeAsk();
 
       if (himMode() !== 'normal' || bubbleEl.classList.contains('show')) return;
       if (state.hunger < 20 && Math.random() < 0.5) showBubble("J'ai faim... 🍔", 2000);
@@ -2157,6 +2317,8 @@
       }
       actionCaption.textContent = caption;
       actionVisual.classList.add('show');
+      const before = snap();
+      if (counter === 'meals') sfx.eat(); else sfx.happy();
 
       state.hunger = clamp(state.hunger + (delta.hunger || 0));
       state.energy = clamp(state.energy + (delta.energy || 0));
@@ -2169,6 +2331,7 @@
       gainXp(xp || 0);
       updateConditions(true);
       renderStats();
+      showDeltas(before);
       checkTrophies();
 
       setTimeout(() => {
@@ -2181,24 +2344,14 @@
 
     function refuse(text) {
       if (!canAct()) return;
+      sfx.bad();
       showBubble(text, 2200);
     }
 
-    const FOODS = [
-      { img: A.coffeeBig, caption: 'Merci pour le café ☕', delta: { hunger: 22, happy: 8, energy: 8 } },
-      { img: A.foodPizza, caption: 'Une part de pizza, miam ! 🍕', delta: { hunger: 28, happy: 14, energy: -2 } },
-      { img: A.foodBurger, caption: 'Un bon gros burger ! 🍔', delta: { hunger: 30, happy: 10, energy: -2 } },
-      { img: A.foodDrumstick, caption: 'Ça creuse, ce poulet ! 🍗', delta: { hunger: 26, happy: 8, energy: 2 } },
-      { img: A.foodWater, caption: "Un grand verre d'eau 💧", delta: { hunger: 6, happy: 4, energy: 14 } },
-      { img: A.himEat, caption: 'Le burger du chef 🍔', delta: { hunger: 30, happy: 12, energy: -2 } },
-      { img: A.himDrink, caption: 'Un smoothie bien frais 🥤', delta: { hunger: 10, happy: 6, energy: 12 } }
-    ];
-    let lastFoodIndex = -1;
     $('btnCoffee').addEventListener('click', () => {
-      let idx = Math.floor(Math.random() * FOODS.length);
-      if (idx === lastFoodIndex) idx = (idx + 1) % FOODS.length;
-      lastFoodIndex = idx;
-      doAction({ ...FOODS[idx], duration: 1600, xp: 3, counter: 'meals' });
+      if (!canAct()) return;
+      renderFood();
+      foodModal.hidden = false;
     });
 
     $('btnRun').addEventListener('click', () => {
@@ -2261,6 +2414,8 @@
     function stroke() {
       const mode = himMode();
       state.counters.strokes++;
+      sfx.purr();
+      buzz(8);
       if (mode === 'normal') {
         state.happy = clamp(state.happy + 1.5);
         state.love = clamp(state.love + 1);
@@ -2287,7 +2442,9 @@
 
     spriteEl.addEventListener('pointerdown', (e) => {
       if (!canAct()) return;
-      rub = { x: e.clientX, y: e.clientY, dist: 0, beats: 0 };
+      rub = { x: e.clientX, y: e.clientY, dist: 0, beats: 0, long: false };
+      const mine = rub;
+      rub.timer = setTimeout(() => { if (rub === mine && mine.dist < 12) { mine.long = true; cuddle(); } }, 650);
       try { spriteEl.setPointerCapture(e.pointerId); } catch (err) { /* ignoré */ }
     });
     spriteEl.addEventListener('pointermove', (e) => {
@@ -2300,13 +2457,18 @@
       }
       while (rub.dist - rub.beats * 70 > 70) { rub.beats++; stroke(); }
     });
-    const endRub = () => { if (rub) suppressClick = rub.dist > 20; rub = null; };
+    const endRub = () => {
+      if (rub) { clearTimeout(rub.timer); suppressClick = rub.dist > 20 || rub.long; }
+      rub = null;
+    };
     spriteEl.addEventListener('pointerup', endRub);
     spriteEl.addEventListener('pointercancel', endRub);
     spriteEl.style.touchAction = 'none';
 
     function tickle() {
       tapTimes = [];
+      sfx.giggle();
+      buzz([20, 40, 20]);
       state.counters.tickles++;
       state.happy = clamp(state.happy + 6);
       gainXp(2);
@@ -2321,7 +2483,10 @@
     spriteEl.addEventListener('click', (e) => {
       e.stopPropagation();
       if (suppressClick) { suppressClick = false; return; }
-      if (!canAct()) return;
+      if (!canAct()) {
+        if (girlBusy) spawnHeart((spriteEl.offsetLeft + 20) + 'px', '90px', '😍');
+        return;
+      }
       const mode = himMode();
       if (mode === 'sleep') {
         awakeUntil = Date.now() + 60 * 1000;
@@ -2343,6 +2508,8 @@
       if (tapTimes.length >= 3) return tickle();
       state.happy = clamp(state.happy + 4);
       state.counters.kisses++;
+      sfx.kiss();
+      buzz(15);
       gainXp(1);
       renderStats();
       checkTrophies();
@@ -2390,6 +2557,7 @@
       lastWishAt = Date.now();
       wishEl.textContent = w.e;
       wishEl.hidden = false;
+      sfx.pop();
       showBubble(w.say, 2600);
     }
 
@@ -2400,6 +2568,7 @@
         state.happy = clamp(state.happy + 10);
         state.love = clamp(state.love + 5);
         toast('Souhait exaucé ! ⭐', A.icoHappy);
+        sfx.coin();
         spawnHeart((spriteEl.offsetLeft + 10) + 'px', '100px', '⭐', true);
         wish = null;
         wishEl.hidden = true;
@@ -2583,6 +2752,9 @@
       setTimeout(() => spawnHeart('55%', '160px', '💖'), 250);
       setTimeout(() => spawnHeart('48%', '140px', '💗'), 500);
 
+      const beforeHug = snap();
+      sfx.happy();
+      buzz(40);
       state.love = clamp(state.love + 26);
       state.happy = clamp(state.happy + 18);
       state.hunger = clamp(state.hunger + 4);
@@ -2594,6 +2766,7 @@
       gainXp(6);
       updateConditions(true);
       renderStats();
+      showDeltas(beforeHug);
       checkTrophies();
       const unsulked = sulkBefore && !state.sulk;
 
@@ -2728,7 +2901,7 @@
         const caught = it.y + 22 >= catchTop && it.y < H - 10 && cx >= game.x - 6 && cx <= game.x + CATCHER_W + 6;
         if (caught) {
           game.score = Math.max(0, game.score + it.type.v);
-          if (it.type.v > 0) { catcherEl.src = A.himJump; game.jumpUntil = ts + 220; }
+          if (it.type.v > 0) { catcherEl.src = A.himJump; game.jumpUntil = ts + 220; sfx.tap(); } else { sfx.bad(); buzz(30); }
           spawnHeart(it.x + 'px', (H - it.y - 10) + 'px', it.type.v > 0 ? `+${it.type.v}` : '🐛 -2');
         }
         if (caught || it.y > H) { it.el.remove(); game.items.splice(i, 1); }
@@ -2810,7 +2983,7 @@
         } else {
           const list = el('ul', 'memories');
           for (const m of [...state.journal].reverse()) {
-            const li = el('li', m.kind === 'special' ? 'special' : '');
+            const li = el('li', m.kind === 'special' ? 'special' : (m.kind === 'answer' ? 'answer' : ''));
             li.append(el('span', 'm-date', formatDate(m.d)), document.createTextNode(m.msg));
             list.appendChild(li);
           }
@@ -3331,8 +3504,10 @@
         guess.wins++;
         setTimeout(() => { guessHim.src = A.himJump; guessHim.classList.add('pose-jump'); }, 350);
         $('guessMsg').textContent = pick(['Bien vu ! 🎉', 'Télépathie 🔮', 'Gagné ! 💕']);
+        sfx.coin();
       } else {
         $('guessMsg').textContent = pick(['Raté ! 😜', 'Perdu, hihi 😝', 'Pas par là ! 🙃']);
+        sfx.bad();
       }
       $('guessInfo').textContent = `Manche ${guess.round} / 5 · ${guess.wins} 🏆`;
       setTimeout(() => (guess.round >= 5 ? endGuessGame() : nextGuessRound()), 1300);
@@ -3627,6 +3802,316 @@
       renderCloudBox();
     });
 
+
+    // =====================================================================
+    //  Sons (synthé rétro) + vibrations
+    // =====================================================================
+    const sfx = (() => {
+      let ctx = null;
+      function tone(freq, dur, type, vol, when) {
+        if (state.sound === false) return;
+        try {
+          ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+          if (ctx.state === 'suspended') ctx.resume();
+          const t = ctx.currentTime + (when || 0);
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = type || 'square';
+          o.frequency.setValueAtTime(freq, t);
+          g.gain.setValueAtTime(vol || 0.04, t);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+          o.connect(g).connect(ctx.destination);
+          o.start(t);
+          o.stop(t + dur + 0.03);
+        } catch (e) { /* pas de son */ }
+      }
+      const seq = (notes, type, vol) => notes.forEach(([f, d, w]) => tone(f, d, type, vol, w));
+      return {
+        tap: () => tone(880, 0.05, 'square', 0.025),
+        purr: () => tone(rand(180, 230), 0.08, 'triangle', 0.05),
+        kiss: () => seq([[988, 0.07, 0], [1319, 0.12, 0.07]], 'square', 0.03),
+        eat: () => seq([[330, 0.06, 0], [262, 0.06, 0.09], [330, 0.08, 0.18]], 'triangle', 0.07),
+        happy: () => seq([[523, 0.07, 0], [659, 0.07, 0.08], [784, 0.13, 0.16]], 'square', 0.03),
+        giggle: () => seq([[784, 0.05, 0], [988, 0.05, 0.07], [784, 0.05, 0.14], [1175, 0.08, 0.21]], 'square', 0.03),
+        level: () => seq([[523, 0.09, 0], [659, 0.09, 0.1], [784, 0.09, 0.2], [1047, 0.25, 0.3]], 'square', 0.035),
+        coin: () => seq([[988, 0.05, 0], [1319, 0.16, 0.05]], 'square', 0.03),
+        bad: () => tone(150, 0.18, 'sawtooth', 0.035),
+        pop: () => tone(660, 0.08, 'sine', 0.05)
+      };
+    })();
+    function buzz(pattern) {
+      try { if (state.sound !== false && navigator.vibrate) navigator.vibrate(pattern); } catch (e) { /* ignoré */ }
+    }
+    function renderSoundBtn() {
+      $('btnSound').textContent = state.sound === false ? '🔇' : '🔊';
+      $('btnSound').setAttribute('aria-label', state.sound === false ? 'Activer le son' : 'Couper le son');
+    }
+    $('btnSound').addEventListener('click', () => {
+      state.sound = state.sound === false;
+      renderSoundBtn();
+      saveState();
+      sfx.pop();
+    });
+
+    // ---- +12 / -8 qui s'envolent à côté des jauges ----
+    const snap = () => ({ hunger: state.hunger, energy: state.energy, happy: state.happy, love: state.love });
+    function showDeltas(before) {
+      for (const k of ['hunger', 'energy', 'happy', 'love']) {
+        const d = Math.round(state[k] - before[k]);
+        if (!d) continue;
+        const row = $('bar-' + k).closest('.stat-row');
+        const t = el('span', 'delta ' + (d > 0 ? 'up' : 'down'), (d > 0 ? '+' : '') + d);
+        row.appendChild(t);
+        setTimeout(() => t.remove(), 1500);
+      }
+    }
+
+    // =====================================================================
+    //  Petit câlin (appui long), elle, l'humeur
+    // =====================================================================
+    function cuddle() {
+      if (!canAct()) return;
+      const mode = himMode();
+      if (mode === 'sleep') { showBubble('*se blottit en dormant* 😴', 1600); state.love = clamp(state.love + 2); renderStats(); return; }
+      const before = snap();
+      state.love = clamp(state.love + 5);
+      state.happy = clamp(state.happy + 3);
+      state.counters.hugs++;
+      state.counters.cuddles++;
+      gainXp(2);
+      if (mode === 'normal') strikePose(A.himStand, null, 1200);
+      showBubble(pick(['Un câlin tout doux 🫂', 'Reste encore un peu 🥺', 'Mmmh… 💞']), 1600);
+      ['💞', '🫂', '💗'].forEach((e, i) => setTimeout(() => spawnHeart((spriteEl.offsetLeft + 6 + i * 16) + 'px', '90px', e), i * 140));
+      sfx.happy();
+      buzz(40);
+      updateConditions();
+      renderStats();
+      showDeltas(before);
+      checkTrophies();
+    }
+
+    spriteHerEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!spriteHerEl.classList.contains('visible')) return;
+      const before = snap();
+      state.love = clamp(state.love + 3);
+      state.counters.herKisses++;
+      showBubble(pick(['Mwah ! 💋', 'Toi aussi tu me manques 🥰', 'Hihi 😚', 'Je t’aime fort 💕']), 1500, A.herHappy);
+      spawnHeart((spriteHerEl.offsetLeft + 10) + 'px', '95px', pick(['💋', 'icoHeart', '💕']));
+      sfx.kiss();
+      buzz(20);
+      renderStats();
+      showDeltas(before);
+      checkTrophies();
+    });
+
+    moodEl.style.cursor = 'pointer';
+    moodEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const mode = himMode();
+      if (mode === 'sleep') return showBubble('Il dort… 😴', 1400);
+      const needs = [];
+      if (state.sick) needs.push('je suis malade 🤒 (💊)');
+      if (state.hunger < 40) needs.push("j'ai faim 🍔");
+      if (state.energy < 35) needs.push('je suis crevé 😪');
+      if (state.poops.length) needs.push("c'est sale ici 💩");
+      if (state.love < 40) needs.push('un câlin ? 🥺');
+      if (state.happy < 40) needs.push("je m'ennuie 🎮");
+      showBubble(needs.length ? 'Bof… ' + needs.slice(0, 2).join(', ') : pick(['Tout va bien 😎', 'Je suis au top 💪', 'La belle vie 🏖️']), 2400);
+      sfx.tap();
+    });
+
+    // =====================================================================
+    //  Repas au choix (+ son plat préféré du jour)
+    // =====================================================================
+    const MENU = [
+      { id: 'cafe', n: 'Café', img: () => A.coffeeBig, d: { hunger: 12, energy: 16, happy: 6 }, cap: 'Merci pour le café ☕' },
+      { id: 'pizza', n: 'Pizza', img: () => A.foodPizza, d: { hunger: 28, happy: 14, energy: -2 }, cap: 'Une part de pizza, miam ! 🍕' },
+      { id: 'burger', n: 'Burger', img: () => A.foodBurger, d: { hunger: 30, happy: 10, energy: -2 }, cap: 'Un bon gros burger ! 🍔' },
+      { id: 'poulet', n: 'Poulet', img: () => A.foodDrumstick, d: { hunger: 26, happy: 8, energy: 2 }, cap: 'Ça creuse, ce poulet ! 🍗' },
+      { id: 'smoothie', n: 'Smoothie', img: () => A.himDrink, d: { hunger: 10, energy: 12, happy: 6 }, cap: 'Un smoothie bien frais 🥤' },
+      { id: 'eau', n: "Verre d'eau", img: () => A.foodWater, d: { hunger: 4, energy: 10, happy: 2 }, cap: "Un grand verre d'eau 💧" }
+    ];
+    const favoriteFood = () => MENU[Math.floor(new Date(dayKey(now())).getTime() / DAY_MS) % (MENU.length - 1)]; // jamais l'eau
+    const foodModal = $('food');
+
+    function renderFood() {
+      const fav = favoriteFood();
+      $('foodHint').textContent = state.hunger > 92 ? "Il n'a plus faim du tout 🤢" : `Aujourd'hui, il rêve de : ${fav.n} ❤️`;
+      $('foodGrid').replaceChildren(...MENU.map((f) => {
+        const b = el('button', 'm-card f-card' + (f === fav ? ' fav' : ''));
+        const img = el('img');
+        img.src = f.img();
+        img.alt = '';
+        b.append(img, el('span', 'm-name', (f === fav ? '❤️ ' : '') + f.n), el('span', 'm-sub', deltaText(f.d)));
+        b.addEventListener('click', () => { foodModal.hidden = true; feed(f); });
+        return b;
+      }));
+    }
+
+    function feed(f) {
+      if (state.hunger > 92) {
+        state.happy = clamp(state.happy - 2);
+        renderStats();
+        sfx.bad();
+        return refuse(pick(["J'ai plus faim 🤢", 'Encore ?! Je vais exploser 🎈', 'Non merci, je suis plein 😵']));
+      }
+      const fav = f === favoriteFood();
+      const d = { ...f.d };
+      if (fav) d.happy = (d.happy || 0) + 10;
+      doAction({ img: f.img(), caption: fav ? `${f.n} ?! Mon préféré 😍` : f.cap, delta: d, duration: 1600, xp: fav ? 5 : 3, counter: 'meals' });
+    }
+
+    $('foodClose').addEventListener('click', () => { foodModal.hidden = true; });
+    foodModal.addEventListener('click', (e) => { if (e.target === foodModal) foodModal.hidden = true; });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') foodModal.hidden = true; });
+
+    // =====================================================================
+    //  Question du jour
+    // =====================================================================
+    const QUESTIONS = [
+      ['Pizza ou burger ?', ['Pizza 🍕', 'Burger 🍔'], ['Team pizza, je valide 🍕', 'Burger, évidemment 🍔']],
+      ['Mer ou montagne ?', ['Mer 🌊', 'Montagne 🏔️'], ['Direction la plage ! 🏖️', 'Chalet et raclette 🧀']],
+      ['Film ou série ce soir ?', ['Film 🎬', 'Série 📺'], ['Je prépare le pop-corn 🍿', 'Encore un épisode… 😏']],
+      ['Câlin ou bisou ?', ['Câlin 🫂', 'Bisou 💋'], ['Viens là 🫂', 'Mwah 💋']],
+      ['Café ou thé ?', ['Café ☕', 'Thé 🍵'], ['Double expresso ! ⚡', 'Tout en douceur 🍵']],
+      ['Chat ou chien ?', ['Chat 🐱', 'Chien 🐶'], ['Miaou 😼', 'Ouaf ! 🐶']],
+      ['Lève-tôt ou couche-tard ?', ['Lève-tôt 🌅', 'Couche-tard 🌙'], ['Grasse mat interdite 😅', 'Les nuits sont faites pour vivre 🌙']],
+      ['Resto ou cuisine maison ?', ['Resto 🍽️', 'Maison 🍲'], ['Je réserve ! 📞', "Je mets mon tablier 👨‍🍳"]],
+      ['Été ou hiver ?', ['Été ☀️', 'Hiver ❄️'], ['Soleil et tongs 🩴', 'Plaid et chocolat chaud ☕']],
+      ['Sucré ou salé ?', ['Sucré 🍫', 'Salé 🥨'], ['Un carré de chocolat ? 🍫', 'Apéro ! 🥨']],
+      ['Circuit ou balade ?', ['Circuit 🏎️', 'Balade 🌳'], ['Vroum vroum, couleurs Gulf ! 🏁', 'Main dans la main 🌳']],
+      ['Plage ou piscine ?', ['Plage 🏖️', 'Piscine 🏊'], ['Sable partout 😂', 'Plouf ! 💦']],
+      ['Jeux vidéo ou jeux de société ?', ['Jeux vidéo 🎮', 'Société 🎲'], ['Prépare-toi à perdre 😏', 'Je mélange les cartes 🃏']],
+      ['Petit-déj au lit ou brunch ?', ['Au lit 🥐', 'Brunch 🥞'], ['Croissants au lit 🥐', 'Pancakes à volonté 🥞']],
+      ['Danse ou karaoké ?', ['Danse 💃', 'Karaoké 🎤'], ['On met le son ! 🪩', 'Je chante faux mais fort 🎤']],
+      ['Tu m’aimes comment ?', ['Beaucoup 💕', 'Passionnément 🔥'], ['Moi aussi 🥰', 'À la folie 😍']],
+      ['Week-end : grasse mat ou aventure ?', ['Grasse mat 😴', 'Aventure 🗺️'], ['Personne ne bouge 😴', 'Sac à dos prêt ! 🎒']],
+      ['Plutôt Noël ou anniversaire ?', ['Noël 🎄', 'Anniversaire 🎂'], ['Le sapin c’est la vie 🎄', 'Des bougies pour moi ? 🎂']]
+    ];
+    const askEl = $('ask');
+    let sessionStart = Date.now();
+    const questionOfDay = () => QUESTIONS[Math.floor(new Date(dayKey(now())).getTime() / DAY_MS) % QUESTIONS.length];
+
+    function maybeAsk() {
+      if (!askEl.hidden || state.lastAsk === dayKey(now()) || himMode() !== 'normal' || busy || Date.now() - sessionStart < 20000) return;
+      const [q, answers, reactions] = questionOfDay();
+      $('askQ').textContent = q;
+      $('askBtns').replaceChildren(...answers.map((a, i) => {
+        const b = el('button', 'ask-btn', a);
+        b.addEventListener('click', (e) => {
+          e.stopPropagation();
+          askEl.hidden = true;
+          state.lastAsk = dayKey(now());
+          state.counters.answers++;
+          const before = snap();
+          state.love = clamp(state.love + 4);
+          state.happy = clamp(state.happy + 3);
+          addMemory(`${q} → ${a}`, 'answer');
+          showBubble(reactions[i], 2200);
+          flashMood(A.himHappy, 2000);
+          sfx.happy();
+          gainXp(4);
+          renderStats();
+          showDeltas(before);
+          checkTrophies();
+        });
+        return b;
+      }));
+      askEl.hidden = false;
+      sfx.pop();
+    }
+
+    // =====================================================================
+    //  Défis du jour
+    // =====================================================================
+    const CHALLENGES = [
+      { id: 'hug2', t: 'Faire 2 câlins', c: 'hugs', n: 2 },
+      { id: 'meal3', t: 'Lui donner 3 repas', c: 'meals', n: 3 },
+      { id: 'game1', t: 'Jouer à un mini-jeu', c: 'games', n: 1 },
+      { id: 'stroke15', t: 'Le caresser (15 fois)', c: 'strokes', n: 15 },
+      { id: 'tickle2', t: 'Le chatouiller 2 fois', c: 'tickles', n: 2 },
+      { id: 'moment1', t: 'Un moment à deux', c: 'moments', n: 1 },
+      { id: 'kiss10', t: '10 bisous', c: 'kisses', n: 10 },
+      { id: 'wish1', t: 'Exaucer une de ses envies', c: 'wishes', n: 1 },
+      { id: 'run1', t: 'Aller courir', c: 'runs', n: 1 },
+      { id: 'wash1', t: 'Lui faire prendre une douche', c: 'washes', n: 1 },
+      { id: 'code2', t: '2 sessions de code', c: 'codes', n: 2 },
+      { id: 'answer1', t: 'Répondre à sa question du jour', c: 'answers', n: 1 }
+    ];
+    const CH = Object.fromEntries(CHALLENGES.map((c) => [c.id, c]));
+
+    function ensureDaily() {
+      const d = dayKey(now());
+      if (state.daily && state.daily.day === d) return;
+      const n = Math.floor(new Date(d).getTime() / DAY_MS);
+      const picks = [];
+      for (let k = n * 7; picks.length < 3; k += 5) {
+        const c = CHALLENGES[((k % CHALLENGES.length) + CHALLENGES.length) % CHALLENGES.length];
+        if (!picks.includes(c.id)) picks.push(c.id);
+      }
+      state.daily = { day: d, base: { ...state.counters }, picks, done: {}, all: false };
+    }
+    const dailyProgress = (c) => Math.min(c.n, (state.counters[c.c] || 0) - (state.daily.base[c.c] || 0));
+
+    function checkDaily() {
+      ensureDaily();
+      const dl = state.daily;
+      for (const id of dl.picks) {
+        const c = CH[id];
+        if (!c || dl.done[id] || dailyProgress(c) < c.n) continue;
+        dl.done[id] = true;
+        toast(`🎯 Défi réussi : ${c.t}`);
+        sfx.coin();
+        gainXp(10);
+      }
+      if (!dl.all && dl.picks.every((id) => dl.done[id])) {
+        dl.all = true;
+        state.counters.dailyDone++;
+        state.love = clamp(state.love + 10);
+        toast('🏁 Tous les défis du jour réussis ! +25 XP');
+        gainXp(25);
+      }
+      const nDone = dl.picks.filter((id) => dl.done[id]).length;
+      $('hudDaily').textContent = `🎯 ${nDone}/3`;
+      $('hudDaily').classList.toggle('done', dl.all);
+    }
+
+    const dailyModal = $('dailyModal');
+    function renderDaily() {
+      ensureDaily();
+      $('dailyList').replaceChildren(...state.daily.picks.map((id) => {
+        const c = CH[id];
+        const p = dailyProgress(c);
+        const row = el('div', 'd-row' + (state.daily.done[id] ? ' ok' : ''));
+        const bar = el('div', 'd-bar');
+        const fill = el('div', 'd-fill');
+        fill.style.width = Math.round((Math.max(0, p) / c.n) * 100) + '%';
+        bar.appendChild(fill);
+        row.append(el('div', 'd-title', (state.daily.done[id] ? '✅ ' : '') + c.t), bar, el('div', 'd-count', `${Math.max(0, p)} / ${c.n}`));
+        return row;
+      }));
+      $('dailyFoot').textContent = state.daily.all ? 'Bravo, tout est fait pour aujourd’hui 🏁 Nouveaux défis demain !' : '+10 XP par défi, +25 XP et de l’amour si les 3 sont faits.';
+    }
+    $('hudDaily').addEventListener('click', () => { renderDaily(); dailyModal.hidden = false; });
+    $('dailyClose').addEventListener('click', () => { dailyModal.hidden = true; });
+    dailyModal.addEventListener('click', (e) => { if (e.target === dailyModal) dailyModal.hidden = true; });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') dailyModal.hidden = true; });
+
+    // =====================================================================
+    //  Aide « comment jouer »
+    // =====================================================================
+    const helpModal = $('help');
+    function closeHelp() {
+      helpModal.hidden = true;
+      if (!state.seenHelp) { state.seenHelp = true; saveState(); }
+    }
+    $('btnHelp').addEventListener('click', () => { helpModal.hidden = false; });
+    $('helpClose').addEventListener('click', closeHelp);
+    $('helpOk').addEventListener('click', closeHelp);
+    helpModal.addEventListener('click', (e) => { if (e.target === helpModal) closeHelp(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !helpModal.hidden) closeHelp(); });
+
     // =====================================================================
     //  Démarrage
     // =====================================================================
@@ -3684,6 +4169,9 @@
     checkTrophies();
     requestAnimationFrame(frame);
     cloudInit(loadedPlayed);
+    renderSoundBtn();
+    checkDaily();
+    if (!state.seenHelp && !window.__noHelp) setTimeout(() => { helpModal.hidden = false; }, 900);
     const welcomed = welcomeBack(away);
     scheduleGirlVisit(welcomed ? rand(4500, 5500) : rand(2200, 3500));
     setInterval(tick, 6000);
