@@ -1198,6 +1198,98 @@
     .wide-btn { width: 100%; flex-direction: row; justify-content: center; margin-top: 8px; padding: 10px; font-size: 13px; }
     .wide-btn.danger { color: var(--low); border-color: var(--low); box-shadow: 0 3px 0 var(--low); }
 
+    .cloud-box {
+      border: 2.5px solid var(--navy);
+      border-radius: 14px;
+      padding: 10px 12px;
+      margin: 10px 0;
+      background: linear-gradient(180deg, #EAF5FB 0%, #fff 100%);
+    }
+    .cloud-box h3 { margin: 0 0 4px; font-family: 'Racing Sans One', sans-serif; font-weight: 400; font-size: 16px; color: var(--navy); }
+    .cloud-code {
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 26px;
+      letter-spacing: 3px;
+      text-align: center;
+      color: var(--navy);
+      background: #fff;
+      border: 2.5px dashed var(--gulf-orange);
+      border-radius: 12px;
+      padding: 6px;
+      margin: 4px 0 8px;
+    }
+    .manual { margin: 8px 0; }
+    .manual summary { cursor: pointer; font-weight: 800; color: var(--navy); font-size: 13px; padding: 6px 0; }
+    .cloud-main { background: var(--gulf-orange); color: #fff; }
+    .cloud-main:hover { background: #F47D3E; }
+    .cloud-link { display: flex; gap: 8px; margin-top: 8px; }
+    .cloud-link input {
+      flex: 1;
+      min-width: 0;
+      font-family: 'Space Mono', monospace;
+      font-size: 15px;
+      text-transform: uppercase;
+      border: 2px solid var(--navy);
+      border-radius: 10px;
+      padding: 6px 8px;
+    }
+    .cloud-link .btn { flex-direction: row; padding: 6px 10px; }
+
+    /* ---- Retouches visuelles ---- */
+    .backdrop { image-rendering: auto; filter: blur(1.2px) saturate(1.08); opacity: 0.7; transform: scale(1.03); }
+    .screen.dusk .backdrop { filter: blur(1.2px) sepia(0.35) saturate(1.2) brightness(0.95); }
+    .preview { image-rendering: auto; }
+    .scanlines { box-shadow: inset 0 0 28px rgba(30, 52, 86, 0.22); }
+    .floor {
+      bottom: 0;
+      height: 27px;
+      background: linear-gradient(0deg, rgba(30, 52, 86, 0.16) 0%, rgba(30, 52, 86, 0.04) 100%);
+      border-top: 2px dashed rgba(30, 52, 86, 0.22);
+    }
+    .screen.night .floor { background: linear-gradient(0deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.1)); border-top-color: rgba(255, 255, 255, 0.15); }
+
+    .ground-shadow {
+      position: absolute;
+      bottom: 22px;
+      height: 8px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center, rgba(30, 52, 86, 0.38) 0%, rgba(30, 52, 86, 0) 70%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .mood {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+      background: #fff;
+      border: 2.5px solid var(--navy);
+      border-radius: 50%;
+      padding: 2px;
+      filter: none;
+      box-shadow: 0 2px 0 var(--navy);
+    }
+
+    .bubble {
+      border: 2.5px solid var(--navy);
+      border-radius: 14px;
+      color: var(--navy);
+      box-shadow: 0 3px 0 var(--navy);
+    }
+
+    .action-caption {
+      left: 14px;
+      right: 14px;
+      bottom: 10px;
+      padding: 5px 10px;
+      border-radius: 12px;
+      background: var(--navy);
+      color: #fff;
+      border: 2px solid var(--gulf-orange);
+      font-size: 12.5px;
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .star, .btn.alert { animation: none; }
     }
@@ -1238,6 +1330,9 @@
         <div class="sprite-layer">
           <img class="sprite" id="sprite" alt="lui">
           <img class="sprite sprite-her" id="spriteHer" alt="toi">
+          <div class="ground-shadow" id="shadowHim"></div>
+          <div class="ground-shadow" id="shadowHer"></div>
+          <div class="ground-shadow" id="shadowPet"></div>
           <img class="pet" id="pet" alt="compagnon" hidden>
           <button class="wish" id="wish" hidden aria-label="Son envie"></button>
         </div>
@@ -1377,7 +1472,28 @@
           <tr><td>Dernière sauvegarde</td><td id="saveWhen"></td></tr>
           <tr><td>Stockage protégé</td><td id="savePersist"></td></tr>
         </table>
+        <div class="cloud-box">
+          <h3>☁️ Sauvegarde en ligne</h3>
+          <p id="cloudStatus"></p>
+          <div id="cloudOn" hidden>
+            <div class="cloud-code" id="cloudCode"></div>
+            <p class="tip">Sur un autre téléphone : ouvre le jeu → 💾 → entre ce code. La partie la plus récente gagne toujours.</p>
+            <div class="save-actions">
+              <button class="btn" id="cloudCopy"><span class="emoji">📋</span>Copier le code</button>
+              <button class="btn" id="cloudOff2"><span class="emoji">⏸️</span>Désactiver ici</button>
+            </div>
+          </div>
+          <div id="cloudOff" hidden>
+            <button class="btn wide-btn cloud-main" id="cloudEnable">☁️ Activer la sauvegarde en ligne</button>
+            <div class="cloud-link">
+              <input id="cloudInput" placeholder="ABCD-EF23" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="9">
+              <button class="btn" id="cloudLink">J'ai un code</button>
+            </div>
+          </div>
+        </div>
         <p class="tip">📱 Astuce : ajoute le jeu à l'écran d'accueil (Partager → « Sur l'écran d'accueil »). Évite la navigation privée, qui efface tout.</p>
+        <details class="manual">
+        <summary>📦 Sauvegarde manuelle (fichier ou code)</summary>
         <div class="save-actions">
           <button class="btn" id="exportFile"><span class="emoji">📤</span>Exporter en fichier</button>
           <button class="btn" id="exportCode"><span class="emoji">📋</span>Copier un code</button>
@@ -1386,6 +1502,7 @@
         </div>
         <input type="file" id="importFile" accept=".json,application/json,text/plain" hidden>
         <textarea id="saveCode" rows="3" placeholder="Code de sauvegarde…" spellcheck="false"></textarea>
+        </details>
         <p class="save-msg" id="saveMsg" role="status"></p>
         <button class="btn wide-btn" id="restoreBackup" hidden>↩️ Revenir à la sauvegarde d'hier</button>
         <button class="btn wide-btn danger" id="resetGame">🗑️ Recommencer à zéro</button>
@@ -1399,6 +1516,10 @@
     //  RÉGLAGES PERSO — à modifier librement
     // =====================================================================
     const CONFIG = {
+      // Adresse du serveur de sauvegarde en ligne. Vide = la même adresse que le jeu.
+      // (Pour le fichier HTML autonome, mets l'adresse du jeu, ex. 'https://cheriotchi.mondomaine.fr')
+      apiBase: '',
+
       // Date de début de votre histoire ('AAAA-MM-JJ'). Si null, le compteur
       // de jours démarre à la première ouverture du jeu.
       coupleStart: null,
@@ -1502,7 +1623,7 @@
         counters: { hugs: 0, meals: 0, runs: 0, codes: 0, sleeps: 0, heals: 0, games: 0, kisses: 0, visits: 0, washes: 0, cleaned: 0, moments: 0, strokes: 0, tickles: 0, wishes: 0 },
         bestGuess: 0,
         trophies: {}, journal: [], name: null,
-        album: {}, decor: 'auto',
+        album: {}, decor: 'auto', playedAt: 0,
         owned: {}, wear: { tete: null, yeux: null, visage: null, cou: null, dos: null, compagnon: null }
       };
     }
@@ -1522,7 +1643,8 @@
       state.name = petNameEl.textContent;
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        if (Date.now() - saveInfoAt > 4000) {
+        if (typeof scheduleCloudPush === 'function') scheduleCloudPush();
+        if (Date.now() - saveInfoAt > 4000 && !(cloud && cloud.code && cloud.lastPush)) {
           saveInfoAt = Date.now();
           const el = document.getElementById('saveInfo');
           if (el) el.textContent = `💾 Sauvegardé à ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} sur cet appareil`;
@@ -2918,6 +3040,25 @@
       spawnHeart(petX + 'px', '60px', 'icoHeart');
     });
 
+    const SHADOWS = [
+      { el: $('shadowHim'), of: () => spriteEl, show: () => spriteEl.style.visibility !== 'hidden' && !spriteEl.classList.contains('pose-sleep') && !spriteEl.classList.contains('pose-lie') },
+      { el: $('shadowHer'), of: () => spriteHerEl, show: () => spriteHerEl.classList.contains('visible') },
+      { el: $('shadowPet'), of: () => petEl, show: () => !petEl.hidden }
+    ];
+    function syncShadows() {
+      for (const sh of SHADOWS) {
+        const t = sh.of();
+        const on = sh.show() && t.offsetWidth > 0;
+        sh.el.style.display = on ? '' : 'none';
+        if (!on) continue;
+        const w = t.offsetWidth * 0.8;
+        const lift = Math.max(0, (parseFloat(t.style.bottom) || 26) - 26);
+        sh.el.style.width = Math.max(10, w - lift * 2) + 'px';
+        sh.el.style.left = (t.offsetLeft + (t.offsetWidth - Math.max(10, w - lift * 2)) / 2) + 'px';
+        sh.el.style.opacity = String(Math.max(0.35, 1 - lift / 12));
+      }
+    }
+
     let lastFrame = performance.now();
     function frame(ts) {
       const dt = Math.min(0.05, (ts - lastFrame) / 1000);
@@ -2925,6 +3066,7 @@
       syncWear();
       syncPet(dt);
       syncWish();
+      syncShadows();
       requestAnimationFrame(frame);
     }
 
@@ -3265,7 +3407,7 @@
       setSaveMsg('');
     }
 
-    $('btnSettings').addEventListener('click', () => { saveState(); renderSaveModal(); saveModal.hidden = false; });
+    $('btnSettings').addEventListener('click', () => { saveState(); renderSaveModal(); renderCloudBox(); saveModal.hidden = false; });
     $('saveClose').addEventListener('click', () => { saveModal.hidden = true; });
     saveModal.addEventListener('click', (e) => { if (e.target === saveModal) saveModal.hidden = true; });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') saveModal.hidden = true; });
@@ -3328,6 +3470,163 @@
       location.reload();
     });
 
+
+    // =====================================================================
+    //  Sauvegarde en ligne (serveur server/server.js)
+    // =====================================================================
+    const SYNC_KEY = 'cheriotchi_sync';
+    const cloud = { available: false, code: null, timer: null, lastPush: 0, pushedPlayedAt: 0, error: '' };
+    const playedOf = (sv) => (sv && (sv.playedAt || sv.lastSeen)) || 0;
+    // « joué » = un vrai toucher / une touche, pas le temps qui passe
+    ['pointerdown', 'keydown'].forEach((ev) => document.addEventListener(ev, () => { state.playedAt = Date.now(); }, true));
+
+    function apiUrl(p) {
+      if (CONFIG.apiBase) return CONFIG.apiBase.replace(/\/$/, '') + p;
+      return location.protocol.startsWith('http') ? p : null;
+    }
+
+    async function api(method, p, body, keepalive) {
+      const u = apiUrl(p);
+      if (!u) throw new Error('offline');
+      const r = await fetch(u, {
+        method,
+        headers: body ? { 'Content-Type': 'application/json' } : {},
+        body: body ? JSON.stringify(body) : undefined,
+        keepalive: !!keepalive,
+        cache: 'no-store'
+      });
+      const data = await r.json().catch(() => ({}));
+      return { status: r.status, data };
+    }
+
+    function applyRemote(remote, why) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
+        sessionStorage.setItem('cheriotchi_pulled', String(Date.now()));
+        sessionStorage.setItem('cheriotchi_pull_msg', why || 'Partie récupérée en ligne ☁️');
+      } catch (e) { /* ignoré */ }
+      saveRestoring = true;
+      location.reload();
+    }
+
+    async function cloudPull(localPlayed) {
+      if (!cloud.available || !cloud.code) return;
+      try {
+        const r = await api('GET', '/api/saves/' + cloud.code);
+        if (r.status === 404) { cloud.error = 'Ce code n’existe plus sur le serveur'; updateCloudInfo(); return; }
+        if (r.status !== 200) return;
+        cloud.error = '';
+        const remote = r.data.save;
+        let recentPull = 0;
+        try { recentPull = Number(sessionStorage.getItem('cheriotchi_pulled')) || 0; } catch (e) { /* ignoré */ }
+        if (playedOf(remote) > (localPlayed || 0) + 1000 && Date.now() - recentPull > 15000) {
+          applyRemote(remote, 'Partie plus récente récupérée ☁️');
+          return;
+        }
+        cloudPush();
+      } catch (e) { cloud.error = 'Serveur injoignable'; updateCloudInfo(); }
+    }
+
+    function scheduleCloudPush() {
+      if (!cloud.available || !cloud.code) return;
+      clearTimeout(cloud.timer);
+      cloud.timer = setTimeout(() => cloudPush(), 4000);
+    }
+
+    async function cloudPush(keepalive) {
+      if (!cloud.available || !cloud.code || saveRestoring) return;
+      if (playedOf(state) <= cloud.pushedPlayedAt) return; // rien de nouveau joué ici
+      const sentPlayed = playedOf(state);
+      try {
+        const r = await api('PUT', '/api/saves/' + cloud.code, { save: state }, keepalive);
+        if (r.status === 200) { cloud.lastPush = Date.now(); cloud.pushedPlayedAt = sentPlayed; cloud.error = ''; }
+        else if (r.status === 409 && r.data && r.data.save) applyRemote(r.data.save, 'Partie plus récente trouvée sur un autre appareil ☁️');
+        else if (r.status === 404) cloud.error = 'Ce code n’existe plus sur le serveur';
+      } catch (e) { cloud.error = 'Serveur injoignable (sauvé sur le téléphone)'; }
+      updateCloudInfo();
+    }
+
+    function updateCloudInfo() {
+      const info = $('saveInfo');
+      if (cloud.code && cloud.lastPush) {
+        info.textContent = `☁️ Sauvegardé en ligne à ${new Date(cloud.lastPush).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+      }
+      if (!saveModal.hidden) renderCloudBox();
+    }
+
+    function renderCloudBox() {
+      const on = cloud.available && cloud.code;
+      $('cloudOn').hidden = !on;
+      $('cloudOff').hidden = !cloud.available || !!cloud.code;
+      $('cloudCode').textContent = cloud.code || '';
+      let txt;
+      if (!cloud.available) txt = 'Pas disponible ici : il faut ouvrir le jeu depuis son adresse en ligne (hébergé avec le serveur).';
+      else if (!cloud.code) txt = 'Désactivée. Active-la pour retrouver la partie sur n’importe quel téléphone.';
+      else if (cloud.error) txt = '⚠️ ' + cloud.error;
+      else txt = cloud.lastPush ? `✅ Activée · dernier envoi à ${new Date(cloud.lastPush).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}` : '✅ Activée';
+      $('cloudStatus').textContent = txt;
+    }
+
+    async function cloudInit(localPlayed) {
+      try { cloud.code = localStorage.getItem(SYNC_KEY); } catch (e) { cloud.code = null; }
+      try {
+        const r = await api('GET', '/api/health');
+        cloud.available = r.status === 200 && !!r.data.ok;
+      } catch (e) { cloud.available = false; }
+      try {
+        const msg = sessionStorage.getItem('cheriotchi_pull_msg');
+        if (msg) { sessionStorage.removeItem('cheriotchi_pull_msg'); toast(msg); }
+      } catch (e) { /* ignoré */ }
+      if (cloud.available && cloud.code) await cloudPull(localPlayed);
+      updateCloudInfo();
+      // appareil resté ouvert sans y toucher : on regarde de temps en temps si l'autre a joué
+      setInterval(() => {
+        if (!document.hidden && Date.now() - playedOf(state) > 60 * 1000) cloudPull(playedOf(state));
+      }, 60 * 1000);
+    }
+
+    $('cloudEnable').addEventListener('click', async () => {
+      try {
+        saveState();
+        const r = await api('POST', '/api/saves', { save: state });
+        if (r.status !== 201) throw new Error();
+        cloud.code = r.data.code;
+        cloud.lastPush = Date.now();
+        cloud.pushedPlayedAt = playedOf(state);
+        localStorage.setItem(SYNC_KEY, cloud.code);
+        setSaveMsg('Sauvegarde en ligne activée ✅ Note bien le code !');
+      } catch (e) { setSaveMsg('Impossible de joindre le serveur 😕'); }
+      renderCloudBox();
+      updateCloudInfo();
+    });
+
+    $('cloudLink').addEventListener('click', async () => {
+      const code = $('cloudInput').value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/^(.{4})(.{4})$/, '$1-$2');
+      if (!/^[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(code)) return setSaveMsg('Le code ressemble à ABCD-EF23');
+      try {
+        const r = await api('GET', '/api/saves/' + code);
+        if (r.status === 404) return setSaveMsg('Code inconnu 😕');
+        if (r.status !== 200) throw new Error();
+        if (!confirm('Récupérer la partie en ligne ? Elle remplace celle de cet appareil.')) return;
+        localStorage.setItem(SYNC_KEY, code);
+        applyRemote(r.data.save, 'Partie récupérée en ligne ☁️');
+      } catch (e) { setSaveMsg('Impossible de joindre le serveur 😕'); }
+    });
+
+    $('cloudCopy').addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(cloud.code); setSaveMsg('Code copié ✅'); }
+      catch (e) { setSaveMsg('Code : ' + cloud.code); }
+    });
+
+    $('cloudOff2').addEventListener('click', () => {
+      if (!confirm('Arrêter la sauvegarde en ligne sur cet appareil ? (la partie reste sur le téléphone et en ligne)')) return;
+      try { localStorage.removeItem(SYNC_KEY); } catch (e) { /* ignoré */ }
+      cloud.code = null;
+      cloud.lastPush = 0;
+      $('saveInfo').textContent = '💾 Sauvegarde sur cet appareil';
+      renderCloudBox();
+    });
+
     // =====================================================================
     //  Démarrage
     // =====================================================================
@@ -3360,6 +3659,7 @@
     spriteHerEl.src = A.herStand;
     document.querySelectorAll('[data-ico]').forEach((img) => { img.src = A[img.dataset.ico]; });
     loadState();
+    const loadedPlayed = playedOf(state);
     requestPersist();
     const away = catchUp(state.lastSeen);
     startDay();
@@ -3383,12 +3683,14 @@
     refreshHim(true);
     checkTrophies();
     requestAnimationFrame(frame);
+    cloudInit(loadedPlayed);
     const welcomed = welcomeBack(away);
     scheduleGirlVisit(welcomed ? rand(4500, 5500) : rand(2200, 3500));
     setInterval(tick, 6000);
 
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden) { saveState(); return; }
+      if (document.hidden) { saveState(); cloudPush(true); return; }
+      cloudPull(playedOf(state));
       const t = Date.now();
       if (t - lastTickAt > 60 * 1000 && !busy) {
         catchUp(lastTickAt);
@@ -3399,7 +3701,7 @@
         refreshHim(true);
       }
     });
-    window.addEventListener('pagehide', saveState);
+    window.addEventListener('pagehide', () => { saveState(); cloudPush(true); });
   </script>
 
 </body>
