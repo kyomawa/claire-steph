@@ -184,6 +184,7 @@ function renderStatus() {
     ['🏁 Rang', `${rankFor(levelFor(state.xp))} (niv. ${levelFor(state.xp)})`],
     ['💞 Complicité', '★'.repeat(bond) + '☆'.repeat(5 - bond)],
     ['📋 Soins oubliés (7 j)', String(recent)],
+    ['🔥 Série', `${state.streak} jour${state.streak > 1 ? 's' : ''} · demain +${Career.streakReward(state.streak + 1)} ⛽`],
     ['🌙 Horaires', 'dodo 22 h 30 · réveil 7 h 30']
   ];
   const t = el('table', 'stat-table');
@@ -201,7 +202,9 @@ function renderStatus() {
     const mins = Math.floor((nowMs - state.alerts[k].since) / 60000);
     al.appendChild(el('p', 'alert-line', `${def.icon} ${def.label} · depuis ${mins} min${state.alerts[k].counted ? ' (soin oublié)' : ''}`));
   }
-  $('statusBody').replaceChildren(al, t, wis);
+  const wk = el('button', 'btn wide-btn', '📈 Voir son bien-être de la semaine');
+  wk.addEventListener('click', () => { statusModal.hidden = true; openWeek(false); });
+  $('statusBody').replaceChildren(al, t, wis, wk);
 }
 
 function openStatus() { renderStatus(); statusModal.hidden = false; sfx.tap(); }

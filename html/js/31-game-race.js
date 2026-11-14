@@ -20,7 +20,7 @@ function startRace() {
   raceCv.width = W * dpr;
   raceCv.height = H * dpr;
   rx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  Object.assign(race, { on: true, W, H, lane: 1, carX: null, items: [], score: 0, lives: 3, t: 0, speed: 150, spawn: 0, road: 0, last: performance.now(), hit: 0, over: false });
+  Object.assign(race, { on: true, W, H, lane: 1, carX: null, items: [], score: 0, lives: 3, t: 0, speed: 150, spawn: 0, road: 0, last: performance.now(), hit: 0, over: false, gp: null });
   race.raf = requestAnimationFrame(raceLoop);
 }
 
@@ -157,7 +157,7 @@ function raceLoop(ts) {
     rx.fillStyle = '#1E3456';
     rx.textAlign = 'center';
     rx.font = 'bold 13px "Baloo 2", sans-serif';
-    rx.fillText('Tape à gauche / à droite', W / 2, H / 2 - 12);
+    rx.fillText(race.gp ? `Grand Prix de ${race.gp.name} ${race.gp.flag}` : 'Tape à gauche / à droite', W / 2, H / 2 - 12);
     rx.fillText('Évite les plots, ramasse les ⛽ 💕', W / 2, H / 2 + 8);
   }
   if (!race.over && (race.lives <= 0 || race.t >= 40)) endRace();
@@ -175,6 +175,7 @@ function raceLoop(ts) {
 }
 
 function endRace() {
+  if (race.gp) return endGP();
   race.over = true;
   const s = race.score;
   const stars = s >= 25 ? 3 : (s >= 14 ? 2 : 1);
@@ -190,6 +191,7 @@ function endRace() {
   state.counters.races++;
   sfx.level();
   const mult = playMult('race');
+  trainFor('game_race', mult);
   act('geek', 3);
   gainXp(Math.round((4 + stars * 3) * mult));
   earn(Math.round((Math.floor(s / 2) + stars) * mult) + geekBonus(), 'à la Course');

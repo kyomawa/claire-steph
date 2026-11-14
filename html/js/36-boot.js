@@ -34,6 +34,7 @@ document.querySelectorAll('[data-ico]').forEach((img) => { img.src = A[img.datas
 loadState();
 const loadedPlayed = playedOf(state);
 requestPersist();
+const preAbsence = { state: JSON.parse(JSON.stringify(state)), from: state.lastSeen };
 const away = catchUp(state.lastSeen);
 handleSimEvents(away.events, true);
 lastPersonality = Sim.personality(state);

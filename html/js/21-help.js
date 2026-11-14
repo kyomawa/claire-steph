@@ -4,7 +4,7 @@
 const helpModal = $('help');
 function closeHelp() {
   helpModal.hidden = true;
-  if (!state.seenHelp) { state.seenHelp = true; saveState(); }
+  if (!state.seenHelp) { state.seenHelp = true; saveState(); setTimeout(() => checkChapters(), 700); }
 }
 $('btnHelp').addEventListener('click', () => { helpModal.hidden = false; });
 $('helpClose').addEventListener('click', closeHelp);

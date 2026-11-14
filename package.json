@@ -5,8 +5,8 @@
   "description": "Le tamagotchi de Stéphane, aux couleurs Gulf",
   "scripts": {
     "start": "node server/server.js",
-    "test": "node tests/sim.test.js && node tests/e2e.test.js",
-    "test:unit": "node tests/sim.test.js",
+    "test": "node tests/sim.test.js && node tests/career.test.js && node tests/e2e.test.js",
+    "test:unit": "node tests/sim.test.js && node tests/career.test.js",
     "build:single": "python3 tools/build-single-file.py",
     "build:artifact": "python3 tools/build-single-file.py --artifact"
   },

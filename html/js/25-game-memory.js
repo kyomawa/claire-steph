@@ -78,6 +78,7 @@ function endMemory() {
   state.counters.games++;
   sfx.level();
   const mult = playMult('memory');
+  trainFor('game_memory', mult);
   act('geek', 3);
   gainXp(Math.round((4 + stars * 3) * mult));
   earn(Math.round(stars * 4 * mult) + geekBonus(), 'au Mémoire');

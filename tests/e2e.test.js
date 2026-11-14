@@ -85,13 +85,25 @@ const ok = (name) => { n++; console.log('✓', name); };
     assert.ok((await p.evaluate(() => state.tokens)) > tokens, 'jetons gagnés');
     ok('mini-jeu Course Gulf');
 
-    // sauvegarde + rechargement
+    // Grand Prix du jour : classement, points, compétences
     await p.waitForTimeout(2600);
-    const xp = await p.evaluate(() => { saveNow(); return state.xp; });
+    await idle(p);
+    await p.click('#raceNo');
+    await p.click('#careerBody .gp-card .btn');
+    await p.waitForTimeout(500);
+    await p.evaluate(() => { race.score = 20; race.t = 39.9; });
+    await p.waitForFunction(() => Object.keys(state.career.gp).length === 1, null, { timeout: 5000 });
+    const gp = await p.evaluate(() => Object.values(state.career.gp)[0]);
+    assert.ok(gp.place >= 1 && gp.place <= 10 && gp.points >= 0);
+    ok('Grand Prix du jour');
+
+    // sauvegarde + rechargement (y compris carrière et compétences)
+    await p.waitForTimeout(2800);
+    const saved = await p.evaluate(() => { saveNow(); return [state.xp, state.career.races, Math.round(state.skills.pilotage)]; });
     await p.reload();
     await p.waitForTimeout(800);
-    assert.strictEqual(await p.evaluate(() => state.xp), xp);
-    ok('sauvegarde et rechargement');
+    assert.deepStrictEqual(await p.evaluate(() => [state.xp, state.career.races, Math.round(state.skills.pilotage)]), saved);
+    ok('sauvegarde et rechargement (carrière comprise)');
 
     // nuit : lumière
     const night = await open('?heure=23', STATE);

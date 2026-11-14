@@ -50,6 +50,12 @@ const TROPHIES = [
   { id: 'postcards_8', e: '✈️', t: 'Globe-trotteurs', d: '8 cartes postales', ok: (s) => Object.keys(s.postcards || {}).length >= 8 },
   { id: 'shop_5', e: '🛍️', t: 'Client fidèle', d: '5 achats à la boutique', ok: (s) => s.counters.purchases >= 5 },
   { id: 'photo_5', e: '📷', t: 'Photographe', d: '5 photos souvenirs', ok: (s) => s.counters.photos >= 5 },
+  { id: 'gp_first', e: '🏁', t: 'Premier départ', d: 'Courir un Grand Prix', ok: (s) => s.career && s.career.races >= 1 },
+  { id: 'gp_win', e: '🥇', t: 'Première victoire', d: 'Gagner un Grand Prix', ok: (s) => s.career && s.career.wins >= 1 },
+  { id: 'gp_podium5', e: '🏆', t: 'Habitué du podium', d: '5 podiums en Grand Prix', ok: (s) => s.career && s.career.podiums >= 5 },
+  { id: 'lemans', e: '🌙', t: 'Vainqueur au Mans', d: 'Gagner le Grand Prix du Mans', ok: (s) => s.career && (s.career.winsAt.lemans || 0) >= 1 },
+  { id: 'story', e: '📖', t: 'Le rêve réalisé', d: 'Finir l’histoire « Le rêve du Mans »', ok: (s) => !!(s.career && s.career.chapters.c7) },
+  { id: 'week_s', e: '📈', t: 'Semaine parfaite', d: 'Obtenir S au bilan de la semaine', ok: (s) => s.bestGrade === 'S' },
   { id: 'memories_10', e: '📖', t: 'Album souvenir', d: '10 souvenirs dans le carnet', ok: (s) => s.journal.length >= 10 }
 ];
 

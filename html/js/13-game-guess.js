@@ -83,6 +83,7 @@ function endGuessGame() {
   state.energy = clamp(state.energy - 5);
   state.counters.games++;
   const mult = playMult('guess');
+  trainFor('game_guess', mult);
   act('geek', 2);
   gainXp(Math.round((2 + w * 2) * mult));
   earn(Math.round(w * 2 * mult) + geekBonus(), 'au mini-jeu');

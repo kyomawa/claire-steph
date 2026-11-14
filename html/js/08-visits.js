@@ -175,6 +175,7 @@ $('btnHug').addEventListener('click', () => {
   buzz(40);
   state.love = clamp(state.love + (isPers('love') ? 34 : 26));
   act('love', 4);
+  trainFor('hugs');
   state.happy = clamp(state.happy + 18);
   state.hunger = clamp(state.hunger + 4);
   state.energy = clamp(state.energy + 6);

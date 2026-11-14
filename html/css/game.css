@@ -1599,3 +1599,64 @@ body { background: transparent; }
 .mood { cursor: pointer; }
 .screen.in-game .ask, .screen.in-game .caprice, .screen.in-game .alert-badge { visibility: hidden; }
 .caprice:not([hidden]) ~ .bubble { top: 82px; }
+
+/* ---- Carrière ---- */
+.race-no { cursor: pointer; }
+.gp-card {
+  border: 3px solid var(--navy);
+  border-radius: 16px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  background:
+    linear-gradient(90deg, transparent 44%, var(--navy) 44% 45.5%, var(--gulf-orange) 45.5% 54.5%, var(--navy) 54.5% 56%, transparent 56%),
+    var(--gulf-blue);
+  box-shadow: 0 4px 0 var(--navy);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.gp-eyebrow { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--navy); background: #fff; align-self: flex-start; padding: 1px 8px; border-radius: 8px; }
+.gp-name { font-family: 'Racing Sans One', sans-serif; font-size: 22px; color: var(--navy); background: #fff; align-self: flex-start; padding: 2px 10px; border-radius: 10px; }
+.gp-help { font-size: 12px; color: var(--navy); margin: 0; background: rgba(255, 255, 255, 0.85); padding: 4px 8px; border-radius: 8px; }
+.gp-result { font-weight: 800; color: var(--navy); background: #fff; border-radius: 10px; padding: 6px 10px; }
+.podium { list-style: none; margin: 0; padding: 6px 10px; background: #fff; border-radius: 10px; font-size: 13px; color: var(--navy); }
+.podium .me { font-weight: 800; color: var(--gulf-orange-deep); }
+.sk-title, .season h3, .story h3 { font-family: 'Racing Sans One', sans-serif; font-weight: 400; font-size: 16px; color: var(--navy); margin: 14px 0 8px; }
+.skills { display: flex; flex-direction: column; gap: 7px; }
+.skill { display: grid; grid-template-columns: 110px 1fr 30px; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700; color: var(--navy); }
+.skill .d-fill { background: linear-gradient(90deg, var(--gulf-blue-deep), var(--gulf-orange)); }
+.sk-val { font-family: 'Space Mono', monospace; text-align: right; }
+.chapter { border: 1.5px solid var(--navy); border-radius: 10px; padding: 6px 10px; margin-bottom: 6px; font-size: 13px; color: var(--navy); }
+.chapter summary { font-weight: 800; cursor: pointer; }
+.chapter p { margin: 6px 0 2px; line-height: 1.45; }
+.chapter.locked { opacity: 0.5; border-style: dashed; }
+.chapter-card { padding: 22px 18px 18px; text-align: center; max-width: 360px; }
+.chapter-icon { font-size: 54px; line-height: 1.1; }
+.chapter-card h2 { font-family: 'Racing Sans One', sans-serif; font-weight: 400; color: var(--navy); margin: 6px 0 10px; font-size: 20px; }
+.chapter-card p { color: var(--navy); line-height: 1.5; font-size: 14px; margin: 0 0 10px; }
+.chapter-reward { font-weight: 800; color: var(--gulf-orange-deep) !important; }
+
+/* ---- Bilan de la semaine ---- */
+.grade {
+  width: 64px; height: 64px; margin: 0 auto 8px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: 'Racing Sans One', sans-serif; font-size: 34px; color: #fff;
+  border: 3px solid var(--navy); box-shadow: 0 0 0 4px var(--gulf-orange);
+  background: var(--navy);
+}
+.grade-S { background: var(--gulf-orange); }
+.grade-A { background: var(--good); }
+.grade-B { background: var(--gulf-blue-deep); }
+.grade-C { background: var(--mid); }
+.grade-D { background: var(--low); }
+.week-msg { text-align: center; font-weight: 800; color: var(--navy); margin: 0 0 10px; }
+.week-reward { text-align: center; font-weight: 800; color: var(--gulf-orange-deep); margin: 10px 0 0; }
+.week-chart { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; height: 130px; align-items: end; margin: 6px 0 12px; padding: 0 2px; border-bottom: 2px solid var(--navy); }
+.wk-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 2px; }
+.wk-bar { width: 100%; border-radius: 6px 6px 0 0; background: var(--gulf-blue); min-height: 4px; }
+.wk-bar.good { background: var(--good); }
+.wk-bar.mid { background: var(--mid); }
+.wk-bar.low { background: var(--low); }
+.wk-bar.empty { background: repeating-linear-gradient(45deg, #E3EDF2 0 4px, #fff 4px 8px); border: 1px dashed var(--gulf-blue-deep); }
+.wk-val { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--navy); font-variant-numeric: tabular-nums; }
+.wk-day { font-size: 11px; font-weight: 800; color: var(--navy); text-transform: uppercase; }

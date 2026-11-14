@@ -95,3 +95,34 @@ Les points s'effacent doucement (demi-vie ~1,5 jour). La catégorie dominante de
 - Transitions : ouverture en iris pour les scènes, fenêtres qui « rebondissent » à l'ouverture,
   jauges qui pulsent quand elles sont critiques, confettis au passage de niveau.
 - Tout est coupé si le téléphone demande de réduire les animations.
+
+## 11. Carrière de pilote (`html/js/engine/career.js`)
+
+**Compétences** (0 à 100) : 🏎️ Pilotage, 💪 Endurance, 🍳 Cuisine, 💻 Code, 💘 Charme.
+Chaque activité en entraîne une ou deux (courir → endurance + pilotage, coder → code,
+moment « Cuisine » → cuisine, câlins et mots doux → charme, Course Gulf → pilotage…).
+Au plus **+6 par compétence et par jour**, et progresser devient plus dur près de 100.
+
+## 12. Grand Prix du jour et championnat
+
+- Un circuit par jour, en boucle : Le Mans, Monaco, Spa, Silverstone, Monza, Suzuka, Daytona.
+- Ouvert de 9 h à 22 h, s'il n'est pas malade et a au moins 30 d'énergie (la course en coûte 15).
+- On joue la Course Gulf ; le classement mélange **ses compétences** (pilotage 45 %, endurance 25 %,
+  charme 10 %), **le score de la course** et un peu de hasard, contre 9 rivaux qui progressent
+  au fil du mois.
+- Points façon F1 (25, 18, 15, 12, 10, 8, 6, 4, 2, 1) ; jetons 30 / 20 / 15 / 5.
+- **Championnat mensuel** : au changement de mois, la saison est archivée avec un titre
+  (Champion du monde dès 300 points, Vice-champion 180, Pilote confirmé 90).
+
+## 13. Histoire « Le rêve du Mans »
+
+7 chapitres débloqués par la progression (premier Grand Prix, premier podium, compétences à 30,
+première victoire, Monaco, victoire au Mans…), chacun avec un petit texte et des jetons.
+
+## 14. Bilan de la semaine et série
+
+- Le bien-être (moyenne des besoins, moins cacas, maladie et bouderie) est relevé **chaque heure**,
+  y compris pendant les absences (rejouées par le moteur).
+- Tous les 7 jours : note **S / A / B / C / D** (bien-être moyen + soins oubliés), graphique
+  des 7 jours, récompense de 40 à 5 jetons.
+- Série de jours d'affilée : 5, 5, 10, 10, 15, 15 puis **40 jetons** le 7ᵉ jour, en boucle.

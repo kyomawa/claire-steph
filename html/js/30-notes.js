@@ -64,6 +64,7 @@ $('noteSend').addEventListener('click', async () => {
     $('noteCount').textContent = '0 / 200';
     state.counters.notesSent++;
     act('love', 3);
+    trainFor('notes');
     addMemory('💌 Mot envoyé : ' + text, 'answer');
     sfx.coin();
     renderStats();

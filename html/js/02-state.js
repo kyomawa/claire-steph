@@ -10,6 +10,9 @@ function freshState() {
     weight: 70, discipline: 50, lights: true, digestQueue: [], alerts: {}, mistakes: [],
     activity: { sport: 0, food: 0, geek: 0, love: 0, party: 0 }, hungerZeroSince: 0, poopsFullSince: 0, awakeUntil: 0,
     gamePlays: null, capriceDay: null,
+    // carrière (js/engine/career.js) et bilan de la semaine
+    skills: { pilotage: 0, endurance: 0, cuisine: 0, code: 0, charme: 0 }, skillDay: null, career: null,
+    history: {}, lastReport: null, streakPaid: null, bestGrade: null,
     xp: 0, bestScore: 0, streak: 0,
     bornAt: Date.now(), lastSeen: null, lastVisitDay: null,
     counters: { hugs: 0, meals: 0, runs: 0, codes: 0, sleeps: 0, heals: 0, games: 0, kisses: 0, visits: 0, washes: 0, cleaned: 0, moments: 0, strokes: 0, tickles: 0, wishes: 0, answers: 0, cuddles: 0, herKisses: 0, dailyDone: 0, fetches: 0, selfies: 0, notesSent: 0, races: 0, notesGot: 0, purchases: 0, photos: 0 },
@@ -82,6 +85,7 @@ function loadState() {
     if (d.name) petNameEl.textContent = d.name;
   } catch (e) { /* stockage indisponible */ }
   Sim.ensure(state);
+  if (window.CheriCareer) window.CheriCareer.ensure(state);
 }
 petNameEl.addEventListener('blur', saveState);
 petNameEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); petNameEl.blur(); } });

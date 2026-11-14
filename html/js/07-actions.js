@@ -44,6 +44,10 @@ function doAction({ img, emoji, caption, delta, duration, xp, counter, after, sc
   else if (weight) state.weight = Math.max(45, Math.min(110, state.weight + weight));
   const c = cat || COUNTER_CAT[counter];
   if (c) act(c, pts || 4);
+  if (typeof trainFor === 'function') {
+    if (counter === 'moments') trainFor('moment_' + ({ food: 'cuisine', sport: 'sport', party: 'party' }[c] || 'love'));
+    else if (counter) trainFor(counter);
+  }
   afterCare();
   if (after) after();
   gainXp(xp || 0);

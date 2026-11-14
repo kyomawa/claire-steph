@@ -128,6 +128,7 @@ function endDance() {
   state.counters.games++;
   sfx.level();
   const mult = playMult('dance');
+  trainFor('game_dance', mult);
   act('party', 4);
   state.weight = Math.max(45, state.weight - 0.3);
   gainXp(Math.round((4 + stars * 3) * mult));

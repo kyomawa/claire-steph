@@ -149,6 +149,7 @@ function endGame() {
   state.hunger = clamp(state.hunger - 8);
   state.counters.games++;
   const mult = playMult('catch');
+  trainFor('game_catch', mult);
   act('geek', 2);
   gainXp(Math.round(Math.max(2, s) * mult));
   earn(Math.round(Math.floor(s / 2) * mult) + geekBonus(), 'au mini-jeu');

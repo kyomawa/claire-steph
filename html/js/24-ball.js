@@ -104,6 +104,7 @@ function petBroughtBall() {
   const before = snap();
   state.counters.fetches++;
   act('sport', 2);
+  trainFor('fetches');
   state.happy = clamp(state.happy + 3);
   state.love = clamp(state.love + 1);
   if (it) showBubble(`${it.say} 🎾`, 1500, A[it.id]);

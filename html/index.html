@@ -256,6 +256,9 @@
           <li><span>🌙</span><div>La nuit il dort : laisse-le… ou réveille-le</div></li>
           <li><span>🍽️</span><div><b>Manger</b> : choisis un plat puis <b>glisse-le jusqu'à lui</b> (ou tape-le, il va le chercher)</div></li>
           <li><span>💌</span><div><b>À deux → Mot doux</b> : un message qui arrive sur l'autre téléphone relié</div></li>
+          <li><span>🏁</span><div><b>Touche son numéro de course</b> : sa carrière, le Grand Prix du jour, ses compétences et l'histoire</div></li>
+          <li><span>💡</span><div>La nuit, <b>éteins la lumière</b> (bouton Dodo) ; dès 21 h, Dodo le couche</div></li>
+          <li><span>⚠️</span><div>Quand il t'appelle, réponds vite : un appel ignoré 45 min = un soin oublié</div></li>
           <li><span>⛽</span><div><b>Jetons</b> (en haut) : gagnés aux jeux et défis, à dépenser à la boutique</div></li>
           <li><span>📸</span><div><b>Photo souvenir</b> de la scène, rangée dans le carnet</div></li>
           <li><span>🎾</span><div><b>Lance le ballon</b> à son compagnon : il le rapporte</div></li>
@@ -311,6 +314,39 @@
         <img class="photo-big" id="photoImg" alt="Photo souvenir">
         <p class="empty" id="photoMsg"></p>
         <button class="btn wide-btn cloud-main" id="photoShare" hidden>📤 Partager la photo</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="careerModal" hidden role="dialog" aria-modal="true" aria-labelledby="careerTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="careerTitle">🏁 Sa carrière</h2>
+        <button class="close" id="careerClose" aria-label="Fermer">✕</button>
+      </div>
+      <div class="tab-body" id="careerBody"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="chapterModal" hidden role="dialog" aria-modal="true" aria-labelledby="chapterTitle">
+    <div class="modal-card chapter-card">
+      <div class="chapter-icon" id="chapterIcon"></div>
+      <h2 id="chapterTitle"></h2>
+      <p id="chapterText"></p>
+      <p class="chapter-reward" id="chapterReward"></p>
+      <button class="btn wide-btn cloud-main" id="chapterOk">La suite ! ✨</button>
+    </div>
+  </div>
+
+  <div class="modal" id="weekModal" hidden role="dialog" aria-modal="true" aria-labelledby="weekTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="weekTitle">📈 Bilan de la semaine</h2>
+        <button class="close" id="weekClose" aria-label="Fermer">✕</button>
+      </div>
+      <div class="tab-body">
+        <div class="grade" id="weekGrade">A</div>
+        <div id="weekBody"></div>
       </div>
     </div>
   </div>
@@ -413,6 +449,7 @@
   </div>
 
   <script src="js/engine/sim.js"></script>
+  <script src="js/engine/career.js"></script>
   <script src="assets.js"></script>
   <script src="js/00-config.js"></script>
   <script src="js/01-utils.js"></script>
@@ -451,6 +488,8 @@
   <script src="js/34-photo.js"></script>
   <script src="js/35-morning.js"></script>
   <script src="js/36-boot.js"></script>
+  <script src="js/37-career.js"></script>
+  <script src="js/38-week.js"></script>
 
 </body>
 
