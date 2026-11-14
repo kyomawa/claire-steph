@@ -10,7 +10,9 @@
   <meta name="theme-color" content="#A9D6E5">
   <title>Chéri-o-tchi</title>
   <link rel="icon" type="image/png" href="img/icones/eggHim.png">
-  <link rel="apple-touch-icon" href="img/icones/eggHim.png">
+  <link rel="apple-touch-icon" href="img/app/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="apple-mobile-web-app-title" content="Chéri-o-tchi">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Racing+Sans+One&family=Space+Mono:wght@400;700&display=swap');
 
@@ -1384,6 +1386,91 @@
       .hud { gap: 4px; }
     }
 
+    .sprite-her.pose-sit { height: 66px; }
+
+    .flash { position: absolute; inset: 0; background: #fff; z-index: 9; pointer-events: none; animation: flash 0.6s ease-out forwards; }
+    @keyframes flash { from { opacity: 0.95; } to { opacity: 0; } }
+
+    .drag-food {
+      position: absolute;
+      z-index: 5;
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 2.5px solid var(--navy);
+      border-radius: 50%;
+      box-shadow: 0 2px 0 var(--navy);
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      animation: wishPop 1.2s ease-in-out infinite;
+      transition: bottom 0.3s ease-in;
+    }
+    .drag-food img { width: 30px; height: 30px; object-fit: contain; pointer-events: none; }
+    .drag-food.dragging { cursor: grabbing; animation: none; transform: scale(1.15); transition: none; }
+    .drag-food.poof { animation: poof 0.4s ease-out forwards; }
+    @keyframes poof { to { opacity: 0; transform: scale(1.6); } }
+
+    .ball { position: absolute; width: 20px; height: 20px; z-index: 3; cursor: grab; touch-action: none; user-select: none; -webkit-user-drag: none; }
+
+    .memory, .dance {
+      position: absolute;
+      inset: 0;
+      z-index: 7;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 8px;
+      gap: 4px;
+    }
+    .memory[hidden], .dance[hidden] { display: none; }
+    .mem-head, .dance-head { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 12px; color: var(--navy); }
+    .mem-grid { flex: 1; width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); gap: 5px; }
+    .mem-card {
+      position: relative;
+      border: 2px solid var(--navy);
+      border-radius: 9px;
+      background: var(--gulf-orange);
+      box-shadow: 0 2px 0 var(--navy);
+      cursor: pointer;
+      padding: 0;
+      overflow: hidden;
+    }
+    .mem-back { font-size: 18px; color: #fff; }
+    .mem-front { position: absolute; inset: 0; margin: auto; max-width: 70%; max-height: 70%; object-fit: contain; opacity: 0; }
+    .mem-card.flipped { background: #fff; }
+    .mem-card.flipped .mem-back { opacity: 0; }
+    .mem-card.flipped .mem-front { opacity: 1; }
+    .mem-card.done { background: #E7F6E8; border-color: var(--good); box-shadow: 0 2px 0 var(--good); }
+
+    .dance { background: linear-gradient(180deg, rgba(30, 52, 86, 0.92), rgba(44, 74, 116, 0.9)); color: #fff; touch-action: manipulation; cursor: pointer; }
+    .dance-head { color: #fff; }
+    .dance-floor { flex: 1; width: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 14px; padding-bottom: 6px; }
+    .dance-him, .dance-her { height: 84px; width: auto; }
+    .dance-her { height: 80px; }
+    .dance-target {
+      position: relative;
+      width: 54px;
+      height: 54px;
+      margin-bottom: 18px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      background: var(--gulf-orange);
+      display: grid;
+      place-items: center;
+      font-family: 'Racing Sans One', sans-serif;
+      font-size: 13px;
+    }
+    .dance-ring { position: absolute; inset: -3px; border-radius: 50%; border: 3px solid var(--gulf-blue); opacity: 0; pointer-events: none; }
+    .dance-msg { min-height: 18px; font-weight: 800; font-size: 13px; }
+    .dance-msg.perfect { color: #FFD166; }
+    .dance-msg.good { color: var(--gulf-blue); }
+    .dance-msg.miss { color: #FF8C7A; }
+
     @media (prefers-reduced-motion: reduce) {
       .star, .btn.alert { animation: none; }
     }
@@ -1437,7 +1524,21 @@
           <div class="ground-shadow" id="shadowHer"></div>
           <div class="ground-shadow" id="shadowPet"></div>
           <img class="pet" id="pet" alt="compagnon" hidden>
+          <img class="ball" id="ball" alt="ballon" hidden draggable="false">
           <button class="wish" id="wish" hidden aria-label="Son envie"></button>
+        </div>
+        <div class="memory" id="memory" hidden>
+          <div class="mem-head" id="memInfo"></div>
+          <div class="mem-grid" id="memGrid"></div>
+        </div>
+        <div class="dance" id="dance" hidden>
+          <div class="dance-head" id="danceInfo"></div>
+          <div class="dance-floor">
+            <img class="dance-him" id="danceHim" alt="">
+            <div class="dance-target"><div class="dance-ring" id="danceRing"></div><span>TAP</span></div>
+            <img class="dance-her" id="danceHer" alt="">
+          </div>
+          <div class="dance-msg" id="danceMsg"></div>
         </div>
         <div class="guess" id="guess" hidden>
           <div class="guess-info" id="guessInfo"></div>
@@ -1593,7 +1694,9 @@
           <li><span>💩</span><div><b>Tape un caca</b> pour le ramasser (ou 🧼 Laver)</div></li>
           <li><span>🎯</span><div><b>Défis du jour</b> en haut, et une <b>question du jour</b></div></li>
           <li><span>🌙</span><div>La nuit il dort : laisse-le… ou réveille-le</div></li>
-          <li><span>💾</span><div>Tout est sauvegardé tout seul</div></li>
+          <li><span>🍽️</span><div><b>Manger</b> : choisis un plat puis <b>glisse-le jusqu'à lui</b> (ou tape-le, il va le chercher)</div></li>
+          <li><span>🎾</span><div><b>Lance le ballon</b> à son compagnon : il le rapporte</div></li>
+          <li><span>💾</span><div>Tout est sauvegardé tout seul · 🔔 notifications dans 💾</div></li>
         </ul>
         <button class="btn wide-btn cloud-main" id="helpOk">C'est parti ! 🏁</button>
       </div>
@@ -1609,6 +1712,8 @@
       <div class="tab-body">
         <div class="moments">
           <button class="m-card g-card" id="pickCatch"><span class="g-ico">💋☕💕</span><span class="m-name">Attrape les bisous</span><span class="m-sub">20 s · glisse le doigt</span><span class="m-sub" id="bestCatch"></span></button>
+          <button class="m-card g-card" id="pickMemory"><span class="g-ico">🧠🃏</span><span class="m-name">Mémoire</span><span class="m-sub">6 paires à retrouver</span><span class="m-sub" id="bestMemoryTxt"></span></button>
+          <button class="m-card g-card" id="pickDance"><span class="g-ico">🪩💃🕺</span><span class="m-name">Danse avec elle</span><span class="m-sub">tape en rythme</span><span class="m-sub" id="bestDanceTxt"></span></button>
           <button class="m-card g-card" id="pickGuess"><span class="g-ico">⬅️🤔➡️</span><span class="m-name">Gauche ou droite ?</span><span class="m-sub">5 manches · devine où il regarde</span><span class="m-sub" id="bestGuess"></span></button>
         </div>
       </div>
@@ -1644,6 +1749,15 @@
               <input id="cloudInput" placeholder="ABCD-EF23" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="9">
               <button class="btn" id="cloudLink">J'ai un code</button>
             </div>
+          </div>
+        </div>
+        <div class="cloud-box">
+          <h3>🔔 Notifications</h3>
+          <p id="pushStatus"></p>
+          <div class="save-actions">
+            <button class="btn" id="pushOn"><span class="emoji">🔔</span>Activer</button>
+            <button class="btn" id="pushTest" hidden><span class="emoji">📲</span>Tester</button>
+            <button class="btn" id="pushOff" hidden><span class="emoji">🔕</span>Désactiver</button>
           </div>
         </div>
         <p class="tip">📱 Astuce : ajoute le jeu à l'écran d'accueil (Partager → « Sur l'écran d'accueil »). Évite la navigation privée, qui efface tout.</p>
@@ -1775,8 +1889,8 @@
         sick: false, sulk: false, poops: [], digest: 0,
         xp: 0, bestScore: 0, streak: 0,
         bornAt: Date.now(), lastSeen: null, lastVisitDay: null,
-        counters: { hugs: 0, meals: 0, runs: 0, codes: 0, sleeps: 0, heals: 0, games: 0, kisses: 0, visits: 0, washes: 0, cleaned: 0, moments: 0, strokes: 0, tickles: 0, wishes: 0, answers: 0, cuddles: 0, herKisses: 0, dailyDone: 0 },
-        bestGuess: 0,
+        counters: { hugs: 0, meals: 0, runs: 0, codes: 0, sleeps: 0, heals: 0, games: 0, kisses: 0, visits: 0, washes: 0, cleaned: 0, moments: 0, strokes: 0, tickles: 0, wishes: 0, answers: 0, cuddles: 0, herKisses: 0, dailyDone: 0, fetches: 0, selfies: 0 },
+        bestGuess: 0, bestMemory: 0, bestMemoryStars: 0, bestDance: 0, bestDanceStars: 0,
         trophies: {}, journal: [], name: null,
         album: {}, decor: 'auto', playedAt: 0, sound: true, seenHelp: false, lastAsk: null, daily: null,
         owned: {}, wear: { tete: null, yeux: null, visage: null, cou: null, dos: null, compagnon: null }
@@ -1902,6 +2016,10 @@
       { id: 'guess_5', e: '🔮', t: 'Télépathe', d: '5 / 5 à « Gauche ou droite »', ok: (s) => s.bestGuess >= 5 },
       { id: 'daily_5', e: '🏁', t: 'Assidu', d: '5 journées de défis réussies', ok: (s) => s.counters.dailyDone >= 5 },
       { id: 'answers_10', e: '💬', t: 'On se dit tout', d: 'Répondre à 10 questions du jour', ok: (s) => s.counters.answers >= 10 },
+      { id: 'fetch_10', e: '🎾', t: 'Bon chien !', d: '10 balles rapportées par son compagnon', ok: (s) => s.counters.fetches >= 10 },
+      { id: 'selfie_5', e: '📸', t: 'Paparazzi', d: '5 selfies avec elle', ok: (s) => s.counters.selfies >= 5 },
+      { id: 'memory_3', e: '🧠', t: 'Mémoire d’éléphant', d: '3 étoiles au jeu de Mémoire', ok: (s) => s.bestMemoryStars >= 3 },
+      { id: 'dance_3', e: '🪩', t: 'Rois de la piste', d: '3 étoiles à la Danse', ok: (s) => s.bestDanceStars >= 3 },
       { id: 'memories_10', e: '📖', t: 'Album souvenir', d: '10 souvenirs dans le carnet', ok: (s) => s.journal.length >= 10 }
     ];
 
@@ -2707,15 +2825,19 @@
       }, 420);
       if (v.big) spriteHerEl.src = A.herJump;
 
+      const stay = v.big ? 3400 : 2000;
+      const act = !v.big && Math.random() < 0.6 ? pick(HER_ACTS) : null;
+      if (act) setTimeout(() => herActivity(act), stay - 300);
       setTimeout(() => {
         clearInterval(blinkTimer);
         leaveGirl(cameFromLeft);
-      }, v.big ? 3400 : 2000);
+      }, stay + (act ? 2800 : 0));
     }
 
     function leaveGirl(cameFromLeft) {
       const screenWidth = screenEl.clientWidth;
       let gx = parseFloat(spriteHerEl.style.left);
+      spriteHerEl.classList.remove('pose-sit');
       spriteHerEl.style.transform = cameFromLeft ? 'scaleX(-1)' : 'scaleX(1)';
 
       let frame = 0;
@@ -3018,6 +3140,8 @@
           ['🥰 Câlins', c.hugs], ['💋 Bisous', c.kisses], ['🍽️ Repas', c.meals],
           ['🧼 Bains', c.washes], ['💩 Cacas ramassés', c.cleaned], ['💑 Moments à deux', c.moments],
           ['🤲 Caresses', c.strokes], ['😂 Chatouilles', c.tickles], ['🧞 Envies exaucées', c.wishes], ['🔮 Record gauche/droite', `${state.bestGuess} / 5`],
+          ['🧠 Record Mémoire', state.bestMemory ? `${state.bestMemory} coups` : '—'], ['🪩 Record Danse', `${state.bestDance} pts`],
+          ['🎾 Balles rapportées', c.fetches], ['📸 Selfies', c.selfies],
           ['🏃 Runs', c.runs], ['💻 Sessions de code', c.codes], ['😴 Siestes', c.sleeps],
           ['💊 Soins', c.heals], ['🚶‍♀️ Visites', c.visits], ['🎮 Parties', c.games]
         ];
@@ -3194,9 +3318,12 @@
       const himL = spriteEl.offsetLeft, himW = spriteEl.offsetWidth;
       const right = !(spriteEl.style.transform || '').includes('-1');
       let target = right ? himL - pw - 2 : himL + himW + 2;
+      if (petFetch === 'chase') target = ball.x + BALL / 2 - pw / 2;
       target = Math.max(2, Math.min(screenEl.clientWidth - pw - 2, target));
       const dx = target - petX;
-      petX += dx * Math.min(1, dt * 2.5);
+      petX += dx * Math.min(1, dt * (petFetch ? 3.2 : 2.5));
+      if (petFetch === 'chase' && ball.mode === 'rest' && Math.abs(dx) < 6) petCaughtBall();
+      else if (petFetch === 'return' && Math.abs(dx) < 8) petBroughtBall();
       const moving = Math.abs(dx) > 3;
       if (moving) petFace = dx > 0 ? 1 : -1;
       petT += dt;
@@ -3240,6 +3367,8 @@
       syncPet(dt);
       syncWish();
       syncShadows();
+      syncFood();
+      syncBall(dt);
       requestAnimationFrame(frame);
     }
 
@@ -3453,6 +3582,8 @@
       if (state.energy < 15) return refuse('Trop fatigué pour jouer 😪');
       $('bestCatch').textContent = `Record : ${state.bestScore}`;
       $('bestGuess').textContent = `Record : ${state.bestGuess} / 5`;
+      $('bestMemoryTxt').textContent = state.bestMemory ? `Record : ${state.bestMemory} coups` : 'Pas encore joué';
+      $('bestDanceTxt').textContent = `Record : ${state.bestDance} pts`;
       gamesModal.hidden = false;
     });
     $('gamesClose').addEventListener('click', () => { gamesModal.hidden = true; });
@@ -3582,7 +3713,7 @@
       setSaveMsg('');
     }
 
-    $('btnSettings').addEventListener('click', () => { saveState(); renderSaveModal(); renderCloudBox(); saveModal.hidden = false; });
+    $('btnSettings').addEventListener('click', () => { saveState(); renderSaveModal(); renderCloudBox(); renderPushBox(); saveModal.hidden = false; });
     $('saveClose').addEventListener('click', () => { saveModal.hidden = true; });
     saveModal.addEventListener('click', (e) => { if (e.target === saveModal) saveModal.hidden = true; });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') saveModal.hidden = true; });
@@ -3925,12 +4056,12 @@
     //  Repas au choix (+ son plat préféré du jour)
     // =====================================================================
     const MENU = [
-      { id: 'cafe', n: 'Café', img: () => A.coffeeBig, d: { hunger: 12, energy: 16, happy: 6 }, cap: 'Merci pour le café ☕' },
-      { id: 'pizza', n: 'Pizza', img: () => A.foodPizza, d: { hunger: 28, happy: 14, energy: -2 }, cap: 'Une part de pizza, miam ! 🍕' },
-      { id: 'burger', n: 'Burger', img: () => A.foodBurger, d: { hunger: 30, happy: 10, energy: -2 }, cap: 'Un bon gros burger ! 🍔' },
-      { id: 'poulet', n: 'Poulet', img: () => A.foodDrumstick, d: { hunger: 26, happy: 8, energy: 2 }, cap: 'Ça creuse, ce poulet ! 🍗' },
-      { id: 'smoothie', n: 'Smoothie', img: () => A.himDrink, d: { hunger: 10, energy: 12, happy: 6 }, cap: 'Un smoothie bien frais 🥤' },
-      { id: 'eau', n: "Verre d'eau", img: () => A.foodWater, d: { hunger: 4, energy: 10, happy: 2 }, cap: "Un grand verre d'eau 💧" }
+      { id: 'cafe', n: 'Café', drag: '☕', img: () => A.coffeeBig, d: { hunger: 12, energy: 16, happy: 6 }, cap: 'Merci pour le café ☕' },
+      { id: 'pizza', n: 'Pizza', drag: 'foodPizza', img: () => A.foodPizza, d: { hunger: 28, happy: 14, energy: -2 }, cap: 'Une part de pizza, miam ! 🍕' },
+      { id: 'burger', n: 'Burger', drag: 'foodBurger', img: () => A.foodBurger, d: { hunger: 30, happy: 10, energy: -2 }, cap: 'Un bon gros burger ! 🍔' },
+      { id: 'poulet', n: 'Poulet', drag: 'foodDrumstick', img: () => A.foodDrumstick, d: { hunger: 26, happy: 8, energy: 2 }, cap: 'Ça creuse, ce poulet ! 🍗' },
+      { id: 'smoothie', n: 'Smoothie', drag: '🥤', img: () => A.himDrink, d: { hunger: 10, energy: 12, happy: 6 }, cap: 'Un smoothie bien frais 🥤' },
+      { id: 'eau', n: "Verre d'eau", drag: 'foodWater', img: () => A.foodWater, d: { hunger: 4, energy: 10, happy: 2 }, cap: "Un grand verre d'eau 💧" }
     ];
     const favoriteFood = () => MENU[Math.floor(new Date(dayKey(now())).getTime() / DAY_MS) % (MENU.length - 1)]; // jamais l'eau
     const foodModal = $('food');
@@ -3944,7 +4075,11 @@
         img.src = f.img();
         img.alt = '';
         b.append(img, el('span', 'm-name', (f === fav ? '❤️ ' : '') + f.n), el('span', 'm-sub', deltaText(f.d)));
-        b.addEventListener('click', () => { foodModal.hidden = true; feed(f); });
+        b.addEventListener('click', () => {
+          foodModal.hidden = true;
+          if (state.hunger > 92) return feed(f);
+          spawnFood(f);
+        });
         return b;
       }));
     }
@@ -4111,6 +4246,577 @@
     $('helpOk').addEventListener('click', closeHelp);
     helpModal.addEventListener('click', (e) => { if (e.target === helpModal) closeHelp(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !helpModal.hidden) closeHelp(); });
+
+
+    // =====================================================================
+    //  Ses activités à elle pendant ses visites
+    // =====================================================================
+    const HER_ACTS = [
+      { src: () => A.herRead, say: 'Je lis un peu à côté de toi 📖' },
+      { src: () => A.herPhone, say: 'Selfie ! 📸', selfie: true },
+      { src: () => A.herDrink, say: 'Un petit café avec toi ☕', d: { energy: 4 } },
+      { src: () => A.herEat, say: 'Je t’ai pris une glace 🍦', d: { hunger: 8, happy: 4 } },
+      { src: () => A.herSport, say: 'Allez, on bouge un peu ! 💪', d: { energy: -4, happy: 5 } },
+      { src: () => A.herSit, say: 'Je me pose un peu avec toi 😌', pose: 'pose-sit', d: { love: 3 } },
+      { src: () => A.herWork, say: 'Je finis un mail et je suis toute à toi 💻' }
+    ];
+
+    function herActivity(act) {
+      if (!spriteHerEl.classList.contains('visible')) return;
+      spriteHerEl.src = act.src();
+      if (act.pose) spriteHerEl.classList.add(act.pose);
+      showBubble(act.say, 2600, A.herHappy);
+      const before = snap();
+      state.love = clamp(state.love + 2);
+      for (const [k, v] of Object.entries(act.d || {})) state[k] = clamp(state[k] + v);
+      if (act.selfie) {
+        const fl = el('div', 'flash');
+        screenEl.appendChild(fl);
+        setTimeout(() => fl.remove(), 600);
+        sfx.coin();
+        state.counters.selfies++;
+        if (addMemory('📸 Selfie ensemble', 'note')) toast('📸 Selfie ajouté au carnet');
+        flashMood(A.himHappy, 1500);
+      } else sfx.pop();
+      renderStats();
+      showDeltas(before);
+      checkTrophies();
+    }
+
+    // =====================================================================
+    //  Repas à glisser jusqu'à lui
+    // =====================================================================
+    let foodItem = null;
+    let foodHints = 0;
+
+    function removeFood(poof) {
+      if (!foodItem) return;
+      const it = foodItem;
+      foodItem = null;
+      if (poof) { it.el.classList.add('poof'); setTimeout(() => it.el.remove(), 400); } else it.el.remove();
+    }
+
+    function spawnFood(f) {
+      removeFood();
+      const box = el('div', 'drag-food');
+      if (f.drag && f.drag.startsWith('ico') === false && f.drag.length <= 4) box.textContent = f.drag;
+      else { const im = el('img'); im.src = A[f.drag] || f.img(); im.alt = f.n; box.appendChild(im); }
+      box.setAttribute('role', 'button');
+      box.setAttribute('aria-label', `${f.n} : glisse-le jusqu'à lui`);
+      screenEl.appendChild(box);
+      const startX = (posX > screenEl.clientWidth / 2) ? 14 : screenEl.clientWidth - 54;
+      foodItem = { el: box, f, x: startX, bottom: 28, dragging: false, born: Date.now() };
+      box.style.left = startX + 'px';
+      box.style.bottom = '28px';
+      if (foodHints < 2) { foodHints++; showBubble("Glisse-le jusqu'à moi ! 😋", 2200); }
+      sfx.pop();
+
+      let down = null;
+      box.addEventListener('pointerdown', (e) => {
+        if (!foodItem || foodItem.el !== box) return;
+        e.stopPropagation();
+        down = { x: e.clientX, y: e.clientY, moved: 0 };
+        foodItem.dragging = true;
+        box.classList.add('dragging');
+        try { box.setPointerCapture(e.pointerId); } catch (err) { /* ignoré */ }
+      });
+      box.addEventListener('pointermove', (e) => {
+        if (!down || !foodItem || foodItem.el !== box) return;
+        down.moved += Math.hypot(e.clientX - down.x, e.clientY - down.y);
+        down.x = e.clientX; down.y = e.clientY;
+        const r = screenEl.getBoundingClientRect();
+        const x = Math.max(0, Math.min(r.width - box.offsetWidth, e.clientX - r.left - box.offsetWidth / 2));
+        const b = Math.max(0, Math.min(r.height - box.offsetHeight, r.bottom - e.clientY - box.offsetHeight / 2));
+        foodItem.x = x;
+        foodItem.bottom = b;
+        box.style.left = x + 'px';
+        box.style.bottom = b + 'px';
+      });
+      const up = (e) => {
+        if (!down || !foodItem || foodItem.el !== box) return;
+        e.stopPropagation();
+        const moved = down.moved;
+        down = null;
+        foodItem.dragging = false;
+        box.classList.remove('dragging');
+        const a = box.getBoundingClientRect(), h = spriteEl.getBoundingClientRect();
+        const over = a.right > h.left + 6 && a.left < h.right - 6 && a.bottom > h.top + 6 && a.top < h.bottom - 6;
+        if (over) return eatFood();
+        if (moved < 8) {
+          // simple tape : il va le chercher
+          if (himMode() === 'normal' && canAct() && walkSpeed() > 0) {
+            walkTarget = Math.max(6, Math.min(screenEl.clientWidth - spriteEl.offsetWidth - 12, foodItem.x - spriteEl.offsetWidth / 2 + 18));
+            pauseUntil = 0;
+            showBubble("J'arrive ! 🏃", 1000);
+          }
+          return;
+        }
+        // on le repose par terre
+        foodItem.bottom = 28;
+        box.style.bottom = '28px';
+      };
+      box.addEventListener('pointerup', up);
+      box.addEventListener('pointercancel', up);
+      box.addEventListener('click', (e) => e.stopPropagation());
+    }
+
+    function eatFood() {
+      if (!foodItem) return;
+      if (!canAct()) { foodItem.bottom = 28; foodItem.el.style.bottom = '28px'; return; }
+      const f = foodItem.f;
+      removeFood();
+      feed(f);
+    }
+
+    function syncFood() {
+      if (!foodItem || foodItem.dragging) return;
+      if (Date.now() - foodItem.born > 60 * 1000) { removeFood(true); return; }
+      if (foodItem.bottom > 40 || !canAct() || himMode() !== 'normal') return;
+      const fc = foodItem.x + foodItem.el.offsetWidth / 2;
+      const hc = spriteEl.offsetLeft + spriteEl.offsetWidth / 2;
+      if (Math.abs(fc - hc) < 26) eatFood();
+    }
+
+    // =====================================================================
+    //  Ballon pour le compagnon
+    // =====================================================================
+    const ballEl = $('ball');
+    ballEl.src = A.toyBall;
+    const ball = { x: 30, y: 26, vx: 0, vy: 0, mode: 'rest', dragging: false, hist: [] };
+    let petFetch = null;
+    const BALL = 20;
+
+    function ballVisible() {
+      return !!ITEM[state.wear.compagnon] && !game.active && himMode() !== 'sleep';
+    }
+
+    function placeBall() {
+      ballEl.style.left = ball.x + 'px';
+      ballEl.style.bottom = ball.y + 'px';
+      ballEl.style.transform = `rotate(${(ball.x * 6) % 360}deg)`;
+    }
+
+    ballEl.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      if (!ballVisible()) return;
+      ball.dragging = true;
+      ball.mode = 'held';
+      petFetch = null;
+      ball.hist = [{ x: e.clientX, y: e.clientY, t: performance.now() }];
+      ball.moved = 0;
+      try { ballEl.setPointerCapture(e.pointerId); } catch (err) { /* ignoré */ }
+    });
+    ballEl.addEventListener('pointermove', (e) => {
+      if (!ball.dragging) return;
+      const r = screenEl.getBoundingClientRect();
+      const last = ball.hist[ball.hist.length - 1];
+      ball.moved += Math.hypot(e.clientX - last.x, e.clientY - last.y);
+      ball.hist.push({ x: e.clientX, y: e.clientY, t: performance.now() });
+      if (ball.hist.length > 6) ball.hist.shift();
+      ball.x = Math.max(0, Math.min(r.width - BALL, e.clientX - r.left - BALL / 2));
+      ball.y = Math.max(26, Math.min(r.height - BALL, r.bottom - e.clientY - BALL / 2));
+      placeBall();
+    });
+    const releaseBall = (e) => {
+      if (!ball.dragging) return;
+      e.stopPropagation();
+      ball.dragging = false;
+      const h = ball.hist;
+      if (ball.moved < 6) {
+        // petite tape : on shoote
+        ball.vx = (Math.random() < 0.5 ? -1 : 1) * rand(180, 300);
+        ball.vy = rand(220, 320);
+      } else {
+        const a = h[0], b = h[h.length - 1];
+        const dt = Math.max(0.016, (b.t - a.t) / 1000);
+        ball.vx = Math.max(-700, Math.min(700, (b.x - a.x) / dt));
+        ball.vy = Math.max(-200, Math.min(700, -(b.y - a.y) / dt));
+      }
+      ball.mode = 'fly';
+      petFetch = 'chase';
+      sfx.pop();
+    };
+    ballEl.addEventListener('pointerup', releaseBall);
+    ballEl.addEventListener('pointercancel', releaseBall);
+    ballEl.addEventListener('click', (e) => e.stopPropagation());
+
+    function syncBall(dt) {
+      const show = ballVisible();
+      ballEl.hidden = !show;
+      if (!show) { petFetch = null; if (ball.mode === 'carried') ball.mode = 'rest'; return; }
+      const W = screenEl.clientWidth, H = screenEl.clientHeight;
+      if (ball.mode === 'fly') {
+        ball.vy -= 950 * dt;
+        ball.x += ball.vx * dt;
+        ball.y += ball.vy * dt;
+        if (ball.x < 0) { ball.x = 0; ball.vx = -ball.vx * 0.6; }
+        if (ball.x > W - BALL) { ball.x = W - BALL; ball.vx = -ball.vx * 0.6; }
+        if (ball.y > H - BALL) { ball.y = H - BALL; ball.vy = -Math.abs(ball.vy) * 0.3; }
+        if (ball.y <= 26) {
+          ball.y = 26;
+          if (Math.abs(ball.vy) > 90) { ball.vy = -ball.vy * 0.5; sfx.tap(); } else ball.vy = 0;
+          ball.vx *= 0.82;
+        }
+        if (ball.y <= 26 && ball.vy === 0) {
+          ball.vx *= Math.max(0, 1 - 3 * dt);
+          if (Math.abs(ball.vx) < 10) { ball.vx = 0; ball.mode = 'rest'; }
+        }
+      }
+      if (ball.mode === 'carried') {
+        ball.x = petX + (petFace > 0 ? (petEl.offsetWidth || 30) - 10 : -6);
+        ball.y = 26 + (petEl.offsetHeight || 34) * 0.45;
+      }
+      placeBall();
+    }
+
+    function petCaughtBall() {
+      ball.mode = 'carried';
+      petFetch = 'return';
+      sfx.pop();
+    }
+
+    function petBroughtBall() {
+      const it = ITEM[state.wear.compagnon];
+      petFetch = null;
+      ball.mode = 'rest';
+      ball.y = 26;
+      const before = snap();
+      state.counters.fetches++;
+      state.happy = clamp(state.happy + 3);
+      state.love = clamp(state.love + 1);
+      if (it) showBubble(`${it.say} 🎾`, 1500, A[it.id]);
+      spawnHeart(petX + 'px', '62px', 'icoHeart');
+      sfx.happy();
+      renderStats();
+      showDeltas(before);
+      checkTrophies();
+    }
+
+    // =====================================================================
+    //  Mini-jeu : Mémoire
+    // =====================================================================
+    const memEl = $('memory');
+    const MEM_ICONS = ['icoHeart', 'icoCake', 'icoGift', 'icoHunger', 'icoHappy', 'icoTrophy', 'icoLove', 'icoHome', 'icoNote', 'toyBall', 'icoThirst', 'decoPumpkin'];
+    const mem = { cards: [], open: [], found: 0, moves: 0, lock: false };
+
+    function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+    function startMemory() {
+      if (!canAct()) return;
+      busy = true;
+      game.active = true;
+      stopHim();
+      bubbleEl.classList.remove('show');
+      spriteEl.style.visibility = 'hidden';
+      afterCare();
+      const icons = shuffle(MEM_ICONS.filter((k) => A[k]).slice()).slice(0, 6);
+      mem.cards = shuffle([...icons, ...icons].map((k) => ({ k, done: false })));
+      mem.open = [];
+      mem.found = 0;
+      mem.moves = 0;
+      mem.lock = false;
+      $('memGrid').replaceChildren(...mem.cards.map((c, i) => {
+        const b = el('button', 'mem-card');
+        b.setAttribute('aria-label', 'Carte');
+        const front = el('img', 'mem-front');
+        front.src = A[c.k];
+        front.alt = '';
+        b.append(el('span', 'mem-back', '⛽'), front);
+        b.addEventListener('click', (e) => { e.stopPropagation(); flipMem(i, b); });
+        c.btn = b;
+        return b;
+      }));
+      $('memInfo').textContent = 'Retrouve les paires ! · 0 coup';
+      memEl.hidden = false;
+    }
+
+    function flipMem(i, b) {
+      const c = mem.cards[i];
+      if (mem.lock || c.done || mem.open.includes(i)) return;
+      b.classList.add('flipped');
+      sfx.tap();
+      mem.open.push(i);
+      if (mem.open.length < 2) return;
+      mem.moves++;
+      const [a1, a2] = mem.open.map((k) => mem.cards[k]);
+      if (a1.k === a2.k) {
+        a1.done = a2.done = true;
+        a1.btn.classList.add('done');
+        a2.btn.classList.add('done');
+        mem.found++;
+        mem.open = [];
+        sfx.coin();
+        if (mem.found === 6) setTimeout(endMemory, 500);
+      } else {
+        mem.lock = true;
+        setTimeout(() => {
+          a1.btn.classList.remove('flipped');
+          a2.btn.classList.remove('flipped');
+          mem.open = [];
+          mem.lock = false;
+        }, 750);
+      }
+      $('memInfo').textContent = `${mem.found} / 6 paires · ${mem.moves} coup${mem.moves > 1 ? 's' : ''}`;
+    }
+
+    function endMemory() {
+      const stars = mem.moves <= 9 ? 3 : (mem.moves <= 13 ? 2 : 1);
+      const record = !state.bestMemory || mem.moves < state.bestMemory;
+      if (record) state.bestMemory = mem.moves;
+      state.bestMemoryStars = Math.max(state.bestMemoryStars || 0, stars);
+      $('memInfo').textContent = `${'⭐'.repeat(stars)} en ${mem.moves} coups${record ? ' · record !' : ''}`;
+      const before = snap();
+      state.happy = clamp(state.happy + stars * 6);
+      state.love = clamp(state.love + stars * 2);
+      state.energy = clamp(state.energy - 4);
+      state.counters.games++;
+      sfx.level();
+      gainXp(4 + stars * 3);
+      updateConditions(true);
+      renderStats();
+      showDeltas(before);
+      checkTrophies();
+      setTimeout(() => {
+        memEl.hidden = true;
+        spriteEl.style.visibility = '';
+        game.active = false;
+        busy = false;
+        refreshHim(true);
+      }, 2200);
+    }
+
+    // =====================================================================
+    //  Mini-jeu : Danse avec elle (rythme)
+    // =====================================================================
+    const danceEl = $('dance');
+    const DANCE_BEAT = 560;
+    const DANCE_PATTERN = [1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1];
+    const dance = { notes: [], start: 0, score: 0, beat: -1, raf: 0, combo: 0 };
+
+    function startDance() {
+      if (!canAct()) return;
+      busy = true;
+      game.active = true;
+      stopHim();
+      bubbleEl.classList.remove('show');
+      spriteEl.style.visibility = 'hidden';
+      afterCare();
+      $('danceHim').src = A.himStand;
+      $('danceHer').src = A.herStand;
+      $('danceMsg').textContent = 'Tape quand le cercle touche le rond !';
+      $('danceInfo').textContent = '🪩 0 pt';
+      danceEl.hidden = false;
+      dance.start = performance.now() + 2000;
+      dance.notes = [];
+      DANCE_PATTERN.forEach((on, i) => { if (on) dance.notes.push({ t: dance.start + (i + 2) * DANCE_BEAT, judged: false }); });
+      dance.end = dance.start + (DANCE_PATTERN.length + 3) * DANCE_BEAT;
+      dance.score = 0;
+      dance.combo = 0;
+      dance.beat = -1;
+      cancelAnimationFrame(dance.raf);
+      dance.raf = requestAnimationFrame(danceLoop);
+    }
+
+    function judge(text, cls) {
+      const m = $('danceMsg');
+      m.textContent = text;
+      m.className = 'dance-msg ' + cls;
+    }
+
+    function danceTap(e) {
+      if (e) e.stopPropagation();
+      if (danceEl.hidden) return;
+      const now = performance.now();
+      let best = null;
+      for (const n of dance.notes) if (!n.judged && (!best || Math.abs(n.t - now) < Math.abs(best.t - now))) best = n;
+      if (!best || Math.abs(best.t - now) > 300) return;
+      best.judged = true;
+      const d = Math.abs(best.t - now);
+      const melody = [523, 587, 659, 784, 880, 784, 659, 587];
+      if (d < 110) { dance.score += 2; dance.combo++; judge(dance.combo > 2 ? `Parfait ! x${dance.combo} 🔥` : 'Parfait ! 💃', 'perfect'); }
+      else if (d < 230) { dance.score += 1; dance.combo++; judge('Bien ! 🕺', 'good'); }
+      else { dance.combo = 0; judge('Raté 😜', 'miss'); sfx.bad(); return; }
+      tonePlay(melody[dance.notes.indexOf(best) % melody.length]);
+      $('danceInfo').textContent = `🪩 ${dance.score} pts`;
+    }
+    function tonePlay(freq) {
+      // petite note de mélodie quand on tape juste
+      if (state.sound === false) return;
+      try {
+        const ctx = tonePlay.ctx || (tonePlay.ctx = new (window.AudioContext || window.webkitAudioContext)());
+        const t = ctx.currentTime;
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = 'square';
+        o.frequency.setValueAtTime(freq, t);
+        g.gain.setValueAtTime(0.035, t);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+        o.connect(g).connect(ctx.destination);
+        o.start(t);
+        o.stop(t + 0.2);
+      } catch (err) { /* pas de son */ }
+    }
+    danceEl.addEventListener('pointerdown', danceTap);
+    document.addEventListener('keydown', (e) => { if (!danceEl.hidden && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); danceTap(); } });
+
+    function danceLoop(now) {
+      if (danceEl.hidden) return;
+      const beat = Math.floor((now - dance.start) / DANCE_BEAT);
+      if (beat !== dance.beat && now >= dance.start) {
+        dance.beat = beat;
+        const up = beat % 2 === 0;
+        $('danceHim').src = up ? A.himJump : A.himStand;
+        $('danceHer').src = up ? A.herStand : A.herJump;
+        $('danceHim').style.transform = beat % 4 < 2 ? 'scaleX(1)' : 'scaleX(-1)';
+        $('danceHer').style.transform = beat % 4 < 2 ? 'scaleX(-1)' : 'scaleX(1)';
+        if (state.sound !== false) tonePlayKick();
+      }
+      // anneau du prochain temps
+      const next = dance.notes.find((n) => !n.judged && n.t > now - 230);
+      const ring = $('danceRing');
+      if (next) {
+        const lead = next.t - now;
+        const sc = Math.max(1, 1 + (lead / (2 * DANCE_BEAT)) * 1.4);
+        ring.style.transform = `scale(${sc})`;
+        ring.style.opacity = lead < 2 * DANCE_BEAT ? '1' : '0';
+      } else ring.style.opacity = '0';
+      for (const n of dance.notes) if (!n.judged && now - n.t > 230) { n.judged = true; dance.combo = 0; judge('Raté 😜', 'miss'); }
+      if (now > dance.end) return endDance();
+      dance.raf = requestAnimationFrame(danceLoop);
+    }
+    function tonePlayKick() {
+      try {
+        const ctx = tonePlay.ctx || (tonePlay.ctx = new (window.AudioContext || window.webkitAudioContext)());
+        const t = ctx.currentTime;
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(140, t);
+        o.frequency.exponentialRampToValueAtTime(50, t + 0.12);
+        g.gain.setValueAtTime(0.12, t);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.15);
+        o.connect(g).connect(ctx.destination);
+        o.start(t);
+        o.stop(t + 0.16);
+      } catch (err) { /* pas de son */ }
+    }
+
+    function endDance() {
+      const max = dance.notes.length * 2;
+      const pct = dance.score / max;
+      const stars = pct >= 0.8 ? 3 : (pct >= 0.5 ? 2 : 1);
+      const record = dance.score > (state.bestDance || 0);
+      if (record) state.bestDance = dance.score;
+      state.bestDanceStars = Math.max(state.bestDanceStars || 0, stars);
+      judge(`${'⭐'.repeat(stars)} ${dance.score} / ${max} pts${record ? ' · record !' : ''}`, 'perfect');
+      const before = snap();
+      state.happy = clamp(state.happy + stars * 6);
+      state.love = clamp(state.love + stars * 4);
+      state.energy = clamp(state.energy - 8);
+      state.hunger = clamp(state.hunger - 4);
+      state.counters.games++;
+      sfx.level();
+      gainXp(4 + stars * 3);
+      updateConditions(true);
+      renderStats();
+      showDeltas(before);
+      checkTrophies();
+      setTimeout(() => {
+        danceEl.hidden = true;
+        spriteEl.style.visibility = '';
+        game.active = false;
+        busy = false;
+        refreshHim(true);
+      }, 2300);
+    }
+
+    $('pickMemory').addEventListener('click', () => { gamesModal.hidden = true; startMemory(); });
+    $('pickDance').addEventListener('click', () => { gamesModal.hidden = true; startDance(); });
+
+    // =====================================================================
+    //  Application installable + notifications
+    // =====================================================================
+    const PUSH_KEY = 'cheriotchi_push';
+    const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isStandalone = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+    const pushSupported = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window && location.protocol.startsWith('http');
+    const pushOn = () => { try { return localStorage.getItem(PUSH_KEY) === '1'; } catch (e) { return false; } };
+
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+      navigator.serviceWorker.register('sw.js').catch(() => { /* pas grave */ });
+    }
+
+    function b64ToBytes(b64) {
+      const s = (b64 + '='.repeat((4 - (b64.length % 4)) % 4)).replace(/-/g, '+').replace(/_/g, '/');
+      const raw = atob(s);
+      return Uint8Array.from(raw, (c) => c.charCodeAt(0));
+    }
+
+    function renderPushBox() {
+      let txt;
+      const on = pushOn();
+      let canEnable = false;
+      if (!cloud.available) txt = 'Il faut ouvrir le jeu depuis son adresse en ligne (avec le serveur).';
+      else if (isIos && !isStandalone()) txt = 'Sur iPhone : ajoute d’abord le jeu à l’écran d’accueil (Partager → « Sur l’écran d’accueil »), puis ouvre-le depuis l’icône.';
+      else if (!pushSupported()) txt = 'Ce navigateur ne gère pas les notifications.';
+      else if (Notification.permission === 'denied') txt = 'Notifications bloquées : autorise-les dans les réglages du téléphone.';
+      else if (on) txt = '✅ Activées : il te prévient quand il a faim, est malade ou que tu lui manques. Jamais la nuit (22 h – 8 h).';
+      else { txt = 'Désactivées. Il peut te prévenir quand il a besoin de toi 🔔'; canEnable = true; }
+      $('pushStatus').textContent = txt;
+      $('pushOn').hidden = !canEnable;
+      $('pushTest').hidden = !on;
+      $('pushOff').hidden = !on;
+    }
+
+    async function ensureCloudCode() {
+      if (cloud.code) return true;
+      saveState();
+      const r = await api('POST', '/api/saves', { save: state });
+      if (r.status !== 201) return false;
+      cloud.code = r.data.code;
+      cloud.lastPush = Date.now();
+      cloud.pushedPlayedAt = playedOf(state);
+      localStorage.setItem(SYNC_KEY, cloud.code);
+      return true;
+    }
+
+    $('pushOn').addEventListener('click', async () => {
+      try {
+        const perm = await Notification.requestPermission();
+        if (perm !== 'granted') { setSaveMsg('Notifications refusées 😕'); return renderPushBox(); }
+        if (!(await ensureCloudCode())) throw new Error('cloud');
+        const reg = await navigator.serviceWorker.ready;
+        const key = await api('GET', '/api/push/key');
+        const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(key.data.publicKey) });
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Paris';
+        const r = await api('POST', '/api/push/subscribe', { code: cloud.code, subscription: sub.toJSON(), tz });
+        if (r.status !== 200) throw new Error('subscribe');
+        localStorage.setItem(PUSH_KEY, '1');
+        setSaveMsg('Notifications activées 🔔');
+        sfx.coin();
+      } catch (e) { setSaveMsg('Impossible d’activer les notifications 😕'); }
+      renderPushBox();
+      renderCloudBox();
+    });
+
+    $('pushTest').addEventListener('click', async () => {
+      try {
+        const r = await api('POST', '/api/push/test', { code: cloud.code });
+        setSaveMsg(r.data && r.data.sent ? 'Notification envoyée, regarde ton téléphone 📲' : 'Aucune notification envoyée 😕');
+      } catch (e) { setSaveMsg('Serveur injoignable 😕'); }
+    });
+
+    $('pushOff').addEventListener('click', async () => {
+      try {
+        const reg = await navigator.serviceWorker.ready;
+        const sub = await reg.pushManager.getSubscription();
+        if (sub) {
+          await api('POST', '/api/push/unsubscribe', { code: cloud.code, endpoint: sub.endpoint });
+          await sub.unsubscribe();
+        }
+      } catch (e) { /* ignoré */ }
+      try { localStorage.removeItem(PUSH_KEY); } catch (e) { /* ignoré */ }
+      setSaveMsg('Notifications désactivées');
+      renderPushBox();
+    });
 
     // =====================================================================
     //  Démarrage

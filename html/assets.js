@@ -113,6 +113,8 @@ window.ASSETS = {
   strawHat: 'img/accessoires/strawHat.png',
   sunglasses: 'img/accessoires/sunglasses.png',
   thugGlasses: 'img/accessoires/thugGlasses.png',
+  toyBall: 'img/accessoires/toyBall.png',
+  toyBasket: 'img/accessoires/toyBasket.png',
   wings: 'img/accessoires/wings.png',
   witchHat: 'img/accessoires/witchHat.png',
   // ---- Compagnons ----

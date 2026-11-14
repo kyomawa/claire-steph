@@ -18,5 +18,7 @@ js = (root / 'assets.js').read_text(encoding='utf-8')
 js = re.sub(r"'(img/[^']+\.png)'", lambda m: "'" + uri(m.group(1)) + "'", js)
 html = html.replace('<script src="assets.js"></script>', '<script>\n' + js + '\n</script>')
 html = re.sub(r'href="(img/[^"]+\.png)"', lambda m: 'href="' + uri(m.group(1)) + '"', html)
+# le fichier autonome s'ouvre sans serveur : pas d'appli installable ni de notifications
+html = html.replace('  <link rel="manifest" href="manifest.webmanifest">\n', '')
 out.write_text(html, encoding='utf-8')
 print(f'{out} ({out.stat().st_size // 1024} Ko)')
