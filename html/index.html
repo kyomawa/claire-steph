@@ -12,7 +12,7 @@
   <link rel="icon" type="image/png" href="img/icones/eggHim.png">
   <link rel="apple-touch-icon" href="img/icones/eggHim.png">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Space+Mono:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Racing+Sans+One&family=Space+Mono:wght@400;700&display=swap');
 
     :root {
       --gulf-blue: #A9D6E5;
@@ -908,6 +908,296 @@
       .hud { font-size: 11px; padding: 4px 8px; }
     }
 
+
+    /* =====================================================================
+       THÈME GULF — livrée bleu poudre / orange / marine
+       ===================================================================== */
+    :root {
+      --gulf-blue: #A6D2EC;
+      --gulf-blue-deep: #3D7FA8;
+      --gulf-orange: #F26A21;
+      --gulf-orange-deep: #D24F12;
+      --navy: #1E3456;
+      --navy-2: #2C4A74;
+      --ink: #1E3456;
+    }
+
+    body { background: transparent; }
+
+    .device {
+      background:
+        linear-gradient(115deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 38%),
+        var(--gulf-blue);
+      border: 4px solid var(--navy);
+      border-radius: 40px;
+      box-shadow:
+        0 28px 50px -22px rgba(30, 52, 86, 0.55),
+        inset 0 0 0 3px rgba(255, 255, 255, 0.55),
+        inset 0 -10px 0 rgba(30, 52, 86, 0.08);
+      padding-top: 18px;
+    }
+
+    /* bande de course orange, filets marine */
+    .stripe {
+      width: 52px;
+      background: var(--gulf-orange);
+      opacity: 1;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+    }
+    .stripe::before, .stripe::after { width: 5px; background: var(--navy); }
+    .stripe::before { left: -11px; }
+    .stripe::after { right: -11px; }
+
+    .topbar {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+
+    .brand {
+      font-family: 'Racing Sans One', 'Baloo 2', sans-serif;
+      font-weight: 400;
+      font-size: 14px;
+      letter-spacing: 1px;
+      color: var(--navy);
+      background: #fff;
+      border: 2.5px solid var(--navy);
+      padding: 2px 14px;
+      box-shadow: 0 3px 0 var(--navy);
+    }
+
+    .icon-btn {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2.5px solid var(--navy);
+      background: #fff;
+      box-shadow: 0 3px 0 var(--navy);
+      font-size: 16px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      padding: 0;
+    }
+    .icon-btn:active { transform: translateY(calc(-50% + 2px)); box-shadow: 0 1px 0 var(--navy); }
+
+    .nameplate {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #fff;
+      border: 3px solid var(--navy);
+      border-radius: 18px;
+      padding: 4px 14px 4px 6px;
+      margin: 0 auto 8px;
+      width: fit-content;
+      max-width: 100%;
+      box-shadow: 0 4px 0 var(--navy);
+    }
+
+    .race-no {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid var(--navy);
+      box-shadow: 0 0 0 3px var(--gulf-orange);
+      display: grid;
+      place-items: center;
+      font-family: 'Racing Sans One', sans-serif;
+      font-size: 20px;
+      color: var(--navy);
+      margin: 3px;
+    }
+
+    .title {
+      font-family: 'Racing Sans One', 'Baloo 2', sans-serif;
+      font-weight: 400;
+      font-size: 24px;
+      letter-spacing: 0.5px;
+      color: var(--navy);
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .subtitle span {
+      color: var(--navy);
+      border-color: var(--navy);
+      font-size: 11px;
+    }
+
+    .hud {
+      background: var(--navy);
+      border: none;
+      color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 3px 0 rgba(30, 52, 86, 0.35);
+    }
+    .xp-track { background: rgba(255, 255, 255, 0.18); border: none; height: 9px; }
+    .xp-fill { background: repeating-linear-gradient(-45deg, var(--gulf-orange) 0 6px, #FF8A4A 6px 12px); }
+
+    .screen-wrap {
+      background: var(--navy);
+      border-radius: 24px;
+      padding: 7px;
+      box-shadow: 0 0 0 3px var(--gulf-orange), 0 0 0 6px var(--navy), 0 10px 18px -6px rgba(30, 52, 86, 0.5);
+      margin: 4px 3px 0;
+    }
+
+    .panel {
+      position: relative;
+      z-index: 2;
+      background: #fff;
+      border: 3px solid var(--navy);
+      border-radius: 18px;
+      padding: 12px 12px;
+      box-shadow: 0 4px 0 var(--navy);
+    }
+
+    .stats.panel { margin-top: 18px; gap: 9px; }
+    .stat-label { color: var(--navy); font-weight: 800; text-transform: uppercase; font-size: 11px; letter-spacing: 0.3px; }
+    .bar-track { height: 13px; background: #E8F2F8; border: 2px solid var(--navy); border-radius: 8px; }
+    .bar-fill { background-image: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.22) 0 5px, transparent 5px 10px) !important; }
+
+    .btn {
+      border: 2.5px solid var(--navy);
+      color: var(--navy);
+      box-shadow: 0 3px 0 var(--navy);
+      font-weight: 800;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
+    }
+    .btn:hover { background: #EAF5FB; }
+    .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--navy); }
+
+    .btn-style { background: var(--gulf-blue); }
+    .btn-style:hover { background: #BFE0F2; }
+
+    .btn-hug {
+      background: linear-gradient(180deg, #FF7F3A 0%, var(--gulf-orange) 100%);
+      border-color: var(--navy);
+      color: #fff;
+      text-shadow: 0 1px 0 rgba(30, 52, 86, 0.5);
+      font-size: 14px;
+    }
+    .btn-hug:hover { background: linear-gradient(180deg, #FF8C4D 0%, #F47530 100%); }
+
+    .btn.alert { border-color: var(--low); }
+
+    .checker {
+      position: relative;
+      z-index: 2;
+      height: 12px;
+      margin: 16px -20px 0;
+      background: repeating-conic-gradient(var(--navy) 0 25%, #fff 0 50%) 0 0 / 12px 12px;
+      border-top: 2px solid var(--navy);
+      border-bottom: 2px solid var(--navy);
+    }
+
+    .footer-note { margin-top: 12px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .footer-note span { color: var(--navy); border-color: var(--navy); }
+    .save-info { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--navy); background: rgba(255, 255, 255, 0.9); padding: 2px 10px; border-radius: 12px; }
+
+    .modal-card { border: 3px solid var(--navy); box-shadow: 0 6px 0 var(--navy); }
+    .modal-head { border-bottom: 4px solid var(--gulf-orange); box-shadow: 0 2px 0 var(--navy); margin-bottom: 10px; padding-bottom: 10px; }
+    .modal-head h2 { font-family: 'Racing Sans One', 'Baloo 2', sans-serif; font-weight: 400; color: var(--navy); }
+    .tab { border: 2px solid var(--navy); color: var(--navy); }
+    .tab[aria-selected="true"] { background: var(--gulf-orange); color: #fff; }
+    .toast { background: var(--navy); color: #fff; border-color: var(--gulf-orange); }
+
+    @media (max-width: 420px) {
+      .checker { margin: 14px -12px 0; }
+      .title { font-size: 21px; }
+    }
+
+    .wish {
+      position: absolute;
+      z-index: 6;
+      min-width: 34px;
+      height: 30px;
+      padding: 0 6px;
+      border-radius: 16px;
+      background: #fff;
+      border: 2.5px solid var(--navy);
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+      animation: wishPop 1.4s ease-in-out infinite;
+      box-shadow: 0 2px 0 var(--navy);
+    }
+    .wish::after {
+      content: "";
+      position: absolute;
+      left: 4px;
+      bottom: -9px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid var(--navy);
+    }
+    @keyframes wishPop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+
+    .guess {
+      position: absolute;
+      inset: 0;
+      z-index: 7;
+      background: rgba(255, 255, 255, 0.86);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .guess[hidden] { display: none; }
+    .guess-info { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 12px; color: var(--navy); }
+    .guess-him { height: 92px; width: auto; transition: transform 0.15s ease; }
+    .guess-msg { font-weight: 800; font-size: 13px; color: var(--navy); min-height: 18px; text-align: center; padding: 0 10px; }
+    .guess-btns { display: flex; gap: 18px; }
+    .guess-btn {
+      width: 64px;
+      height: 40px;
+      font-size: 20px;
+      border-radius: 12px;
+      background: #fff;
+      border: 2.5px solid var(--navy);
+      box-shadow: 0 3px 0 var(--navy);
+      cursor: pointer;
+    }
+    .guess-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--navy); }
+    .guess-btn:disabled { opacity: 0.5; }
+
+    .g-card { align-items: center; text-align: center; padding: 14px 8px; }
+    .g-ico { font-size: 26px; letter-spacing: 2px; }
+
+    .save-body p { font-size: 13px; line-height: 1.4; margin: 0 0 10px; }
+    .save-body .tip { background: #EAF5FB; border-radius: 10px; padding: 8px 10px; font-size: 12px; }
+    .save-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }
+    .save-actions .btn { grid-column: auto; }
+    .save-body textarea {
+      width: 100%;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      border: 2px solid var(--navy);
+      border-radius: 10px;
+      padding: 6px;
+      resize: vertical;
+    }
+    .save-msg { font-weight: 700; color: var(--gulf-orange-deep); min-height: 16px; }
+    .wide-btn { width: 100%; flex-direction: row; justify-content: center; margin-top: 8px; padding: 10px; font-size: 13px; }
+    .wide-btn.danger { color: var(--low); border-color: var(--low); box-shadow: 0 3px 0 var(--low); }
+
     @media (prefers-reduced-motion: reduce) {
       .star, .btn.alert { animation: none; }
     }
@@ -919,11 +1209,15 @@
   <div class="device">
     <div class="stripe"></div>
 
-    <div class="brandrow">
+    <div class="topbar">
       <span class="brand">⛽ GULF · since 1901</span>
+      <button class="icon-btn" id="btnSettings" aria-label="Sauvegarde et réglages" title="Sauvegarde">💾</button>
     </div>
-    <h1 class="title" contenteditable="true" spellcheck="false" id="petName">Mon Chéri-o-tchi</h1>
-    <div class="subtitle"><span>tape sur lui pour un bisou 💋</span></div>
+    <div class="nameplate">
+      <span class="race-no" aria-hidden="true">1</span>
+      <h1 class="title" contenteditable="true" spellcheck="false" id="petName">Mon Chéri-o-tchi</h1>
+    </div>
+    <div class="subtitle"><span>tape, caresse, chatouille-le 💋</span></div>
 
     <div class="hud" aria-label="Progression">
       <span class="chip" id="hudDays">🗓️ Jour 1</span>
@@ -937,7 +1231,7 @@
         <img class="backdrop" id="backdrop" alt="" hidden>
         <div class="sky" id="sky"><div class="moon">🌙</div></div>
         <div class="scanlines"></div>
-        <div class="floor"></div>
+        <div class="floor" style="pointer-events:none"></div>
         <img class="mood" id="mood" alt="humeur">
         <div class="bubble" id="bubble"><img class="bubble-face" id="bubbleFace" alt=""><span id="bubbleText"></span></div>
         <div id="poops"></div>
@@ -945,6 +1239,16 @@
           <img class="sprite" id="sprite" alt="lui">
           <img class="sprite sprite-her" id="spriteHer" alt="toi">
           <img class="pet" id="pet" alt="compagnon" hidden>
+          <button class="wish" id="wish" hidden aria-label="Son envie"></button>
+        </div>
+        <div class="guess" id="guess" hidden>
+          <div class="guess-info" id="guessInfo"></div>
+          <img class="guess-him" id="guessHim" alt="">
+          <div class="guess-msg" id="guessMsg"></div>
+          <div class="guess-btns">
+            <button class="guess-btn" id="guessLeft" aria-label="Gauche">⬅️</button>
+            <button class="guess-btn" id="guessRight" aria-label="Droite">➡️</button>
+          </div>
         </div>
         <div class="game" id="game">
           <div class="game-hud"><span id="gameScore">💋 0</span><span id="gameTime">⏱ 20</span></div>
@@ -963,7 +1267,7 @@
       </div>
     </div>
 
-    <div class="stats">
+    <div class="stats panel">
       <div class="stat-row">
         <div class="stat-label"><img class="stat-ico" data-ico="icoHunger" alt=""> Faim</div>
         <div class="bar-track"><div class="bar-fill" id="bar-hunger"></div></div>
@@ -996,7 +1300,11 @@
       <button class="btn btn-hug" id="btnHug"><span class="emoji">🥰</span>Câlin de ta copine</button>
     </div>
 
-    <div class="footer-note"><span>nourris-le, câline-le, sinon il boude ⛽</span></div>
+    <div class="checker" aria-hidden="true"></div>
+    <div class="footer-note">
+      <span>nourris-le, câline-le, sinon il boude ⛽</span>
+      <div class="save-info" id="saveInfo">💾 Sauvegarde automatique</div>
+    </div>
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"><img id="toastIco" alt=""><span id="toastText"></span></div>
@@ -1039,6 +1347,49 @@
         <button class="close" id="duoClose" aria-label="Fermer">✕</button>
       </div>
       <div class="tab-body"><div class="moments" id="duoGrid"></div></div>
+    </div>
+  </div>
+
+  <div class="modal" id="games" hidden role="dialog" aria-modal="true" aria-labelledby="gamesTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="gamesTitle">🎮 À quoi on joue ?</h2>
+        <button class="close" id="gamesClose" aria-label="Fermer">✕</button>
+      </div>
+      <div class="tab-body">
+        <div class="moments">
+          <button class="m-card g-card" id="pickCatch"><span class="g-ico">💋☕💕</span><span class="m-name">Attrape les bisous</span><span class="m-sub">20 s · glisse le doigt</span><span class="m-sub" id="bestCatch"></span></button>
+          <button class="m-card g-card" id="pickGuess"><span class="g-ico">⬅️🤔➡️</span><span class="m-name">Gauche ou droite ?</span><span class="m-sub">5 manches · devine où il regarde</span><span class="m-sub" id="bestGuess"></span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="saveModal" hidden role="dialog" aria-modal="true" aria-labelledby="saveTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="saveTitle">💾 Sauvegarde</h2>
+        <button class="close" id="saveClose" aria-label="Fermer">✕</button>
+      </div>
+      <div class="tab-body save-body">
+        <p>La partie s'enregistre <b>toute seule, à chaque action</b>, sur cet appareil. Il peut fermer le jeu le soir : le lendemain tout est là (et il aura un peu faim 😉).</p>
+        <table class="stat-table">
+          <tr><td>Dernière sauvegarde</td><td id="saveWhen"></td></tr>
+          <tr><td>Stockage protégé</td><td id="savePersist"></td></tr>
+        </table>
+        <p class="tip">📱 Astuce : ajoute le jeu à l'écran d'accueil (Partager → « Sur l'écran d'accueil »). Évite la navigation privée, qui efface tout.</p>
+        <div class="save-actions">
+          <button class="btn" id="exportFile"><span class="emoji">📤</span>Exporter en fichier</button>
+          <button class="btn" id="exportCode"><span class="emoji">📋</span>Copier un code</button>
+          <label class="btn" for="importFile"><span class="emoji">📥</span>Importer un fichier</label>
+          <button class="btn" id="importCode"><span class="emoji">🔑</span>Coller un code</button>
+        </div>
+        <input type="file" id="importFile" accept=".json,application/json,text/plain" hidden>
+        <textarea id="saveCode" rows="3" placeholder="Code de sauvegarde…" spellcheck="false"></textarea>
+        <p class="save-msg" id="saveMsg" role="status"></p>
+        <button class="btn wide-btn" id="restoreBackup" hidden>↩️ Revenir à la sauvegarde d'hier</button>
+        <button class="btn wide-btn danger" id="resetGame">🗑️ Recommencer à zéro</button>
+      </div>
     </div>
   </div>
 
@@ -1141,13 +1492,15 @@
     //  État + sauvegarde
     // =====================================================================
     const STORAGE_KEY = 'cheriotchi_state';
+    let saveRestoring = false;
     function freshState() {
       return {
         hunger: 78, energy: 78, happy: 78, love: 78,
         sick: false, sulk: false, poops: [], digest: 0,
         xp: 0, bestScore: 0, streak: 0,
         bornAt: Date.now(), lastSeen: null, lastVisitDay: null,
-        counters: { hugs: 0, meals: 0, runs: 0, codes: 0, sleeps: 0, heals: 0, games: 0, kisses: 0, visits: 0, washes: 0, cleaned: 0, moments: 0 },
+        counters: { hugs: 0, meals: 0, runs: 0, codes: 0, sleeps: 0, heals: 0, games: 0, kisses: 0, visits: 0, washes: 0, cleaned: 0, moments: 0, strokes: 0, tickles: 0, wishes: 0 },
+        bestGuess: 0,
         trophies: {}, journal: [], name: null,
         album: {}, decor: 'auto',
         owned: {}, wear: { tete: null, yeux: null, visage: null, cou: null, dos: null, compagnon: null }
@@ -1162,10 +1515,22 @@
     const bubbleEl = $('bubble');
     const petNameEl = $('petName');
 
+    let saveInfoAt = 0;
     function saveState() {
+      if (saveRestoring) return;
       state.lastSeen = Date.now();
       state.name = petNameEl.textContent;
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { /* stockage indisponible */ }
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        if (Date.now() - saveInfoAt > 4000) {
+          saveInfoAt = Date.now();
+          const el = document.getElementById('saveInfo');
+          if (el) el.textContent = `💾 Sauvegardé à ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} sur cet appareil`;
+        }
+      } catch (e) {
+        const el = document.getElementById('saveInfo');
+        if (el) el.textContent = '⚠️ Sauvegarde impossible (navigation privée ?)';
+      }
     }
 
     function loadState() {
@@ -1254,6 +1619,10 @@
       { id: 'style_4', e: '👕', t: 'Fashion week', d: 'Porter 4 accessoires à la fois', ok: (s) => Object.values(s.wear).filter(Boolean).length >= 4 },
       { id: 'moments_10', e: '💑', t: 'Inséparables', d: '10 moments à deux', ok: (s) => s.counters.moments >= 10 },
       { id: 'album_all', e: '📸', t: 'Album complet', d: "Tous les moments de l'album", ok: (s) => Object.keys(s.album).length >= 16 },
+      { id: 'strokes_100', e: '🤲', t: 'Pro des papouilles', d: '100 caresses (frotte-le)', ok: (s) => s.counters.strokes >= 100 },
+      { id: 'tickles_20', e: '😂', t: 'Roi des chatouilles', d: '20 chatouilles (3 tapes rapides)', ok: (s) => s.counters.tickles >= 20 },
+      { id: 'wishes_10', e: '🧞', t: 'Génie de la lampe', d: 'Exaucer 10 de ses envies', ok: (s) => s.counters.wishes >= 10 },
+      { id: 'guess_5', e: '🔮', t: 'Télépathe', d: '5 / 5 à « Gauche ou droite »', ok: (s) => s.bestGuess >= 5 },
       { id: 'memories_10', e: '📖', t: 'Album souvenir', d: '10 souvenirs dans le carnet', ok: (s) => s.journal.length >= 10 }
     ];
 
@@ -1266,6 +1635,7 @@
     function checkTrophies() {
       for (const t of TROPHIES) if (!state.trophies[t.id] && t.ok(state)) unlock(t.id);
       checkUnlocks();
+      if (typeof checkWish === 'function' && wish) setTimeout(checkWish, 0);
     }
 
     function gainXp(n) {
@@ -1524,7 +1894,16 @@
       const frames = speed === 2 ? [A.himWalk, A.himRun] : [A.himStand, A.himWalk];
       walkTimer = setInterval(() => {
         if (Date.now() < pauseUntil) return;
-        if (speed === 1 && Math.random() < 0.006) {
+        if (walkTarget !== null) {
+          direction = walkTarget > posX ? 1 : -1;
+          if (Math.abs(walkTarget - posX) <= (speed === 2 ? 8 : 5)) {
+            posX = walkTarget;
+            walkTarget = null;
+            spriteEl.style.left = posX + 'px';
+            strikePose(A.himStand, null, 1600);
+            return;
+          }
+        } else if (speed === 1 && Math.random() < 0.006) {
           const p = pick(IDLE_PAUSES);
           strikePose(p.src(), null, 3800);
           if (!bubbleEl.classList.contains('show')) showBubble(p.text, 2000);
@@ -1615,6 +1994,8 @@
       updateConditions();
       renderStats();
       refreshHim();
+      checkWish();
+      maybeWish();
 
       if (himMode() !== 'normal' || bubbleEl.classList.contains('show')) return;
       if (state.hunger < 20 && Math.random() < 0.5) showBubble("J'ai faim... 🍔", 2000);
@@ -1750,8 +2131,74 @@
       });
     });
 
-    // ---- Tape sur lui ----
-    spriteEl.addEventListener('click', () => {
+    // ---- Toucher : bisou (tap), chatouilles (3 taps), caresse (frotter) ----
+    let rub = null;
+    let suppressClick = false;
+    let tapTimes = [];
+
+    function stroke() {
+      const mode = himMode();
+      state.counters.strokes++;
+      if (mode === 'normal') {
+        state.happy = clamp(state.happy + 1.5);
+        state.love = clamp(state.love + 1);
+        if (state.counters.strokes % 4 === 0) {
+          showBubble(pick(['Mmmh, encore 😌', 'Trop bien 🥰', 'Ronron… 😽', 'Juste là, oui 😍']), 1400);
+          flashMood(A.himHappy, 1400);
+        }
+      } else if (mode === 'sulk') {
+        state.love = clamp(state.love + 2.5);
+        if (state.counters.strokes % 3 === 0) showBubble(pick(['Hmpf… 😳', 'Bon… peut-être 🙄', 'Continue… 😶']), 1300);
+      } else if (mode === 'sick') {
+        state.happy = clamp(state.happy + 1);
+        if (state.counters.strokes % 4 === 0) showBubble('Ça fait du bien… 🥺', 1400);
+      } else if (mode === 'sleep') {
+        state.love = clamp(state.love + 0.5);
+        if (state.counters.strokes % 5 === 0) showBubble('*sourit en dormant* 😴', 1400);
+      }
+      spawnHeart((spriteEl.offsetLeft + rand(0, spriteEl.offsetWidth - 16)) + 'px', rand(60, 95) + 'px', pick(['💗', '💕', 'icoHeart']));
+      if (state.counters.strokes % 3 === 0) gainXp(1);
+      updateConditions();
+      renderStats();
+      checkTrophies();
+    }
+
+    spriteEl.addEventListener('pointerdown', (e) => {
+      if (!canAct()) return;
+      rub = { x: e.clientX, y: e.clientY, dist: 0, beats: 0 };
+      try { spriteEl.setPointerCapture(e.pointerId); } catch (err) { /* ignoré */ }
+    });
+    spriteEl.addEventListener('pointermove', (e) => {
+      if (!rub) return;
+      rub.dist += Math.hypot(e.clientX - rub.x, e.clientY - rub.y);
+      rub.x = e.clientX; rub.y = e.clientY;
+      if (rub.dist > 20 && currentMode && currentMode.startsWith('normal')) {
+        if (Date.now() >= pauseUntil) setPose(A.himStand, null);
+        pauseUntil = Date.now() + 700;
+      }
+      while (rub.dist - rub.beats * 70 > 70) { rub.beats++; stroke(); }
+    });
+    const endRub = () => { if (rub) suppressClick = rub.dist > 20; rub = null; };
+    spriteEl.addEventListener('pointerup', endRub);
+    spriteEl.addEventListener('pointercancel', endRub);
+    spriteEl.style.touchAction = 'none';
+
+    function tickle() {
+      tapTimes = [];
+      state.counters.tickles++;
+      state.happy = clamp(state.happy + 6);
+      gainXp(2);
+      strikePose(A.himJump, 'pose-jump', 900);
+      showBubble(pick(['Ha ha ! Arrête ! 😂', 'Pas les chatouilles ! 🤣', 'Hihihi 😆', 'Au secours 😂😂']), 1600);
+      flashMood(A.himHappy, 1500);
+      ['😂', '✨', '😆'].forEach((e, i) => setTimeout(() => spawnHeart((spriteEl.offsetLeft + 10 + i * 14) + 'px', '90px', e), i * 120));
+      renderStats();
+      checkTrophies();
+    }
+
+    spriteEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (suppressClick) { suppressClick = false; return; }
       if (!canAct()) return;
       const mode = himMode();
       if (mode === 'sleep') {
@@ -1766,8 +2213,12 @@
       if (mode === 'sulk') {
         state.love = clamp(state.love + 1);
         renderStats();
-        return showBubble(pick(['Hmpf. 😤', '...', "Je t'entends pas 🙉"]), 1400);
+        return showBubble(pick(['Hmpf. 😤', '...', "Je t'entends pas 🙉", 'Essaie plutôt un câlin 🙄']), 1400);
       }
+      const t = Date.now();
+      tapTimes = tapTimes.filter((x) => t - x < 900);
+      tapTimes.push(t);
+      if (tapTimes.length >= 3) return tickle();
       state.happy = clamp(state.happy + 4);
       state.counters.kisses++;
       gainXp(1);
@@ -1776,6 +2227,79 @@
       flashMood(A.himHappy, 900);
       spawnHeart(spriteEl.style.left, '80px', pick(['💙', 'icoHeart', '💋']));
     });
+
+    // ---- Tape par terre : il y va ----
+    let walkTarget = null;
+    screenEl.addEventListener('click', (e) => {
+      const t = e.target;
+      if (!(t === screenEl || t.classList.contains('sprite-layer') || t.classList.contains('backdrop'))) return;
+      if (!canAct()) return;
+      const mode = himMode();
+      if (mode === 'sleep') return showBubble('Chut… il dort 🤫', 1200);
+      if (mode !== 'normal') return;
+      if (walkSpeed() === 0) return showBubble('Trop fatigué pour bouger 😪', 1600);
+      const rect = screenEl.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      walkTarget = Math.max(6, Math.min(screenEl.clientWidth - spriteEl.offsetWidth - 12, x - spriteEl.offsetWidth / 2));
+      pauseUntil = 0;
+      spawnHeart((x - 8) + 'px', Math.max(30, rect.bottom - e.clientY) + 'px', '✨');
+      if (Math.random() < 0.35) showBubble(pick(["J'arrive ! 🏃", 'Me voilà !', 'Par ici ? 👀']), 1100);
+    });
+
+    // ---- Ses envies ----
+    const WISHES = [
+      { id: 'meals', e: '🍔', say: "J'ai trop envie de manger un truc 🍔" },
+      { id: 'runs', e: '🏃', say: 'On va courir un peu ? 🏃' },
+      { id: 'hugs', e: '🫂', say: "J'ai besoin d'un câlin 🥺" },
+      { id: 'games', e: '🎮', say: 'On joue à un jeu ? 🎮' },
+      { id: 'moments', e: '💑', say: 'On fait un truc à deux ? 💑' },
+      { id: 'strokes', e: '🤲', say: 'Une petite caresse ? 🥰 (frotte-moi)' },
+      { id: 'tickles', e: '😆', say: 'Chatouille-moi ! (tape 3 fois) 😆' }
+    ];
+    const WISH_TIME = 2 * 60 * 1000;
+    let wish = null;
+    let lastWishAt = Date.now();
+    const wishEl = $('wish');
+
+    function maybeWish() {
+      if (wish || himMode() !== 'normal' || busy || Date.now() - lastWishAt < 50 * 1000 || Math.random() > 0.12) return;
+      const w = pick(WISHES);
+      wish = { ...w, base: state.counters[w.id], until: Date.now() + WISH_TIME };
+      lastWishAt = Date.now();
+      wishEl.textContent = w.e;
+      wishEl.hidden = false;
+      showBubble(w.say, 2600);
+    }
+
+    function checkWish() {
+      if (!wish) return;
+      if (state.counters[wish.id] > wish.base) {
+        state.counters.wishes++;
+        state.happy = clamp(state.happy + 10);
+        state.love = clamp(state.love + 5);
+        toast('Souhait exaucé ! ⭐', A.icoHappy);
+        spawnHeart((spriteEl.offsetLeft + 10) + 'px', '100px', '⭐', true);
+        wish = null;
+        wishEl.hidden = true;
+        gainXp(5);
+        renderStats();
+        checkTrophies();
+      } else if (Date.now() > wish.until) {
+        wish = null;
+        wishEl.hidden = true;
+        state.happy = clamp(state.happy - 3);
+        if (!busy) showBubble('Tant pis… 😕', 1500);
+      }
+    }
+    wishEl.addEventListener('click', (e) => { e.stopPropagation(); if (wish) showBubble(wish.say, 2200); });
+
+    function syncWish() {
+      if (wishEl.hidden) return;
+      const show = !busy && himMode() === 'normal';
+      wishEl.style.visibility = show ? 'visible' : 'hidden';
+      wishEl.style.left = (spriteEl.offsetLeft + spriteEl.offsetWidth / 2 + 6) + 'px';
+      wishEl.style.top = Math.max(2, spriteEl.offsetTop - 40) + 'px';
+    }
 
     // =====================================================================
     //  Ses visites
@@ -1991,10 +2515,8 @@
       gameIntro.hidden = false;
     }
 
-    $('btnGame').addEventListener('click', () => {
+    function startCatchGame() {
       if (!canAct()) return;
-      if (state.sick) return refuse('Trop malade pour jouer 🤒');
-      if (state.energy < 15) return refuse('Trop fatigué pour jouer 😪');
       busy = true;
       game.active = true;
       stopHim();
@@ -2025,7 +2547,7 @@
         game.last = performance.now();
         requestAnimationFrame(gameLoop);
       }, 1800);
-    });
+    }
 
     function moveTarget(clientX) {
       const rect = screenEl.getBoundingClientRect();
@@ -2200,6 +2722,7 @@
           ['🎮 Record mini-jeu', state.bestScore],
           ['🥰 Câlins', c.hugs], ['💋 Bisous', c.kisses], ['🍽️ Repas', c.meals],
           ['🧼 Bains', c.washes], ['💩 Cacas ramassés', c.cleaned], ['💑 Moments à deux', c.moments],
+          ['🤲 Caresses', c.strokes], ['😂 Chatouilles', c.tickles], ['🧞 Envies exaucées', c.wishes], ['🔮 Record gauche/droite', `${state.bestGuess} / 5`],
           ['🏃 Runs', c.runs], ['💻 Sessions de code', c.codes], ['😴 Siestes', c.sleeps],
           ['💊 Soins', c.heals], ['🚶‍♀️ Visites', c.visits], ['🎮 Parties', c.games]
         ];
@@ -2401,6 +2924,7 @@
       lastFrame = ts;
       syncWear();
       syncPet(dt);
+      syncWish();
       requestAnimationFrame(frame);
     }
 
@@ -2603,6 +3127,207 @@
       pv.style.backgroundImage = src ? `url("${src}")` : '';
     }
 
+
+    // =====================================================================
+    //  Choix du jeu + « Gauche ou droite ? »
+    // =====================================================================
+    const gamesModal = $('games');
+    $('btnGame').addEventListener('click', () => {
+      if (!canAct()) return;
+      if (state.sick) return refuse('Trop malade pour jouer 🤒');
+      if (state.energy < 15) return refuse('Trop fatigué pour jouer 😪');
+      $('bestCatch').textContent = `Record : ${state.bestScore}`;
+      $('bestGuess').textContent = `Record : ${state.bestGuess} / 5`;
+      gamesModal.hidden = false;
+    });
+    $('gamesClose').addEventListener('click', () => { gamesModal.hidden = true; });
+    gamesModal.addEventListener('click', (e) => { if (e.target === gamesModal) gamesModal.hidden = true; });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') gamesModal.hidden = true; });
+    $('pickCatch').addEventListener('click', () => { gamesModal.hidden = true; startCatchGame(); });
+    $('pickGuess').addEventListener('click', () => { gamesModal.hidden = true; startGuessGame(); });
+
+    const guessEl = $('guess');
+    const guessHim = $('guessHim');
+    const guess = { round: 0, wins: 0, locked: false };
+
+    function startGuessGame() {
+      if (!canAct()) return;
+      busy = true;
+      game.active = true;
+      stopHim();
+      bubbleEl.classList.remove('show');
+      spriteEl.style.visibility = 'hidden';
+      afterCare();
+      guess.round = 0;
+      guess.wins = 0;
+      guessEl.hidden = false;
+      nextGuessRound();
+    }
+
+    function nextGuessRound() {
+      guess.round++;
+      guess.locked = false;
+      guessHim.src = A.himStand;
+      guessHim.style.transform = '';
+      guessHim.classList.remove('pose-jump');
+      $('guessInfo').textContent = `Manche ${guess.round} / 5 · ${guess.wins} 🏆`;
+      $('guessMsg').textContent = 'Il va regarder de quel côté ? 🤔';
+      $('guessLeft').disabled = false;
+      $('guessRight').disabled = false;
+    }
+
+    function playGuess(side) {
+      if (guess.locked) return;
+      guess.locked = true;
+      $('guessLeft').disabled = true;
+      $('guessRight').disabled = true;
+      const his = Math.random() < 0.5 ? 'left' : 'right';
+      guessHim.src = A.himWalk;
+      guessHim.style.transform = his === 'left' ? 'scaleX(-1)' : 'scaleX(1)';
+      const win = his === side;
+      if (win) {
+        guess.wins++;
+        setTimeout(() => { guessHim.src = A.himJump; guessHim.classList.add('pose-jump'); }, 350);
+        $('guessMsg').textContent = pick(['Bien vu ! 🎉', 'Télépathie 🔮', 'Gagné ! 💕']);
+      } else {
+        $('guessMsg').textContent = pick(['Raté ! 😜', 'Perdu, hihi 😝', 'Pas par là ! 🙃']);
+      }
+      $('guessInfo').textContent = `Manche ${guess.round} / 5 · ${guess.wins} 🏆`;
+      setTimeout(() => (guess.round >= 5 ? endGuessGame() : nextGuessRound()), 1300);
+    }
+    $('guessLeft').addEventListener('click', (e) => { e.stopPropagation(); playGuess('left'); });
+    $('guessRight').addEventListener('click', (e) => { e.stopPropagation(); playGuess('right'); });
+
+    function endGuessGame() {
+      const w = guess.wins;
+      const record = w > state.bestGuess;
+      if (record) state.bestGuess = w;
+      $('guessMsg').textContent = `${w} / 5 ${w >= 4 ? '🔮 Vous êtes connectés !' : (w >= 2 ? '😊 Pas mal !' : '😜 Il est imprévisible')}${record ? ' · record !' : ''}`;
+      state.happy = clamp(state.happy + w * 5);
+      state.love = clamp(state.love + w * 2);
+      state.energy = clamp(state.energy - 5);
+      state.counters.games++;
+      gainXp(2 + w * 2);
+      updateConditions(true);
+      renderStats();
+      checkTrophies();
+      setTimeout(() => {
+        guessEl.hidden = true;
+        spriteEl.style.visibility = '';
+        game.active = false;
+        busy = false;
+        refreshHim(true);
+      }, 2200);
+    }
+
+    // =====================================================================
+    //  Sauvegarde : export / import / sauvegarde d'hier
+    // =====================================================================
+    const BACKUP_KEY = 'cheriotchi_backup';
+    const saveModal = $('saveModal');
+    const encodeSave = (obj) => btoa(unescape(encodeURIComponent(JSON.stringify(obj))));
+    const decodeSave = (code) => JSON.parse(decodeURIComponent(escape(atob(code.trim()))));
+    let persisted = false;
+
+    function requestPersist() {
+      try {
+        if (navigator.storage && navigator.storage.persist) {
+          navigator.storage.persisted().then((p) => p || navigator.storage.persist()).then((p) => { persisted = !!p; }).catch(() => {});
+        }
+      } catch (e) { /* ignoré */ }
+    }
+
+    function backupYesterday() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) localStorage.setItem(BACKUP_KEY, raw);
+      } catch (e) { /* ignoré */ }
+    }
+
+    function restoreFrom(obj) {
+      if (!obj || typeof obj.hunger !== 'number') throw new Error('format');
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+      saveRestoring = true;
+      location.reload();
+    }
+
+    function setSaveMsg(text) { $('saveMsg').textContent = text; }
+
+    function renderSaveModal() {
+      const t = state.lastSeen ? new Date(state.lastSeen) : new Date();
+      $('saveWhen').textContent = t.toLocaleString('fr-FR', { weekday: 'long', hour: '2-digit', minute: '2-digit' });
+      $('savePersist').textContent = persisted ? 'oui ✅' : 'pas garanti (ajoute le jeu à l’écran d’accueil)';
+      let backup = null;
+      try { backup = JSON.parse(localStorage.getItem(BACKUP_KEY) || 'null'); } catch (e) { backup = null; }
+      $('restoreBackup').hidden = !backup;
+      if (backup && backup.lastSeen) $('restoreBackup').textContent = `↩️ Revenir à la sauvegarde du ${new Date(backup.lastSeen).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}`;
+      $('saveCode').value = '';
+      setSaveMsg('');
+    }
+
+    $('btnSettings').addEventListener('click', () => { saveState(); renderSaveModal(); saveModal.hidden = false; });
+    $('saveClose').addEventListener('click', () => { saveModal.hidden = true; });
+    saveModal.addEventListener('click', (e) => { if (e.target === saveModal) saveModal.hidden = true; });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') saveModal.hidden = true; });
+
+    $('exportFile').addEventListener('click', () => {
+      saveState();
+      const blob = new Blob([JSON.stringify(state, null, 1)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `cheriotchi-sauvegarde-${dayKey(new Date())}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      setSaveMsg('Fichier téléchargé ✅ Garde-le précieusement.');
+    });
+
+    $('exportCode').addEventListener('click', async () => {
+      saveState();
+      const code = encodeSave(state);
+      $('saveCode').value = code;
+      try { await navigator.clipboard.writeText(code); setSaveMsg('Code copié ✅ Colle-le sur l’autre téléphone.'); }
+      catch (e) { $('saveCode').select(); setSaveMsg('Code affiché ci-dessous : copie-le à la main.'); }
+    });
+
+    $('importCode').addEventListener('click', () => {
+      const code = $('saveCode').value;
+      if (!code.trim()) return setSaveMsg('Colle d’abord un code de sauvegarde ci-dessous.');
+      try {
+        const obj = decodeSave(code);
+        if (confirm('Remplacer la partie actuelle par cette sauvegarde ?')) restoreFrom(obj);
+      } catch (e) { setSaveMsg('Ce code ne marche pas 😕'); }
+    });
+
+    $('importFile').addEventListener('change', (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      f.text().then((txt) => {
+        let obj;
+        try { obj = JSON.parse(txt); } catch (err) { obj = null; }
+        if (!obj) { try { obj = decodeSave(txt); } catch (err) { obj = null; } }
+        if (!obj || typeof obj.hunger !== 'number') return setSaveMsg('Ce fichier ne ressemble pas à une sauvegarde 😕');
+        if (confirm('Remplacer la partie actuelle par ce fichier ?')) restoreFrom(obj);
+      });
+      e.target.value = '';
+    });
+
+    $('restoreBackup').addEventListener('click', () => {
+      try {
+        const obj = JSON.parse(localStorage.getItem(BACKUP_KEY));
+        if (confirm('Revenir à la sauvegarde de la veille ? La progression d’aujourd’hui sera perdue.')) restoreFrom(obj);
+      } catch (e) { setSaveMsg('Pas de sauvegarde de la veille.'); }
+    });
+
+    $('resetGame').addEventListener('click', () => {
+      if (!confirm('Tout effacer et recommencer à zéro ? (une copie reste dans « sauvegarde d’hier »)')) return;
+      backupYesterday();
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignoré */ }
+      saveRestoring = true;
+      location.reload();
+    });
+
     // =====================================================================
     //  Démarrage
     // =====================================================================
@@ -2611,6 +3336,7 @@
       if (state.lastVisitDay === today) return;
       const y = now(); y.setDate(y.getDate() - 1);
       state.streak = state.lastVisitDay === dayKey(y) ? state.streak + 1 : 1;
+      if (state.lastVisitDay) backupYesterday();
       state.lastVisitDay = today;
       isNewDay = true;
     }
@@ -2634,6 +3360,7 @@
     spriteHerEl.src = A.herStand;
     document.querySelectorAll('[data-ico]').forEach((img) => { img.src = A[img.dataset.ico]; });
     loadState();
+    requestPersist();
     const away = catchUp(state.lastSeen);
     startDay();
     if (isNewDay) {
