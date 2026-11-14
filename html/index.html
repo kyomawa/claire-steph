@@ -1478,6 +1478,47 @@
     .confirm-actions .btn { flex-direction: row; justify-content: center; padding: 10px 6px; font-size: 13px; }
     #confirmOk.danger { background: var(--low); }
 
+    .race-no.two { font-size: 15px; letter-spacing: -0.5px; }
+
+    .sun { position: absolute; top: 8px; left: 46%; font-size: 26px; z-index: 1; pointer-events: none; animation: sunSpin 30s linear infinite; }
+    .sun[hidden] { display: none; }
+    @keyframes sunSpin { to { transform: rotate(360deg); } }
+    .screen.rain .sky { opacity: 1; background: rgba(70, 90, 115, 0.28); }
+    .screen.rain .sky .moon, .screen.rain .sky .star { display: none; }
+    .screen.rain.night .sky { background: rgba(27, 37, 65, 0.86); }
+    .screen.rain.night .sky .moon { display: none; }
+    .drop {
+      position: absolute;
+      top: -16px;
+      width: 1.5px;
+      height: 14px;
+      background: linear-gradient(transparent, rgba(166, 210, 236, 0.95));
+      z-index: 6;
+      pointer-events: none;
+      animation: rainFall 0.7s linear forwards;
+    }
+    @keyframes rainFall { to { transform: translate(-18px, 260px); } }
+
+    .race { position: absolute; inset: 0; z-index: 7; touch-action: manipulation; cursor: pointer; }
+    .race[hidden] { display: none; }
+    .race canvas { width: 100%; height: 100%; display: block; }
+
+    .note-cta { margin: 0 0 12px; background: #FFF1E6; border-color: var(--gulf-orange); color: var(--gulf-orange-deep); }
+    .note-help { font-size: 12.5px; color: var(--navy); margin: 0 0 8px; line-height: 1.4; }
+    #noteText {
+      width: 100%;
+      font-family: inherit;
+      font-size: 15px;
+      border: 2.5px solid var(--navy);
+      border-radius: 12px;
+      padding: 8px 10px;
+      resize: vertical;
+      color: var(--navy);
+    }
+    .note-row { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; gap: 10px; }
+    .note-row span { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--navy); }
+    .note-row .btn { flex-direction: row; padding: 8px 16px; font-size: 13px; }
+
     @media (prefers-reduced-motion: reduce) {
       .star, .btn.alert { animation: none; }
     }
@@ -1498,7 +1539,7 @@
       <button class="icon-btn" id="btnSettings" aria-label="Sauvegarde et réglages" title="Sauvegarde">💾</button>
     </div>
     <div class="nameplate">
-      <span class="race-no" aria-hidden="true">1</span>
+      <span class="race-no" id="raceNo">1</span>
       <h1 class="title" contenteditable="true" spellcheck="false" id="petName">Mon Chéri-o-tchi</h1>
     </div>
     <div class="subtitle"><span>tape, caresse, chatouille-le 💋</span></div>
@@ -1515,6 +1556,7 @@
       <div class="screen" id="screen">
         <img class="backdrop" id="backdrop" alt="" hidden>
         <div class="sky" id="sky"><div class="moon">🌙</div></div>
+        <div class="sun" id="sun" hidden>☀️</div>
         <div class="scanlines"></div>
         <div class="floor" style="pointer-events:none"></div>
         <img class="mood" id="mood" alt="humeur">
@@ -1534,6 +1576,7 @@
           <img class="ball" id="ball" alt="ballon" hidden draggable="false">
           <button class="wish" id="wish" hidden aria-label="Son envie"></button>
         </div>
+        <div class="race" id="race" hidden><canvas id="raceCanvas"></canvas></div>
         <div class="memory" id="memory" hidden>
           <div class="mem-head" id="memInfo"></div>
           <div class="mem-grid" id="memGrid"></div>
@@ -1652,7 +1695,10 @@
         <h2 id="duoTitle">💑 On fait quoi tous les deux ?</h2>
         <button class="close" id="duoClose" aria-label="Fermer">✕</button>
       </div>
-      <div class="tab-body"><div class="moments" id="duoGrid"></div></div>
+      <div class="tab-body">
+        <button class="btn wide-btn note-cta" id="btnNote">💌 Lui écrire un mot doux</button>
+        <div class="moments" id="duoGrid"></div>
+      </div>
     </div>
   </div>
 
@@ -1702,10 +1748,29 @@
           <li><span>🎯</span><div><b>Défis du jour</b> en haut, et une <b>question du jour</b></div></li>
           <li><span>🌙</span><div>La nuit il dort : laisse-le… ou réveille-le</div></li>
           <li><span>🍽️</span><div><b>Manger</b> : choisis un plat puis <b>glisse-le jusqu'à lui</b> (ou tape-le, il va le chercher)</div></li>
+          <li><span>💌</span><div><b>À deux → Mot doux</b> : un message qui arrive sur l'autre téléphone relié</div></li>
           <li><span>🎾</span><div><b>Lance le ballon</b> à son compagnon : il le rapporte</div></li>
           <li><span>💾</span><div>Tout est sauvegardé tout seul · 🔔 notifications dans 💾</div></li>
         </ul>
         <button class="btn wide-btn cloud-main" id="helpOk">C'est parti ! 🏁</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="noteModal" hidden role="dialog" aria-modal="true" aria-labelledby="noteTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="noteTitle">💌 Un mot doux</h2>
+        <button class="close" id="noteClose" aria-label="Fermer">✕</button>
+      </div>
+      <div class="tab-body">
+        <p class="empty" id="noteOff" hidden></p>
+        <div id="noteForm">
+          <p class="note-help">Il arrive sur l’autre téléphone relié à cette partie : elle le lui apporte à sa prochaine visite, avec une notification.</p>
+          <textarea id="noteText" maxlength="200" rows="4" placeholder="Je pense fort à toi…"></textarea>
+          <div class="note-row"><span id="noteCount">0 / 200</span><button class="btn cloud-main" id="noteSend">Envoyer 💌</button></div>
+          <p class="save-msg" id="noteMsg" role="status"></p>
+        </div>
       </div>
     </div>
   </div>
@@ -1721,6 +1786,7 @@
           <button class="m-card g-card" id="pickCatch"><span class="g-ico">💋☕💕</span><span class="m-name">Attrape les bisous</span><span class="m-sub">20 s · glisse le doigt</span><span class="m-sub" id="bestCatch"></span></button>
           <button class="m-card g-card" id="pickMemory"><span class="g-ico">🧠🃏</span><span class="m-name">Mémoire</span><span class="m-sub">6 paires à retrouver</span><span class="m-sub" id="bestMemoryTxt"></span></button>
           <button class="m-card g-card" id="pickDance"><span class="g-ico">🪩💃🕺</span><span class="m-name">Danse avec elle</span><span class="m-sub">tape en rythme</span><span class="m-sub" id="bestDanceTxt"></span></button>
+          <button class="m-card g-card" id="pickRace"><span class="g-ico">🏎️🏁</span><span class="m-name">Course Gulf</span><span class="m-sub">évite les plots, ramasse le carburant</span><span class="m-sub" id="bestRaceTxt"></span></button>
           <button class="m-card g-card" id="pickGuess"><span class="g-ico">⬅️🤔➡️</span><span class="m-name">Gauche ou droite ?</span><span class="m-sub">5 manches · devine où il regarde</span><span class="m-sub" id="bestGuess"></span></button>
         </div>
       </div>
@@ -1813,7 +1879,7 @@
       // Dates spéciales ('MM-JJ'). Le message s'affiche à sa visite ce jour-là
       // et rejoint le carnet de souvenirs.
       specialDates: {
-        '07-08': { msg: "Joyeux anniversaire Stéphane 🎂🎉", fx: ['icoCake', 'icoGift', '🎉'], scene: 'anniversaire' }, // ⚠️ date à vérifier
+        // Son anniversaire, à ajouter : 'MM-JJ': { msg: "Joyeux anniversaire …", fx: ['icoCake', 'icoGift', '🎉'], scene: 'anniversaire' },
         // '05-20': { msg: "Joyeux anniversaire à nous deux 💑", fx: ['💑', 'icoLove', '💍'] },
         '02-14': { msg: "Joyeuse Saint-Valentin mon amour 💘", fx: ['icoLove', '🌹', 'icoHeart'], scene: 'amour' },
         '12-25': { msg: "Joyeux Noël mon cœur 🎄", fx: ['🎄', 'icoGift', '⭐'], scene: 'hiver' },
@@ -1906,8 +1972,8 @@
         sick: false, sulk: false, poops: [], digest: 0,
         xp: 0, bestScore: 0, streak: 0,
         bornAt: Date.now(), lastSeen: null, lastVisitDay: null,
-        counters: { hugs: 0, meals: 0, runs: 0, codes: 0, sleeps: 0, heals: 0, games: 0, kisses: 0, visits: 0, washes: 0, cleaned: 0, moments: 0, strokes: 0, tickles: 0, wishes: 0, answers: 0, cuddles: 0, herKisses: 0, dailyDone: 0, fetches: 0, selfies: 0 },
-        bestGuess: 0, bestMemory: 0, bestMemoryStars: 0, bestDance: 0, bestDanceStars: 0,
+        counters: { hugs: 0, meals: 0, runs: 0, codes: 0, sleeps: 0, heals: 0, games: 0, kisses: 0, visits: 0, washes: 0, cleaned: 0, moments: 0, strokes: 0, tickles: 0, wishes: 0, answers: 0, cuddles: 0, herKisses: 0, dailyDone: 0, fetches: 0, selfies: 0, notesSent: 0, races: 0, notesGot: 0 },
+        bestGuess: 0, bestMemory: 0, bestMemoryStars: 0, bestDance: 0, bestDanceStars: 0, bestRace: 0,
         trophies: {}, journal: [], name: null,
         album: {}, decor: 'auto', playedAt: 0, sound: true, seenHelp: false, lastAsk: null, daily: null,
         owned: {}, wear: { tete: null, yeux: null, visage: null, cou: null, dos: null, compagnon: null }
@@ -2037,6 +2103,8 @@
       { id: 'selfie_5', e: '📸', t: 'Paparazzi', d: '5 selfies avec elle', ok: (s) => s.counters.selfies >= 5 },
       { id: 'memory_3', e: '🧠', t: 'Mémoire d’éléphant', d: '3 étoiles au jeu de Mémoire', ok: (s) => s.bestMemoryStars >= 3 },
       { id: 'dance_3', e: '🪩', t: 'Rois de la piste', d: '3 étoiles à la Danse', ok: (s) => s.bestDanceStars >= 3 },
+      { id: 'race_25', e: '🏎️', t: 'Pilote Gulf', d: '25 points à la Course Gulf', ok: (s) => (s.bestRace || 0) >= 25 },
+      { id: 'note_1', e: '💌', t: 'Facteur de l’amour', d: 'Recevoir un mot doux', ok: (s) => s.counters.notesGot >= 1 },
       { id: 'memories_10', e: '📖', t: 'Album souvenir', d: '10 souvenirs dans le carnet', ok: (s) => s.journal.length >= 10 }
     ];
 
@@ -2059,7 +2127,7 @@
       state.xp += n;
       const after = levelFor(state.xp);
       if (after > before) {
-        toast(`Niveau ${after} ! Bravo 🎉`, A.icoGrow);
+        toast(rankFor(after) !== rankFor(before) ? `Niveau ${after} : ${rankFor(after)} ! 🏁` : `Niveau ${after} ! Bravo 🎉`, A.icoGrow);
         try { sfx.level(); buzz([30, 50, 30]); } catch (e) { /* init */ }
         setTimeout(() => {
           showBubble(`Niveau ${after} ! 🎉`, 2200);
@@ -2109,6 +2177,7 @@
       const lvl = levelFor(state.xp);
       const lo = xpFloor(lvl), hi = xpFloor(lvl + 1);
       $('hudLevel').textContent = `⭐ Niv. ${lvl}`;
+      if (typeof renderRank === 'function') renderRank();
       $('xpFill').style.width = Math.round(((state.xp - lo) / (hi - lo)) * 100) + '%';
       const days = daysTogether();
       $('hudDays').textContent = CONFIG.coupleStart ? `💑 ${days.toLocaleString('fr-FR')} j` : `🗓️ Jour ${days}`;
@@ -2119,6 +2188,7 @@
     }
 
     function applyPhase() {
+      if (typeof applyWeather === 'function') applyWeather();
       const ph = phase();
       screenEl.classList.toggle('night', ph === 'night');
       screenEl.classList.toggle('dusk', ph === 'dusk');
@@ -2803,6 +2873,12 @@
     }
 
     function visitMessage() {
+      if (pendingNotes.length) {
+        const n = pendingNotes.shift();
+        state.counters.notesGot++;
+        addMemory('💌 ' + n.text, 'special');
+        return { msg: '💌 ' + n.text, fx: ['💌', 'icoHeart', '💕'], big: true };
+      }
       const special = specialToday();
       if (!firstVisitDone) {
         firstVisitDone = true;
@@ -2819,6 +2895,8 @@
         return { msg: ph === 'day' ? 'Coucou toi ☀️' : (ph === 'dusk' ? 'Bonne soirée mon cœur 🌇' : 'Encore debout ? 🌙'), fx: ['💕'] };
       }
       if (special && Math.random() < 0.4) return { msg: special.msg, fx: special.fx, big: true };
+      const wc = Math.random() < 0.3 ? weatherComment() : null;
+      if (wc) return { msg: wc, fx: ['💕'] };
       if (state.sick) return { msg: 'Oh mon pauvre... soigne-toi 🤒💕', fx: ['💕'] };
       if (state.sulk) return { msg: 'Allez, fais pas la tête 🥺', fx: ['💕'] };
       return { msg: pick(SWEET_MESSAGES), fx: ['💕'] };
@@ -3177,6 +3255,7 @@
           ['🤲 Caresses', c.strokes], ['😂 Chatouilles', c.tickles], ['🧞 Envies exaucées', c.wishes], ['🔮 Record gauche/droite', `${state.bestGuess} / 5`],
           ['🧠 Record Mémoire', state.bestMemory ? `${state.bestMemory} coups` : '—'], ['🪩 Record Danse', `${state.bestDance} pts`],
           ['🎾 Balles rapportées', c.fetches], ['📸 Selfies', c.selfies],
+          ['🏁 Rang', rankFor(levelFor(state.xp))], ['🏎️ Record Course', `${state.bestRace || 0} pts`], ['💌 Mots doux reçus', c.notesGot],
           ['🏃 Runs', c.runs], ['💻 Sessions de code', c.codes], ['😴 Siestes', c.sleeps],
           ['💊 Soins', c.heals], ['🚶‍♀️ Visites', c.visits], ['🎮 Parties', c.games]
         ];
@@ -3648,6 +3727,7 @@
       $('bestGuess').textContent = `Record : ${state.bestGuess} / 5`;
       $('bestMemoryTxt').textContent = state.bestMemory ? `Record : ${state.bestMemory} coups` : 'Pas encore joué';
       $('bestDanceTxt').textContent = `Record : ${state.bestDance} pts`;
+      $('bestRaceTxt').textContent = `Record : ${state.bestRace || 0} pts`;
       gamesModal.hidden = false;
     });
     $('gamesClose').addEventListener('click', () => { gamesModal.hidden = true; });
@@ -3949,6 +4029,8 @@
         if (msg) { sessionStorage.removeItem('cheriotchi_pull_msg'); toast(msg); }
       } catch (e) { /* ignoré */ }
       if (cloud.available && cloud.code) await cloudPull(localPlayed);
+      fetchNotes();
+      setInterval(() => { if (!document.hidden) fetchNotes(); }, 45 * 1000);
       updateCloudInfo();
       // appareil resté ouvert sans y toucher : on regarde de temps en temps si l'autre a joué
       setInterval(() => {
@@ -4883,6 +4965,342 @@
       renderPushBox();
     });
 
+
+    // =====================================================================
+    //  Rangs de pilote
+    // =====================================================================
+    const RANKS = [
+      [1, 'Apprenti pilote'], [2, 'Pilote du dimanche'], [4, 'Pilote'], [6, 'Pilote confirmé'],
+      [8, "Pilote d'élite"], [10, 'Champion Gulf'], [15, 'Légende du circuit']
+    ];
+    function rankFor(lvl) { let r = RANKS[0][1]; for (const [n, t] of RANKS) if (lvl >= n) r = t; return r; }
+    function renderRank() {
+      const lvl = levelFor(state.xp);
+      const no = $('raceNo');
+      no.textContent = String(lvl);
+      no.classList.toggle('two', lvl >= 10);
+      no.title = `${rankFor(lvl)} · niveau ${lvl}`;
+      $('hudLevel').title = rankFor(lvl);
+    }
+
+    // =====================================================================
+    //  Météo du jour
+    // =====================================================================
+    function weatherToday() {
+      const d = now();
+      const m = d.getMonth() + 1;
+      if (m === 12 || m <= 2) return 'snow';
+      const n = Math.floor(new Date(dayKey(d)).getTime() / DAY_MS);
+      const r = ((n * 2654435761) >>> 0) % 100;
+      const rainy = (m >= 9 && m <= 11) || (m >= 3 && m <= 4) ? 35 : 18;
+      return r < rainy ? 'rain' : 'sun';
+    }
+    let rainTimer = null;
+    function applyWeather() {
+      const w = weatherToday();
+      const ph = phase();
+      screenEl.classList.toggle('rain', w === 'rain');
+      $('sun').hidden = !(w === 'sun' && ph === 'day');
+      if (w === 'rain' && !rainTimer) {
+        rainTimer = setInterval(() => {
+          if (document.hidden) return;
+          for (let i = 0; i < 3; i++) {
+            const d = el('div', 'drop');
+            d.style.left = rand(0, 100) + '%';
+            d.style.animationDuration = rand(0.55, 0.85) + 's';
+            screenEl.appendChild(d);
+            setTimeout(() => d.remove(), 900);
+          }
+        }, 120);
+      }
+    }
+    function weatherComment() {
+      const w = weatherToday();
+      if (w === 'rain') return pick(['Il pleut… on reste au chaud ? ☔', 'Temps parfait pour un plaid 🌧️', 'Même sous la pluie je souris 😊☔']);
+      if (w === 'snow') return pick(['Il neige ! ❄️', 'Bataille de boules de neige ? ⛄']);
+      return null;
+    }
+
+    // =====================================================================
+    //  Mots doux (envoyés d'un téléphone à l'autre avec le même code)
+    // =====================================================================
+    const DEVICE_KEY = 'cheriotchi_device';
+    const NOTES_SEEN_KEY = 'cheriotchi_notes_seen';
+    let deviceId = '';
+    try {
+      deviceId = localStorage.getItem(DEVICE_KEY) || '';
+      if (!deviceId) { deviceId = Math.random().toString(36).slice(2, 12); localStorage.setItem(DEVICE_KEY, deviceId); }
+    } catch (e) { deviceId = 'x' + Math.random().toString(36).slice(2, 8); }
+    const pendingNotes = [];
+    const noteModal = $('noteModal');
+
+    function notesSeen() { try { return Number(localStorage.getItem(NOTES_SEEN_KEY)) || 0; } catch (e) { return 0; } }
+
+    async function fetchNotes() {
+      if (!cloud.available || !cloud.code) return;
+      try {
+        const r = await api('GET', `/api/notes/${cloud.code}?after=${notesSeen()}`);
+        if (r.status !== 200) return;
+        let maxId = notesSeen();
+        for (const n of r.data.notes || []) {
+          maxId = Math.max(maxId, n.id);
+          if (n.device === deviceId) continue;
+          if (!pendingNotes.some((x) => x.id === n.id)) pendingNotes.push(n);
+        }
+        try { localStorage.setItem(NOTES_SEEN_KEY, String(maxId)); } catch (e) { /* ignoré */ }
+        if (pendingNotes.length) {
+          toast('💌 Un mot doux arrive…');
+          setTimeout(() => { if (canAct() && himMode() !== 'sleep') startGirlVisit(); }, 2500);
+        }
+      } catch (e) { /* hors ligne */ }
+    }
+
+    function renderNoteModal() {
+      const ok = cloud.available && cloud.code;
+      $('noteForm').hidden = !ok;
+      $('noteOff').hidden = !!ok;
+      $('noteOff').textContent = !cloud.available
+        ? 'Les mots doux passent par le serveur : ouvre le jeu depuis son adresse en ligne.'
+        : 'Il faut la même partie sur vos deux téléphones : sur le sien, 💾 → activer la sauvegarde en ligne, puis sur le tien, 💾 → « J’ai un code ».';
+      $('noteMsg').textContent = '';
+      $('noteCount').textContent = `${$('noteText').value.length} / 200`;
+    }
+
+    $('btnNote').addEventListener('click', () => { duo.hidden = true; renderNoteModal(); noteModal.hidden = false; setTimeout(() => $('noteText').focus(), 50); });
+    $('noteClose').addEventListener('click', () => { noteModal.hidden = true; });
+    noteModal.addEventListener('click', (e) => { if (e.target === noteModal) noteModal.hidden = true; });
+    $('noteText').addEventListener('input', () => { $('noteCount').textContent = `${$('noteText').value.length} / 200`; });
+    $('noteSend').addEventListener('click', async () => {
+      const text = $('noteText').value.trim();
+      if (!text) { $('noteMsg').textContent = 'Écris d’abord ton petit mot 🙂'; return; }
+      let exclude = null;
+      try {
+        const reg = await navigator.serviceWorker.getRegistration();
+        const sub = reg && await reg.pushManager.getSubscription();
+        exclude = sub ? sub.endpoint : null;
+      } catch (e) { /* pas d'abonnement */ }
+      try {
+        const r = await api('POST', `/api/notes/${cloud.code}`, { text, device: deviceId, exclude });
+        if (r.status !== 201) throw new Error();
+        $('noteText').value = '';
+        $('noteMsg').textContent = r.data.sent ? 'Envoyé 💌 Son téléphone vient de vibrer !' : 'Envoyé 💌 Il le recevra à sa prochaine visite dans le jeu.';
+        $('noteCount').textContent = '0 / 200';
+        state.counters.notesSent++;
+        addMemory('💌 Mot envoyé : ' + text, 'answer');
+        sfx.coin();
+        renderStats();
+        checkTrophies();
+      } catch (e) { $('noteMsg').textContent = 'Envoi impossible, réessaie dans un moment 😕'; }
+    });
+
+    // =====================================================================
+    //  Mini-jeu : Course Gulf
+    // =====================================================================
+    const raceEl = $('race');
+    const raceCv = $('raceCanvas');
+    const rx = raceCv.getContext('2d');
+    const race = { on: false };
+
+    function startRace() {
+      if (!canAct()) return;
+      busy = true;
+      game.active = true;
+      stopHim();
+      bubbleEl.classList.remove('show');
+      spriteEl.style.visibility = 'hidden';
+      afterCare();
+      raceEl.hidden = false;
+      const dpr = window.devicePixelRatio || 1;
+      const W = screenEl.clientWidth, H = screenEl.clientHeight;
+      raceCv.width = W * dpr;
+      raceCv.height = H * dpr;
+      rx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      Object.assign(race, { on: true, W, H, lane: 1, carX: null, items: [], score: 0, lives: 3, t: 0, speed: 150, spawn: 0, road: 0, last: performance.now(), hit: 0, over: false });
+      race.raf = requestAnimationFrame(raceLoop);
+    }
+
+    const laneX = (i) => {
+      const left = race.W * 0.16, right = race.W * 0.84;
+      return left + ((right - left) / 3) * (i + 0.5);
+    };
+
+    function raceInput(dir) {
+      if (!race.on || race.over) return;
+      race.lane = Math.max(0, Math.min(2, race.lane + dir));
+      sfx.tap();
+    }
+    raceEl.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      const r = raceEl.getBoundingClientRect();
+      raceInput(e.clientX - r.left < r.width / 2 ? -1 : 1);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (!race.on) return;
+      if (e.key === 'ArrowLeft') { raceInput(-1); e.preventDefault(); }
+      if (e.key === 'ArrowRight') { raceInput(1); e.preventDefault(); }
+    });
+
+    function drawCar(x, y, blink) {
+      const c = rx;
+      const w = 30, h = 46;
+      c.save();
+      c.translate(x - w / 2, y - h / 2);
+      if (blink) c.globalAlpha = 0.45;
+      c.fillStyle = '#111';
+      [[-3, 6], [w - 3, 6], [-3, h - 16], [w - 3, h - 16]].forEach(([wx, wy]) => c.fillRect(wx, wy, 6, 11));
+      c.fillStyle = '#1E3456';
+      c.fillRect(0, 2, w, h - 2);
+      c.fillStyle = '#A6D2EC';
+      c.fillRect(2, 3, w - 4, h - 5);
+      c.fillStyle = '#1E3456';
+      c.fillRect(w / 2 - 7, 3, 2, h - 5);
+      c.fillRect(w / 2 + 5, 3, 2, h - 5);
+      c.fillStyle = '#F26A21';
+      c.fillRect(w / 2 - 5, 3, 10, h - 5);
+      c.fillStyle = '#1E3456';
+      c.fillRect(5, 9, w - 10, 7);
+      c.fillStyle = '#fff';
+      c.beginPath(); c.arc(w / 2, h - 15, 6, 0, Math.PI * 2); c.fill();
+      c.fillStyle = '#1E3456';
+      c.font = 'bold 9px "Space Mono", monospace';
+      c.textAlign = 'center';
+      c.textBaseline = 'middle';
+      c.fillText(String(Math.min(99, levelFor(state.xp))), w / 2, h - 14.5);
+      c.restore();
+    }
+
+    function drawItem(it) {
+      const c = rx;
+      if (it.k === 'cone') {
+        c.fillStyle = '#F26A21';
+        c.beginPath(); c.moveTo(it.x, it.y - 12); c.lineTo(it.x - 10, it.y + 10); c.lineTo(it.x + 10, it.y + 10); c.closePath(); c.fill();
+        c.fillStyle = '#fff'; c.fillRect(it.x - 6, it.y, 12, 3);
+        c.fillStyle = '#1E3456'; c.fillRect(it.x - 12, it.y + 9, 24, 3);
+      } else if (it.k === 'oil') {
+        c.fillStyle = 'rgba(20,20,30,0.85)';
+        c.beginPath(); c.ellipse(it.x, it.y, 14, 8, 0, 0, Math.PI * 2); c.fill();
+        c.fillStyle = 'rgba(166,210,236,0.35)'; c.beginPath(); c.ellipse(it.x - 4, it.y - 2, 4, 2, 0, 0, Math.PI * 2); c.fill();
+      } else {
+        c.font = '20px sans-serif';
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        c.fillText(it.k === 'fuel' ? '⛽' : '💕', it.x, it.y);
+      }
+    }
+
+    function raceLoop(ts) {
+      if (!race.on) return;
+      const dt = Math.min(0.05, (ts - race.last) / 1000);
+      race.last = ts;
+      const { W, H } = race;
+      if (!race.over) {
+        race.t += dt;
+        race.speed = 150 + race.t * 6;
+        race.road = (race.road + race.speed * dt) % 40;
+        race.spawn -= dt;
+        if (race.spawn <= 0) {
+          race.spawn = Math.max(0.42, 0.95 - race.t * 0.015);
+          const r = Math.random();
+          const k = r < 0.42 ? 'cone' : r < 0.6 ? 'oil' : r < 0.9 ? 'fuel' : 'heart';
+          race.items.push({ k, lane: Math.floor(Math.random() * 3), y: -20, x: 0 });
+        }
+      }
+      // route
+      rx.fillStyle = '#3B4452'; rx.fillRect(0, 0, W, H);
+      rx.fillStyle = '#5E8F4E'; rx.fillRect(0, 0, W * 0.12, H); rx.fillRect(W * 0.88, 0, W * 0.12, H);
+      for (let y = -40 + race.road; y < H; y += 40) {
+        rx.fillStyle = (Math.round((y - race.road) / 40) % 2) ? '#F26A21' : '#A6D2EC';
+        rx.fillRect(W * 0.12, y, 8, 20); rx.fillRect(W * 0.88 - 8, y, 8, 20);
+        rx.fillStyle = (Math.round((y - race.road) / 40) % 2) ? '#A6D2EC' : '#F26A21';
+        rx.fillRect(W * 0.12, y + 20, 8, 20); rx.fillRect(W * 0.88 - 8, y + 20, 8, 20);
+        rx.fillStyle = 'rgba(255,255,255,0.55)';
+        rx.fillRect(laneX(0) + (laneX(1) - laneX(0)) / 2 - 1.5, y + 6, 3, 18);
+        rx.fillRect(laneX(1) + (laneX(2) - laneX(1)) / 2 - 1.5, y + 6, 3, 18);
+      }
+      // voiture
+      const target = laneX(race.lane);
+      race.carX = race.carX === null ? target : race.carX + (target - race.carX) * Math.min(1, dt * 14);
+      const carY = H - 40;
+      // objets
+      for (let i = race.items.length - 1; i >= 0; i--) {
+        const it = race.items[i];
+        if (!race.over) it.y += race.speed * dt;
+        it.x = laneX(it.lane);
+        drawItem(it);
+        const near = Math.abs(it.x - race.carX) < 18 && Math.abs(it.y - carY) < 26;
+        if (near && !race.over) {
+          race.items.splice(i, 1);
+          if (it.k === 'fuel') { race.score += 1; sfx.tap(); }
+          else if (it.k === 'heart') { race.score += 2; sfx.coin(); }
+          else if (ts > race.hit) { race.lives--; race.hit = ts + 1200; sfx.bad(); buzz(60); }
+          continue;
+        }
+        if (it.y > H + 30) race.items.splice(i, 1);
+      }
+      drawCar(race.carX, carY, ts < race.hit && Math.floor(ts / 120) % 2 === 0);
+      // tableau de bord
+      rx.fillStyle = 'rgba(30,52,86,0.85)';
+      rx.fillRect(6, 6, 140, 22);
+      rx.fillStyle = '#fff';
+      rx.font = 'bold 12px "Space Mono", monospace';
+      rx.textAlign = 'left';
+      rx.textBaseline = 'middle';
+      rx.fillText(`⛽ ${race.score}  ${'❤️'.repeat(Math.max(0, race.lives))}`, 12, 17);
+      if (race.t < 2.2 && !race.over) {
+        rx.fillStyle = 'rgba(255,255,255,0.92)';
+        rx.fillRect(W / 2 - 120, H / 2 - 30, 240, 52);
+        rx.fillStyle = '#1E3456';
+        rx.textAlign = 'center';
+        rx.font = 'bold 13px "Baloo 2", sans-serif';
+        rx.fillText('Tape à gauche / à droite', W / 2, H / 2 - 12);
+        rx.fillText('Évite les plots, ramasse les ⛽ 💕', W / 2, H / 2 + 8);
+      }
+      if (!race.over && (race.lives <= 0 || race.t >= 40)) endRace();
+      if (race.over) {
+        rx.fillStyle = 'rgba(255,255,255,0.92)';
+        rx.fillRect(W / 2 - 110, H / 2 - 32, 220, 60);
+        rx.fillStyle = '#1E3456';
+        rx.textAlign = 'center';
+        rx.font = 'bold 15px "Baloo 2", sans-serif';
+        rx.fillText(race.result, W / 2, H / 2 - 10);
+        rx.font = '12px "Space Mono", monospace';
+        rx.fillText(race.result2, W / 2, H / 2 + 12);
+      }
+      race.raf = requestAnimationFrame(raceLoop);
+    }
+
+    function endRace() {
+      race.over = true;
+      const s = race.score;
+      const stars = s >= 25 ? 3 : (s >= 14 ? 2 : 1);
+      const record = s > (state.bestRace || 0);
+      if (record) state.bestRace = s;
+      race.result = `${'⭐'.repeat(stars)} ${s} pts${race.lives <= 0 ? ' · sortie de piste !' : ''}`;
+      race.result2 = record ? 'Nouveau record 🏁' : `Record : ${state.bestRace}`;
+      const before = snap();
+      state.happy = clamp(state.happy + stars * 6);
+      state.love = clamp(state.love + stars * 2);
+      state.energy = clamp(state.energy - 6);
+      state.counters.games++;
+      state.counters.races++;
+      sfx.level();
+      gainXp(4 + stars * 3);
+      updateConditions(true);
+      renderStats();
+      showDeltas(before);
+      checkTrophies();
+      setTimeout(() => {
+        race.on = false;
+        cancelAnimationFrame(race.raf);
+        raceEl.hidden = true;
+        spriteEl.style.visibility = '';
+        game.active = false;
+        busy = false;
+        refreshHim(true);
+      }, 2400);
+    }
+    $('pickRace').addEventListener('click', () => { gamesModal.hidden = true; startRace(); });
+
     // =====================================================================
     //  Démarrage
     // =====================================================================
@@ -4950,6 +5368,7 @@
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) { saveState(); cloudPush(true); return; }
       cloudPull(playedOf(state));
+      fetchNotes();
       const t = Date.now();
       if (t - lastTickAt > 60 * 1000 && !busy) {
         catchUp(lastTickAt);
