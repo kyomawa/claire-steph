@@ -68,12 +68,15 @@ function checkTrophies() {
 
 function gainXp(n) {
   if (!n) return;
+  if (state.discipline > 70) n = Math.round(n * 1.1);
   const before = levelFor(state.xp);
   state.xp += n;
   const after = levelFor(state.xp);
   if (after > before) {
     toast(rankFor(after) !== rankFor(before) ? `Niveau ${after} : ${rankFor(after)} ! 🏁` : `Niveau ${after} ! Bravo 🎉`, A.icoGrow);
     if (typeof earn === 'function') earn(10, 'cadeau de niveau');
+    const no = document.getElementById('raceNo');
+    if (no) { no.classList.remove('spin'); void no.offsetWidth; no.classList.add('spin'); confetti(no, 34); }
     try { sfx.level(); buzz([30, 50, 30]); } catch (e) { /* init */ }
     setTimeout(() => {
       showBubble(`Niveau ${after} ! 🎉`, 2200);

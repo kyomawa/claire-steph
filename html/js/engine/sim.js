@@ -215,5 +215,10 @@
 
   function activeAlerts(s) { return Object.keys((s && s.alerts) || {}); }
 
-  return { RULES, ALERTS, PERSONALITIES, MIN, HOUR, DAY, clamp, isSleepHour, isAsleep, ensure, simulate, eat, addActivity, personality, bond, playMultiplier, activeAlerts };
+  // Retire tout de suite les appels réglés par une action (sans attendre le pas suivant)
+  function clearResolved(s, asleep) {
+    for (const k of Object.keys(s.alerts || {})) if (!ALERTS[k] || !ALERTS[k].test(s, { asleep })) delete s.alerts[k];
+  }
+
+  return { RULES, ALERTS, PERSONALITIES, MIN, HOUR, DAY, clamp, isSleepHour, isAsleep, ensure, simulate, eat, addActivity, personality, bond, playMultiplier, activeAlerts, clearResolved };
 }));

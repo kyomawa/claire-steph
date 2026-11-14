@@ -20,6 +20,7 @@ function renderStats() {
   if (moodEl.getAttribute('src') !== face) moodEl.src = face;
 
   $('btnHeal').classList.toggle('alert', state.sick);
+  if (typeof renderLife === 'function') renderLife();
 
   const lvl = levelFor(state.xp);
   const lo = xpFloor(lvl), hi = xpFloor(lvl + 1);

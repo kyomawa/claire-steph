@@ -63,6 +63,8 @@ function renderDuo() {
 function doMoment(m) {
   doAction({
     img: sceneOf(m.id), scene: true, caption: m.cap, delta: m.d, duration: 2800, xp: 6, counter: 'moments',
+    cat: { sport: 'sport', fete: 'party', cuisine: 'food', jeux: 'geek' }[m.id] || 'love',
+    weight: m.id === 'sport' ? -0.5 : (m.id === 'cuisine' ? 0.3 : 0),
     after: () => { addToAlbum(m.id); if (m.id === 'voyage') sendPostcard(); }
   });
 }

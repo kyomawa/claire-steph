@@ -1554,3 +1554,48 @@ body { background: transparent; }
 @media (prefers-reduced-motion: reduce) {
   .star, .btn.alert { animation: none; }
 }
+
+/* ---- Cycle de vie : appels, caprices, lumière, statut ---- */
+.alert-badge {
+  position: absolute;
+  top: 8px;
+  right: 56px;
+  z-index: 9;
+  min-width: 32px;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: 14px;
+  border: 2.5px solid var(--navy);
+  background: #FFE9A8;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--navy);
+  cursor: pointer;
+  box-shadow: 0 2px 0 var(--navy);
+}
+.alert-badge[hidden] { display: none; }
+.caprice {
+  position: absolute;
+  left: 8px;
+  right: 56px;
+  top: 8px;
+  z-index: 9;
+  background: #FFF6E5;
+  border: 2.5px solid var(--gulf-orange);
+  border-radius: 14px;
+  box-shadow: 0 3px 0 var(--navy);
+  padding: 6px 8px;
+}
+.caprice[hidden] { display: none; }
+.screen.lights-off .sky { opacity: 1; background: rgba(4, 7, 18, 0.9); }
+.screen.lights-on-night .sky { opacity: 1; background: rgba(60, 50, 30, 0.35); }
+.screen.lights-on-night .moon { display: none; }
+.bar-track.critical { border-color: var(--low); }
+.ok-line, .alert-line { margin: 0 0 6px; font-weight: 700; font-size: 13px; color: var(--navy); }
+.alert-line { background: #FFF1EC; border-left: 4px solid var(--low); border-radius: 8px; padding: 6px 10px; }
+.ok-line { background: #E7F6E8; border-left: 4px solid var(--good); border-radius: 8px; padding: 6px 10px; }
+.wisdom { margin-top: 12px; }
+.wisdom .d-fill { background: var(--gulf-blue-deep); }
+.mood { cursor: pointer; }
+.screen.in-game .ask, .screen.in-game .caprice, .screen.in-game .alert-badge { visibility: hidden; }
+.caprice:not([hidden]) ~ .bubble { top: 82px; }

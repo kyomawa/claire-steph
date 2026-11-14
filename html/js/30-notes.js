@@ -63,6 +63,7 @@ $('noteSend').addEventListener('click', async () => {
     $('noteMsg').textContent = r.data.sent ? 'Envoyé 💌 Son téléphone vient de vibrer !' : 'Envoyé 💌 Il le recevra à sa prochaine visite dans le jeu.';
     $('noteCount').textContent = '0 / 200';
     state.counters.notesSent++;
+    act('love', 3);
     addMemory('💌 Mot envoyé : ' + text, 'answer');
     sfx.coin();
     renderStats();

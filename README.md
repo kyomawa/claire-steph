@@ -2,16 +2,30 @@
 
 Un tamagotchi perso aux couleurs Gulf.
 
-- `html/` : le jeu (page `index.html`, images dans `html/img/`, liste des images dans `html/assets.js`)
-- `server/server.js` : petit serveur Node **sans dépendance** qui sert le jeu et la **sauvegarde en ligne**
+- `html/` : le jeu
+  - `index.html` : la page (structure seulement)
+  - `css/game.css` : le thème Gulf · `css/motion.css` : le langage d'animation
+  - `js/engine/sim.js` : **le moteur** (règles du jeu, sans affichage), partagé avec le serveur
+  - `js/NN-*.js` : un fichier par système, chargés dans l'ordre (état, cycle de vie, actions,
+    visites, garde-robe, mini-jeux, sauvegarde, notifications…)
+  - `assets.js` + `img/` : les images
+- `server/` : petit serveur Node **sans dépendance** (jeu + sauvegarde en ligne + notifications)
+- `docs/GAME_DESIGN.md` : **les règles du jeu** (besoins, sommeil, appels, maladie, poids,
+  sagesse, personnalité, économie, motion design)
+- `tests/` : `sim.test.js` (moteur) et `e2e.test.js` (navigateur réel)
 - `source/` : les planches de dessins d'origine
-- `tools/build-single-file.py` : fabrique un seul fichier HTML autonome (images intégrées) pour tester
+- `tools/build-single-file.py` : assemble un HTML autonome (ou un artefact avec `--artifact`)
 
 ## Lancer en local
 
 ```bash
-node server/server.js        # puis http://localhost:3000
+npm start                    # puis http://localhost:3000
+npm test                     # tests du moteur + tests navigateur (Playwright)
+npm run build:single         # cheriotchi-autonome.html, à ouvrir sans serveur
 ```
+
+Pour changer l'équilibrage (vitesse de la faim, horaires de dodo…), tout est dans
+`RULES` en haut de `html/js/engine/sim.js` : le jeu **et** les notifications suivent.
 
 Les sauvegardes en ligne vont dans `data/` (une petite fiche JSON par code).
 

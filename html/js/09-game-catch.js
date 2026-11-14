@@ -148,8 +148,10 @@ function endGame() {
   state.energy = clamp(state.energy - 10);
   state.hunger = clamp(state.hunger - 8);
   state.counters.games++;
-  gainXp(Math.max(2, s));
-  earn(Math.floor(s / 2), 'au mini-jeu');
+  const mult = playMult('catch');
+  act('geek', 2);
+  gainXp(Math.round(Math.max(2, s) * mult));
+  earn(Math.round(Math.floor(s / 2) * mult) + geekBonus(), 'au mini-jeu');
   updateConditions(true);
   renderStats();
   checkTrophies();

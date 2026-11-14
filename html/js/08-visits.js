@@ -12,7 +12,7 @@ let firstVisitDone = false;
 let isNewDay = false;
 
 function scheduleGirlVisit(firstDelay) {
-  const delay = firstDelay || rand(7000, 16000);
+  const delay = firstDelay || rand(7000, 16000) * (1 + (5 - Sim.bond(state, Date.now())) * 0.3);
   setTimeout(() => {
     if (canAct() && himMode() !== 'sleep' && (!firstVisitDone || Math.random() < 0.8)) startGirlVisit();
     scheduleGirlVisit();
@@ -173,7 +173,8 @@ $('btnHug').addEventListener('click', () => {
   const beforeHug = snap();
   sfx.happy();
   buzz(40);
-  state.love = clamp(state.love + 26);
+  state.love = clamp(state.love + (isPers('love') ? 34 : 26));
+  act('love', 4);
   state.happy = clamp(state.happy + 18);
   state.hunger = clamp(state.hunger + 4);
   state.energy = clamp(state.energy + 6);

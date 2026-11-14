@@ -10,13 +10,15 @@ function canAct() { return !busy && !girlBusy && !game.active; }
 
 function afterCare() {
   if (isNight()) {
-    awakeUntil = Date.now() + 60 * 1000;   // il se recouche au bout d'une minute
+    if (himMode() === 'sleep' || state.awakeUntil > Date.now()) state.awakeUntil = Date.now() + 60 * 1000;   // il se recouche au bout d'une minute
     const h = now().getHours();
     if (h >= 0 && h < 5) unlock('night_owl');
   }
 }
 
-function doAction({ img, emoji, caption, delta, duration, xp, counter, after, scene }) {
+const COUNTER_CAT = { meals: 'food', runs: 'sport', codes: 'geek', moments: 'love' };
+
+function doAction({ img, emoji, caption, delta, duration, xp, counter, after, scene, weight, cat, pts }) {
   if (!canAct()) return;
   busy = true;
   stopHim();
@@ -38,7 +40,10 @@ function doAction({ img, emoji, caption, delta, duration, xp, counter, after, sc
   state.happy = clamp(state.happy + (delta.happy || 0));
   state.love = clamp(state.love + (delta.love || 0));
   if (counter) state.counters[counter]++;
-  if (counter === 'meals') state.digest += Math.max(0, delta.hunger || 0);
+  if (counter === 'meals') Sim.eat(state, Date.now(), weight ?? 0.3);
+  else if (weight) state.weight = Math.max(45, Math.min(110, state.weight + weight));
+  const c = cat || COUNTER_CAT[counter];
+  if (c) act(c, pts || 4);
   afterCare();
   if (after) after();
   gainXp(xp || 0);
@@ -72,7 +77,7 @@ $('btnRun').addEventListener('click', () => {
   if (state.energy < 10) return refuse('Trop crevé pour courir 😮‍💨');
   doAction({
     img: A.runningBig, caption: 'Ça défoule, un petit run ! 🏃',
-    delta: { energy: -12, happy: 22, hunger: -14 }, duration: 1600, xp: 5, counter: 'runs'
+    delta: { energy: -12, happy: isPers('sport') ? 33 : 22, hunger: -14 }, duration: 1600, xp: 5, counter: 'runs', weight: -0.5
   });
 });
 
@@ -88,16 +93,23 @@ $('btnCode').addEventListener('click', () => {
 });
 
 $('btnSleep').addEventListener('click', () => {
-  const night = isNight();
+  if (!canAct()) return;
+  // il dort : le bouton sert d'interrupteur
+  if (himMode() === 'sleep') return toggleLights();
+  const night = isNight() || now().getHours() >= 21;   // dès 21 h : on le couche
   doAction({
-    img: night ? sceneOf('nuit') : A.sleepBig, scene: night, caption: night ? 'Bonne nuit mon cœur 💤' : 'Petite sieste… Zzz 💤',
-    delta: { energy: 32, happy: 6, hunger: -4, love: night ? 6 : 0 }, duration: night ? 2600 : 2000, xp: 2, counter: 'sleeps',
-    after: () => { awakeUntil = 0; if (night) addToAlbum('nuit'); }
+    img: night ? sceneOf('nuit') : A.sleepBig, scene: night, caption: night ? 'Au lit ! Lumière éteinte 🌙💤' : 'Petite sieste… Zzz 💤',
+    delta: { energy: night ? 10 : 32, happy: 6, hunger: -4, love: night ? 6 : 0 }, duration: night ? 2600 : 2000, xp: 2, counter: 'sleeps',
+    after: () => {
+      state.awakeUntil = 0;
+      if (night) { state.lights = false; addToAlbum('nuit'); }
+    }
   });
 });
 
 $('btnHeal').addEventListener('click', () => {
   if (!state.sick) return refuse('Il pète la forme, pas besoin 💪');
+  if (state.discipline < 30 && Math.random() < 1 / 3) return refuse('Pas envie du médicament ! 😝 (un peu de sagesse l’aiderait)');
   doAction({
     img: sceneOf('soins'), scene: true, caption: 'Une tisane, un plaid, et je veille sur toi 🍵',
     delta: { energy: 10, happy: 12, love: 6, hunger: 10 }, duration: 2200, xp: 4, counter: 'heals',
@@ -127,6 +139,7 @@ let tapTimes = [];
 function stroke() {
   const mode = himMode();
   state.counters.strokes++;
+  act('love', 0.4);
   sfx.purr();
   buzz(8);
   if (mode === 'normal') {
@@ -181,8 +194,10 @@ spriteEl.style.touchAction = 'none';
 function tickle() {
   tapTimes = [];
   sfx.giggle();
+  squash();
   buzz([20, 40, 20]);
   state.counters.tickles++;
+  act('party', 0.8);
   state.happy = clamp(state.happy + 6);
   gainXp(2);
   strikePose(A.himJump, 'pose-jump', 900);
@@ -202,7 +217,7 @@ spriteEl.addEventListener('click', (e) => {
   }
   const mode = himMode();
   if (mode === 'sleep') {
-    awakeUntil = Date.now() + 60 * 1000;
+    state.awakeUntil = Date.now() + 60 * 1000;
     showBubble("Hein ?! J'dormais... 😪", 2000);
     setTimeout(() => flashMood(A.himSurprised, 1800), 0);
     refreshHim(true);
@@ -221,12 +236,14 @@ spriteEl.addEventListener('click', (e) => {
   if (tapTimes.length >= 3) return tickle();
   state.happy = clamp(state.happy + 4);
   state.counters.kisses++;
+  act('love', 0.3);
   sfx.kiss();
   buzz(15);
   gainXp(1);
   renderStats();
   checkTrophies();
   flashMood(A.himHappy, 900);
+  squash();
   spawnHeart(spriteEl.style.left, '80px', pick(['💙', 'icoHeart', '💋']));
 });
 

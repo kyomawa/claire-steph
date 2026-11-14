@@ -2,11 +2,11 @@
 //  Repas au choix (+ son plat préféré du jour)
 // =====================================================================
 const MENU = [
-  { id: 'cafe', n: 'Café', drag: '☕', img: () => A.coffeeBig, d: { hunger: 12, energy: 16, happy: 6 }, cap: 'Merci pour le café ☕' },
-  { id: 'pizza', n: 'Pizza', drag: 'foodPizza', img: () => A.foodPizza, d: { hunger: 28, happy: 14, energy: -2 }, cap: 'Une part de pizza, miam ! 🍕' },
-  { id: 'burger', n: 'Burger', drag: 'foodBurger', img: () => A.foodBurger, d: { hunger: 30, happy: 10, energy: -2 }, cap: 'Un bon gros burger ! 🍔' },
-  { id: 'poulet', n: 'Poulet', drag: 'foodDrumstick', img: () => A.foodDrumstick, d: { hunger: 26, happy: 8, energy: 2 }, cap: 'Ça creuse, ce poulet ! 🍗' },
-  { id: 'smoothie', n: 'Smoothie', drag: '🥤', img: () => A.himDrink, d: { hunger: 10, energy: 12, happy: 6 }, cap: 'Un smoothie bien frais 🥤' },
+  { id: 'cafe', n: 'Café', w: 0, drag: '☕', img: () => A.coffeeBig, d: { hunger: 12, energy: 16, happy: 6 }, cap: 'Merci pour le café ☕' },
+  { id: 'pizza', n: 'Pizza', w: 0.5, drag: 'foodPizza', img: () => A.foodPizza, d: { hunger: 28, happy: 14, energy: -2 }, cap: 'Une part de pizza, miam ! 🍕' },
+  { id: 'burger', n: 'Burger', w: 0.6, drag: 'foodBurger', img: () => A.foodBurger, d: { hunger: 30, happy: 10, energy: -2 }, cap: 'Un bon gros burger ! 🍔' },
+  { id: 'poulet', n: 'Poulet', w: 0.3, drag: 'foodDrumstick', img: () => A.foodDrumstick, d: { hunger: 26, happy: 8, energy: 2 }, cap: 'Ça creuse, ce poulet ! 🍗' },
+  { id: 'smoothie', n: 'Smoothie', w: 0.1, drag: '🥤', img: () => A.himDrink, d: { hunger: 10, energy: 12, happy: 6 }, cap: 'Un smoothie bien frais 🥤' },
   { id: 'eau', n: "Verre d'eau", drag: 'foodWater', img: () => A.foodWater, d: { hunger: 4, energy: 10, happy: 2 }, cap: "Un grand verre d'eau 💧" }
 ];
 const favoriteFood = () => MENU[Math.floor(new Date(dayKey(now())).getTime() / DAY_MS) % (MENU.length - 1)]; // jamais l'eau
@@ -39,8 +39,8 @@ function feed(f) {
   }
   const fav = f === favoriteFood();
   const d = { ...f.d };
-  if (fav) d.happy = (d.happy || 0) + 10;
-  doAction({ img: f.img(), emoji: f.drag, caption: fav ? `${f.n} ?! Mon préféré 😍` : f.cap, delta: d, duration: 1600, xp: fav ? 5 : 3, counter: 'meals' });
+  if (fav) d.happy = (d.happy || 0) + (isPers('food') ? 20 : 10);
+  doAction({ img: f.img(), emoji: f.drag, caption: fav ? `${f.n} ?! Mon préféré 😍` : f.cap, delta: d, duration: 1600, xp: fav ? 5 : 3, counter: 'meals', weight: f.w ?? 0.3 });
 }
 
 $('foodClose').addEventListener('click', () => { foodModal.hidden = true; });

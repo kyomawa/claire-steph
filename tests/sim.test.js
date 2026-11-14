@@ -110,4 +110,13 @@ test('anti-farm des mini-jeux', () => {
   assert.deepStrictEqual([1, 3, 4, 6, 7, 20].map(Sim.playMultiplier), [1, 1, 0.5, 0.5, 0.25, 0.25]);
 });
 
+test('un appel réglé disparaît tout de suite', () => {
+  const s = fresh({ hunger: 10 });
+  Sim.simulate(s, at(10), at(10.2), { hourOf });
+  assert.ok(s.alerts.hunger);
+  s.hunger = 50;
+  Sim.clearResolved(s, false);
+  assert.ok(!s.alerts.hunger);
+});
+
 console.log(`\n${n} tests OK`);

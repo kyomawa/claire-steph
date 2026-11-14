@@ -189,8 +189,10 @@ function endRace() {
   state.counters.games++;
   state.counters.races++;
   sfx.level();
-  gainXp(4 + stars * 3);
-  earn(Math.floor(s / 2) + stars, 'à la Course');
+  const mult = playMult('race');
+  act('geek', 3);
+  gainXp(Math.round((4 + stars * 3) * mult));
+  earn(Math.round((Math.floor(s / 2) + stars) * mult) + geekBonus(), 'à la Course');
   updateConditions(true);
   renderStats();
   showDeltas(before);

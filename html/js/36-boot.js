@@ -11,7 +11,9 @@ function startDay() {
   isNewDay = true;
 }
 
-function welcomeBack(hours) {
+function welcomeBack(hours, events) {
+  const missed = (events || []).filter((e) => e.type === 'mistake').length;
+  if (missed) setTimeout(() => toast(`Pendant ton absence : ${missed} soin${missed > 1 ? 's' : ''} oublié${missed > 1 ? 's' : ''} 📋`), 1600);
   if (hours < 1) return;
   const h = Math.round(hours);
   const absent = h >= 24 ? `${Math.round(h / 24)} jour${h >= 48 ? 's' : ''}` : `${h} h`;
@@ -33,6 +35,8 @@ loadState();
 const loadedPlayed = playedOf(state);
 requestPersist();
 const away = catchUp(state.lastSeen);
+handleSimEvents(away.events, true);
+lastPersonality = Sim.personality(state);
 startDay();
 if (isNewDay) {
   const sp = specialToday();
@@ -60,17 +64,17 @@ checkDaily();
 renderTokens();
 morningWake();
 if (!state.seenHelp && !window.__noHelp) setTimeout(() => { helpModal.hidden = false; }, 900);
-const welcomed = welcomeBack(away);
+const welcomed = welcomeBack(away.hours, away.events);
 scheduleGirlVisit(welcomed ? rand(4500, 5500) : rand(2200, 3500));
-setInterval(tick, 6000);
+setInterval(tick, TICK_MS);
 
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) { saveState(); cloudPush(true); return; }
+  if (document.hidden) { saveNow(); cloudPush(true); return; }
   cloudPull(playedOf(state));
   fetchNotes();
   const t = Date.now();
   if (t - lastTickAt > 60 * 1000 && !busy) {
-    catchUp(lastTickAt);
+    handleSimEvents(catchUp(lastTickAt).events, true);
     lastTickAt = t;
     updateConditions();
     applyPhase();
@@ -78,4 +82,12 @@ document.addEventListener('visibilitychange', () => {
     refreshHim(true);
   }
 });
-window.addEventListener('pagehide', () => { saveState(); cloudPush(true); });
+window.addEventListener('pagehide', () => { saveNow(); cloudPush(true); });
+
+// Images des poses préchargées et décodées : pas de clignotement aux changements de pose
+for (const k of ['himStand', 'himWalk', 'himRun', 'himJump', 'himSit', 'himLie', 'himSleep', 'himRead', 'himPhone', 'himDrink', 'himSport', 'herStand', 'herWalk', 'herJump', 'herSit', 'herRead', 'herPhone']) {
+  if (!A[k]) continue;
+  const im = new Image();
+  im.src = A[k];
+  if (im.decode) im.decode().catch(() => {});
+}

@@ -77,8 +77,10 @@ function endMemory() {
   state.energy = clamp(state.energy - 4);
   state.counters.games++;
   sfx.level();
-  gainXp(4 + stars * 3);
-  earn(stars * 4, 'au Mémoire');
+  const mult = playMult('memory');
+  act('geek', 3);
+  gainXp(Math.round((4 + stars * 3) * mult));
+  earn(Math.round(stars * 4 * mult) + geekBonus(), 'au Mémoire');
   updateConditions(true);
   renderStats();
   showDeltas(before);

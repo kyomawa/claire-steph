@@ -57,7 +57,15 @@
         <div class="sun" id="sun" hidden>☀️</div>
         <div class="scanlines"></div>
         <div class="floor" style="pointer-events:none"></div>
-        <img class="mood" id="mood" alt="humeur">
+        <img class="mood" id="mood" alt="humeur" title="Son statut">
+        <button class="alert-badge" id="alertBadge" hidden aria-label="Il a besoin de toi">⚠️</button>
+        <div class="caprice" id="caprice" hidden>
+          <div class="ask-q"><span>😤 Caprice</span><b id="capriceText"></b></div>
+          <div class="ask-btns">
+            <button class="ask-btn" id="capriceGive">Céder 🥺</button>
+            <button class="ask-btn" id="capriceNo">Lui expliquer 🎓</button>
+          </div>
+        </div>
         <div class="ask" id="ask" hidden>
           <div class="ask-q"><span>💬 Question du jour</span><b id="askQ"></b></div>
           <div class="ask-btns" id="askBtns"></div>
@@ -307,6 +315,16 @@
     </div>
   </div>
 
+  <div class="modal" id="statusModal" hidden role="dialog" aria-modal="true" aria-labelledby="statusTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="statusTitle">📋 Son statut</h2>
+        <button class="close" id="statusClose" aria-label="Fermer">✕</button>
+      </div>
+      <div class="tab-body" id="statusBody"></div>
+    </div>
+  </div>
+
   <div class="modal" id="games" hidden role="dialog" aria-modal="true" aria-labelledby="gamesTitle">
     <div class="modal-card">
       <div class="modal-head">
@@ -402,7 +420,7 @@
   <script src="js/03-progression.js"></script>
   <script src="js/04-render.js"></script>
   <script src="js/05-character.js"></script>
-  <script src="js/06-tick.js"></script>
+  <script src="js/06-life.js"></script>
   <script src="js/07-actions.js"></script>
   <script src="js/08-visits.js"></script>
   <script src="js/09-game-catch.js"></script>

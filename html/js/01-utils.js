@@ -31,6 +31,9 @@ function phaseAt(hour) {
 }
 const phase = () => phaseAt(now().getHours());
 const isNight = () => phase() === 'night';
+const Sim = window.CheriSim;
+// heure « décimale » d'un instant (respecte ?heure=… pour les tests)
+const hourOfTs = (t) => (params.has('heure') ? (Number(params.get('heure')) || 0) + 0.25 : new Date(t).getHours() + new Date(t).getMinutes() / 60);
 
 function formatDate(key) {
   const [y, m, d] = key.split('-').map(Number);

@@ -10,12 +10,12 @@ function earn(n, why) {
 function renderTokens() { $('hudTokens').textContent = `⛽ ${state.tokens || 0}`; }
 
 const TREATS = [
-  { id: 'cake', n: 'Part de gâteau', drag: '🍰', price: 15, d: { hunger: 20, happy: 26 }, cap: 'Un gâteau rien que pour moi ?! 🍰' },
-  { id: 'sushi', n: 'Plateau sushi', drag: '🍣', price: 12, d: { hunger: 32, happy: 14 }, cap: 'Sushi time ! 🍣' },
-  { id: 'icecream', n: 'Glace', drag: '🍦', price: 8, d: { hunger: 8, happy: 16, energy: 4 }, cap: 'Une glace, la vie est belle 🍦' },
-  { id: 'fries', n: 'Frites', drag: '🍟', price: 6, d: { hunger: 18, happy: 10, energy: -2 }, cap: 'Des frites !!! 🍟' },
-  { id: 'strawberry', n: 'Fraises', drag: '🍓', price: 5, d: { hunger: 8, happy: 8, energy: 6 }, cap: 'Fraises toutes fraîches 🍓' },
-  { id: 'energy', n: 'Boisson énergie', drag: '🧃', price: 10, d: { energy: 30, happy: 4 }, cap: 'Plein d’énergie ! ⚡' }
+  { id: 'cake', w: 0.9, n: 'Part de gâteau', drag: '🍰', price: 15, d: { hunger: 20, happy: 26 }, cap: 'Un gâteau rien que pour moi ?! 🍰' },
+  { id: 'sushi', w: 0.3, n: 'Plateau sushi', drag: '🍣', price: 12, d: { hunger: 32, happy: 14 }, cap: 'Sushi time ! 🍣' },
+  { id: 'icecream', w: 0.4, n: 'Glace', drag: '🍦', price: 8, d: { hunger: 8, happy: 16, energy: 4 }, cap: 'Une glace, la vie est belle 🍦' },
+  { id: 'fries', w: 0.7, n: 'Frites', drag: '🍟', price: 6, d: { hunger: 18, happy: 10, energy: -2 }, cap: 'Des frites !!! 🍟' },
+  { id: 'strawberry', w: 0.05, n: 'Fraises', drag: '🍓', price: 5, d: { hunger: 8, happy: 8, energy: 6 }, cap: 'Fraises toutes fraîches 🍓' },
+  { id: 'energy', w: 0.1, n: 'Boisson énergie', drag: '🧃', price: 10, d: { energy: 30, happy: 4 }, cap: 'Plein d’énergie ! ⚡' }
 ];
 const shopModal = $('shop');
 let shopTab = 'treats';

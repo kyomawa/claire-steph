@@ -10,6 +10,8 @@ function cuddle() {
   state.happy = clamp(state.happy + 3);
   state.counters.hugs++;
   state.counters.cuddles++;
+  act('love', 1);
+  squash();
   gainXp(2);
   if (mode === 'normal') strikePose(A.himStand, null, 1200);
   showBubble(pick(['Un câlin tout doux 🫂', 'Reste encore un peu 🥺', 'Mmmh… 💞']), 1600);
@@ -40,15 +42,5 @@ spriteHerEl.addEventListener('click', (e) => {
 moodEl.style.cursor = 'pointer';
 moodEl.addEventListener('click', (e) => {
   e.stopPropagation();
-  const mode = himMode();
-  if (mode === 'sleep') return showBubble('Il dort… 😴', 1400);
-  const needs = [];
-  if (state.sick) needs.push('je suis malade 🤒 (💊)');
-  if (state.hunger < 40) needs.push("j'ai faim 🍔");
-  if (state.energy < 35) needs.push('je suis crevé 😪');
-  if (state.poops.length) needs.push("c'est sale ici 💩");
-  if (state.love < 40) needs.push('un câlin ? 🥺');
-  if (state.happy < 40) needs.push("je m'ennuie 🎮");
-  showBubble(needs.length ? 'Bof… ' + needs.slice(0, 2).join(', ') : pick(['Tout va bien 😎', 'Je suis au top 💪', 'La belle vie 🏖️']), 2400);
-  sfx.tap();
+  openStatus();
 });

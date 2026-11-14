@@ -115,7 +115,7 @@ function tonePlayKick() {
 function endDance() {
   const max = dance.notes.length * 2;
   const pct = dance.score / max;
-  const stars = pct >= 0.8 ? 3 : (pct >= 0.5 ? 2 : 1);
+  const stars = Math.min(3, (pct >= 0.8 ? 3 : (pct >= 0.5 ? 2 : 1)) + (isPers('party') ? 1 : 0));
   const record = dance.score > (state.bestDance || 0);
   if (record) state.bestDance = dance.score;
   state.bestDanceStars = Math.max(state.bestDanceStars || 0, stars);
@@ -127,8 +127,11 @@ function endDance() {
   state.hunger = clamp(state.hunger - 4);
   state.counters.games++;
   sfx.level();
-  gainXp(4 + stars * 3);
-  earn(stars * 4, 'à la Danse');
+  const mult = playMult('dance');
+  act('party', 4);
+  state.weight = Math.max(45, state.weight - 0.3);
+  gainXp(Math.round((4 + stars * 3) * mult));
+  earn(Math.round(stars * 4 * mult) + geekBonus(), 'à la Danse');
   updateConditions(true);
   renderStats();
   showDeltas(before);

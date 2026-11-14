@@ -3,24 +3,18 @@
 // =====================================================================
 let busy = false;
 let girlBusy = false;
-let awakeUntil = 0;
 let direction = 1;
 let posX = 40;
 
 function himMode() {
   if (state.sick) return 'sick';
-  if (isNight() && Date.now() > awakeUntil) return 'sleep';
+  if (Sim.isAsleep(state, Date.now(), hourOfTs)) return 'sleep';
   if (state.sulk) return 'sulk';
   return 'normal';
 }
 
 function updateConditions(silent) {
-  const avg = (state.hunger + state.energy + state.happy + state.love) / 4;
-  if (!state.sick && (state.hunger <= 5 || avg < 18)) {
-    state.sick = true;
-    state.sulk = false;
-    if (!silent) showBubble('Je me sens pas bien... 🤒', 2600);
-  }
+  // la maladie est gérée par le moteur (js/engine/sim.js) ; ici seulement la bouderie
   if (!state.sick && !state.sulk && state.love < 20) {
     state.sulk = true;
     if (!silent) showBubble("Tu t'occupes plus de moi... 😤", 2600);
@@ -36,9 +30,41 @@ let pauseUntil = 0;
 
 const POSES = ['pose-sit', 'pose-lie', 'pose-sleep', 'pose-jump'];
 function setPose(src, pose) {
-  spriteEl.src = src;
+  if (spriteEl.getAttribute('src') !== src) spriteEl.src = src;
   spriteEl.classList.remove(...POSES);
   if (pose) spriteEl.classList.add(pose);
+  // respiration quand il ne marche pas
+  spriteEl.classList.toggle('idle', !!pose || Date.now() < pauseUntil);
+}
+
+// « squash & stretch » : petit écrasement élastique (bisou, chatouilles, câlin)
+function squash(target) {
+  const t = target || spriteEl;
+  t.classList.remove('squash');
+  void t.offsetWidth;
+  t.classList.add('squash');
+  clearTimeout(t._sq);
+  t._sq = setTimeout(() => t.classList.remove('squash'), 450);
+}
+
+// Confettis aux couleurs Gulf depuis un élément
+function confetti(fromEl, n) {
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const r = (fromEl || screenEl).getBoundingClientRect();
+  const colors = ['#F26A21', '#A6D2EC', '#1E3456', '#FFD166', '#FFFFFF'];
+  for (let i = 0; i < (n || 26); i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = (r.left + r.width / 2) + 'px';
+    c.style.top = (r.top + r.height / 2) + 'px';
+    c.style.background = colors[i % colors.length];
+    c.style.setProperty('--dx', rand(-160, 160) + 'px');
+    c.style.setProperty('--dy', rand(60, 320) + 'px');
+    c.style.setProperty('--rot', rand(-540, 540) + 'deg');
+    c.style.setProperty('--dur', rand(0.9, 1.6) + 's');
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 1700);
+  }
 }
 
 function stopHim() {

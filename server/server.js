@@ -123,35 +123,52 @@ function localParts(ts, tz) {
   return { day: `${p.year}-${p.month}-${p.day}`, hour: Number(p.hour) % 24 };
 }
 
-// même calcul que le jeu : ce que deviennent ses jauges pendant l'absence
-function project(save, tz, now) {
-  const p = { hunger: save.hunger, energy: save.energy, happy: save.happy, love: save.love };
-  let t = save.lastSeen;
-  let left = Math.min((now - t) / 3600000, 72);
-  const c = (v) => Math.max(0, Math.min(100, v));
-  while (left > 0) {
-    const dt = Math.min(1, left);
-    const h = localParts(t, tz).hour;
-    if (h >= 22 || h < 7) { p.energy += 8 * dt; p.hunger -= 2.5 * dt; p.happy -= 1 * dt; p.love -= 1.5 * dt; }
-    else { p.hunger -= 5 * dt; p.energy -= 3 * dt; p.happy -= 4 * dt; p.love -= 3 * dt; }
-    for (const k of Object.keys(p)) p[k] = c(p[k]);
-    t += dt * 3600000; left -= dt;
-  }
-  return p;
+// Les règles du jeu viennent du même moteur que le téléphone (une seule source de vérité)
+const Sim = require('../html/js/engine/sim.js');
+
+function hourIn(tz) {
+  const f = new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false });
+  return (t) => {
+    const p = Object.fromEntries(f.formatToParts(new Date(t)).map((x) => [x.type, x.value]));
+    return (Number(p.hour) % 24) + Number(p.minute) / 60;
+  };
 }
+
+// Ce que deviennent ses jauges pendant l'absence (copie : la sauvegarde n'est pas modifiée)
+function project(save, tz, now) {
+  const s = JSON.parse(JSON.stringify(save));
+  Sim.simulate(s, save.lastSeen, now, { hourOf: hourIn(tz), random: () => 0.5 });
+  return s;
+}
+
+const NOTIFS = {
+  sick: { title: '🤒 Il ne se sent pas bien…', body: (n) => `${n} a besoin de toi, viens le soigner 💊`, cooldown: 8 },
+  hunger: { title: "🍔 J'ai faim !", body: (n) => `${n} réclame à manger… viens vite 😋`, cooldown: 6 },
+  love: { title: '💌 Tu me manques…', body: (n) => `${n} attend un câlin 🥺`, cooldown: 10 },
+  happy: { title: '😢 Il s’ennuie…', body: (n) => `${n} aimerait jouer avec toi 🎮`, cooldown: 10 },
+  dirty: { title: '💩 Oups…', body: (n) => `Il y a du ménage à faire chez ${n} 🧼`, cooldown: 8 }
+};
 
 function pickNotification(save, entry, now) {
   const tz = entry.tz || 'Europe/Paris';
   const last = entry.last || {};
   const { day, hour } = localParts(now, tz);
   if (now - save.lastSeen < 45 * 60 * 1000) return null;        // il joue en ce moment
+  const hf = hourIn(tz)(now);
+  // seule exception au silence de la nuit : il vient de s'endormir lumière allumée
+  if (hf >= 22.5 && hf < 23.25 && last.lights !== day) {
+    const pn = project(save, tz, now);
+    if (pn.alerts && pn.alerts.lights) return { key: 'lights', dayMark: day, title: '💡 Il s’est endormi…', body: 'Éteins-lui la lumière pour qu’il dorme bien 🌙' };
+  }
   if (hour >= 22 || hour < 8) return null;                       // on ne réveille personne
   const p = project(save, tz, now);
-  const since = (k) => now - (last[k] || 0);
   const name = (save.name || '').replace(/^Mon\s+/i, '') || 'ton Chéri-o-tchi';
-  if (p.hunger <= 5 && since('sick') > 8 * 3600e3) return { key: 'sick', title: '🤒 Il ne se sent pas bien…', body: `${name} a besoin de toi, viens le soigner 💊` };
-  if (p.hunger < 25 && since('hunger') > 8 * 3600e3) return { key: 'hunger', title: "🍔 J'ai faim !", body: `${name} réclame à manger… viens vite 😋` };
-  if (p.love < 30 && since('love') > 12 * 3600e3) return { key: 'love', title: '💌 Tu me manques…', body: `${name} attend un câlin 🥺` };
+  for (const key of ['sick', 'hunger', 'love', 'happy', 'dirty']) {
+    if (!p.alerts || !p.alerts[key]) continue;
+    const n = NOTIFS[key];
+    if (now - (last[key] || 0) < n.cooldown * 3600e3) continue;
+    return { key, title: n.title, body: n.body(name) };
+  }
   if (hour >= 9 && hour < 12 && save.lastVisitDay !== day && last.daily !== day) return { key: 'daily', dayMark: day, title: '☀️ Coucou !', body: 'Ton mot du jour et tes défis t’attendent 💌' };
   return null;
 }

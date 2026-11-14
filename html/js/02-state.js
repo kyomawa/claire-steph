@@ -6,7 +6,10 @@ let saveRestoring = false;
 function freshState() {
   return {
     hunger: 78, energy: 78, happy: 78, love: 78,
-    sick: false, sulk: false, poops: [], digest: 0,
+    sick: false, sulk: false, poops: [],
+    weight: 70, discipline: 50, lights: true, digestQueue: [], alerts: {}, mistakes: [],
+    activity: { sport: 0, food: 0, geek: 0, love: 0, party: 0 }, hungerZeroSince: 0, poopsFullSince: 0, awakeUntil: 0,
+    gamePlays: null, capriceDay: null,
     xp: 0, bestScore: 0, streak: 0,
     bornAt: Date.now(), lastSeen: null, lastVisitDay: null,
     counters: { hugs: 0, meals: 0, runs: 0, codes: 0, sleeps: 0, heals: 0, games: 0, kisses: 0, visits: 0, washes: 0, cleaned: 0, moments: 0, strokes: 0, tickles: 0, wishes: 0, answers: 0, cuddles: 0, herKisses: 0, dailyDone: 0, fetches: 0, selfies: 0, notesSent: 0, races: 0, notesGot: 0, purchases: 0, photos: 0 },
@@ -26,8 +29,23 @@ const bubbleEl = $('bubble');
 const petNameEl = $('petName');
 
 let saveInfoAt = 0;
+let saveTimer = null;
+let lastWrite = 0;
+// Les actions appellent saveState() très souvent : on regroupe les écritures (≤ 1 par seconde).
 function saveState() {
   if (saveRestoring) return;
+  const wait = 1000 - (Date.now() - lastWrite);
+  if (wait > 0) {
+    if (!saveTimer) saveTimer = setTimeout(() => { saveTimer = null; writeState(); }, wait);
+    return;
+  }
+  writeState();
+}
+// Écriture immédiate (fermeture de l'appli, passage en arrière-plan)
+function saveNow() { clearTimeout(saveTimer); saveTimer = null; writeState(); }
+function writeState() {
+  if (saveRestoring) return;
+  lastWrite = Date.now();
   state.lastSeen = Date.now();
   state.name = petNameEl.textContent;
   try {
@@ -63,32 +81,15 @@ function loadState() {
     state.wear = { ...base.wear, ...((d.wear && typeof d.wear === 'object') ? d.wear : {}) };
     if (d.name) petNameEl.textContent = d.name;
   } catch (e) { /* stockage indisponible */ }
+  Sim.ensure(state);
 }
 petNameEl.addEventListener('blur', saveState);
 petNameEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); petNameEl.blur(); } });
 
-// Le temps passe même jeu fermé : on rejoue les heures d'absence.
+// Le temps passe même jeu fermé : le moteur rejoue les heures d'absence (72 h max)
 function catchUp(fromMs) {
-  if (!fromMs) return 0;
-  const gap = Date.now() - fromMs;
-  if (gap < 2 * 60 * 1000) return 0;
-  const hours = Math.min(gap / HOUR_MS, 72);
-  let t = fromMs;
-  let left = hours;
-  let dayHours = 0;
-  while (left > 0) {
-    const dt = Math.min(1, left);
-    if (phaseAt(new Date(t).getHours()) === 'night') {
-      state.energy += 8 * dt; state.hunger -= 2.5 * dt; state.happy -= 1 * dt; state.love -= 1.5 * dt;
-    } else {
-      state.hunger -= 5 * dt; state.energy -= 3 * dt; state.happy -= 4 * dt; state.love -= 3 * dt;
-      dayHours += dt;
-      state.happy -= state.poops.length * 1.5 * dt;
-      if (dayHours >= 5 && state.poops.length < 3) { dayHours -= 5; addPoop(); }
-    }
-    state.hunger = clamp(state.hunger); state.energy = clamp(state.energy);
-    state.happy = clamp(state.happy); state.love = clamp(state.love);
-    t += dt * HOUR_MS; left -= dt;
-  }
-  return gap / HOUR_MS;
+  const to = Date.now();
+  if (!fromMs || to - fromMs < 60 * 1000) return { hours: 0, events: [] };
+  const events = Sim.simulate(state, fromMs, to, { hourOf: hourOfTs });
+  return { hours: (to - fromMs) / HOUR_MS, events };
 }

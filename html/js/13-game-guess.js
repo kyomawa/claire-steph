@@ -82,8 +82,10 @@ function endGuessGame() {
   state.love = clamp(state.love + w * 2);
   state.energy = clamp(state.energy - 5);
   state.counters.games++;
-  gainXp(2 + w * 2);
-  earn(w * 2, 'au mini-jeu');
+  const mult = playMult('guess');
+  act('geek', 2);
+  gainXp(Math.round((2 + w * 2) * mult));
+  earn(Math.round(w * 2 * mult) + geekBonus(), 'au mini-jeu');
   updateConditions(true);
   renderStats();
   checkTrophies();

@@ -149,9 +149,13 @@ function addWearHost(img, container, flip) {
 }
 
 function syncWear() {
+  const wearSig = WEAR_SLOTS.map((s) => state.wear[s] || '').join('|');
   for (const h of wearHosts) {
     const an = window.ANCHORS[POSE_OF[h.img.getAttribute('src')]];
     const W = h.img.offsetWidth, H = h.img.offsetHeight;
+    const sig = `${h.img.getAttribute('src')}|${h.img.offsetLeft}|${h.img.offsetTop}|${W}|${H}|${h.img.style.transform}|${h.img.style.visibility}|${wearSig}`;
+    if (sig === h.sig && !WEAR_SLOTS.some((s) => h.els[s].hidden === false && !h.els[s].naturalWidth)) continue;
+    h.sig = sig;
     const shown = an && W > 0 && h.img.style.visibility !== 'hidden';
     const flip = shown && h.flip();
     for (const s of WEAR_SLOTS) {
@@ -232,6 +236,7 @@ function frame(ts) {
   syncWear();
   syncPet(dt);
   syncWish();
+  syncOverlays();
   syncShadows();
   syncFood();
   syncBall(dt);
