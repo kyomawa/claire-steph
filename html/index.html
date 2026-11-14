@@ -340,6 +340,43 @@
     .sprite.pose-jump { height: 88px; }
     .sprite.sickly { filter: saturate(0.7) hue-rotate(25deg); }
 
+    .sprite { z-index: 2; }
+
+    .wear { position: absolute; pointer-events: none; z-index: 3; height: auto; max-width: none; }
+    .wear.behind { z-index: 1; }
+    .game .wear { z-index: 2; }
+
+    .pet {
+      position: absolute;
+      bottom: 26px;
+      height: 34px;
+      width: auto;
+      z-index: 3;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .deco-floor { position: absolute; right: 10px; bottom: 24px; height: 30px; width: auto; z-index: 1; pointer-events: none; }
+    .deco-balloon { position: absolute; left: 14px; bottom: 70px; height: 46px; width: auto; z-index: 1; pointer-events: none; animation: bob 3s ease-in-out infinite; }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0) rotate(-3deg); }
+      50% { transform: translateY(-8px) rotate(3deg); }
+    }
+
+    .falling {
+      position: absolute;
+      top: -20px;
+      height: 14px;
+      width: auto;
+      pointer-events: none;
+      z-index: 1;
+      animation: fall 7s linear forwards;
+      opacity: 0.85;
+    }
+
+    @keyframes fall { to { transform: translate(var(--drift), 270px) rotate(var(--rot)); } }
+
     .sprite-her {
       height: 80px;
       z-index: 3;
@@ -593,8 +630,17 @@
       50% { box-shadow: 0 0 0 5px rgba(217, 87, 59, 0); }
     }
 
+    .btn-style {
+      grid-column: span 4;
+      margin-top: 2px;
+      flex-direction: row;
+      justify-content: center;
+      gap: 6px;
+      font-size: 13px;
+    }
+
     .btn-hug {
-      grid-column: 1 / -1;
+      grid-column: span 8;
       margin-top: 2px;
       background: linear-gradient(135deg, #FFE0EA 0%, #FFF0F5 100%);
       border-color: var(--love-deep);
@@ -765,6 +811,46 @@
 
     .empty { font-size: 13px; color: var(--gulf-blue-deep); text-align: center; padding: 20px 0; }
 
+    .preview {
+      position: relative;
+      height: 150px;
+      margin: 0 16px 10px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, var(--shell) 0%, #fff 100%);
+      border: 1.5px solid #e3edf0;
+      overflow: hidden;
+    }
+
+    .preview .sprite { bottom: 8px; height: 92px; left: calc(50% - 26px); cursor: default; }
+    .preview .pet { bottom: 8px; left: calc(50% + 36px); cursor: default; }
+    .tabs.wrap { flex-wrap: wrap; }
+    .tabs.wrap .tab { flex: 1 0 30%; }
+
+    .wardrobe { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+
+    .w-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-height: 84px;
+      padding: 6px 4px;
+      background: #fff;
+      border: 1.5px solid var(--gulf-blue-deep);
+      border-radius: 14px;
+      font-family: inherit;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .w-item img { height: 38px; max-width: 90%; object-fit: contain; }
+    .w-item .w-name { font-size: 10px; font-weight: 700; line-height: 1.15; text-align: center; }
+    .w-item .w-none { font-size: 26px; line-height: 38px; color: var(--gulf-blue-deep); }
+    .w-item.on { background: #FFF1E6; border-color: var(--gulf-orange); border-width: 2.5px; }
+    .w-item.locked { opacity: 0.5; cursor: default; border-style: dashed; }
+    .w-item.locked img { filter: grayscale(1) brightness(0.6); }
+
     .stat-table { width: 100%; border-collapse: collapse; font-size: 13px; }
     .stat-table td { padding: 5px 0; border-bottom: 1px solid #eef3f5; }
     .stat-table td:last-child { text-align: right; font-weight: 800; }
@@ -814,6 +900,7 @@
         <div class="sprite-layer">
           <img class="sprite" id="sprite" alt="lui">
           <img class="sprite sprite-her" id="spriteHer" alt="toi">
+          <img class="pet" id="pet" alt="compagnon" hidden>
         </div>
         <div class="game" id="game">
           <div class="game-hud"><span id="gameScore">💋 0</span><span id="gameTime">⏱ 20</span></div>
@@ -861,6 +948,7 @@
       <button class="btn" id="btnWash"><span class="emoji">🧼</span>Laver</button>
       <button class="btn" id="btnHeal"><span class="emoji">💊</span>Soigner</button>
       <button class="btn" id="btnBook"><span class="emoji">📖</span>Carnet</button>
+      <button class="btn btn-style" id="btnStyle"><span class="emoji">👕</span>Garde-robe</button>
       <button class="btn btn-hug" id="btnHug"><span class="emoji">🥰</span>Câlin de ta copine</button>
     </div>
 
@@ -881,6 +969,21 @@
         <button class="tab" role="tab" data-tab="stats" aria-selected="false">📊 Stats</button>
       </div>
       <div class="tab-body" id="bookBody"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="closet" hidden role="dialog" aria-modal="true" aria-labelledby="closetTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="closetTitle">👕 Garde-robe</h2>
+        <button class="close" id="closetClose" aria-label="Fermer">✕</button>
+      </div>
+      <div class="preview" id="preview">
+        <img class="sprite" id="previewHim" alt="aperçu">
+        <img class="pet" id="previewPet" alt="" hidden>
+      </div>
+      <div class="tabs wrap" role="tablist" id="closetTabs"></div>
+      <div class="tab-body"><div class="wardrobe" id="closetGrid"></div></div>
     </div>
   </div>
 
@@ -990,7 +1093,8 @@
         xp: 0, bestScore: 0, streak: 0,
         bornAt: Date.now(), lastSeen: null, lastVisitDay: null,
         counters: { hugs: 0, meals: 0, runs: 0, codes: 0, sleeps: 0, heals: 0, games: 0, kisses: 0, visits: 0, washes: 0, cleaned: 0 },
-        trophies: {}, journal: [], name: null
+        trophies: {}, journal: [], name: null,
+        owned: {}, wear: { tete: null, yeux: null, visage: null, cou: null, dos: null, compagnon: null }
       };
     }
     let state = freshState();
@@ -1022,6 +1126,8 @@
         state.trophies = d.trophies || {};
         state.journal = Array.isArray(d.journal) ? d.journal : [];
         state.poops = Array.isArray(d.poops) ? d.poops.slice(0, 3) : [];
+        state.owned = (d.owned && typeof d.owned === 'object') ? d.owned : {};
+        state.wear = { ...base.wear, ...((d.wear && typeof d.wear === 'object') ? d.wear : {}) };
         if (d.name) petNameEl.textContent = d.name;
       } catch (e) { /* stockage indisponible */ }
     }
@@ -1088,6 +1194,7 @@
       { id: 'special', e: '🎁', t: 'Jour spécial', d: 'Ouvrir le jeu un jour de fête', ok: (s) => !!s.trophies.special },
       { id: 'washes_10', e: '🧼', t: 'Propre comme un sou neuf', d: '10 bains', ok: (s) => s.counters.washes >= 10 },
       { id: 'cleaned_20', e: '💩', t: 'Ramasse-crottes', d: '20 cacas ramassés', ok: (s) => s.counters.cleaned >= 20 },
+      { id: 'style_4', e: '👕', t: 'Fashion week', d: 'Porter 4 accessoires à la fois', ok: (s) => Object.values(s.wear).filter(Boolean).length >= 4 },
       { id: 'memories_10', e: '📖', t: 'Album souvenir', d: '10 souvenirs dans le carnet', ok: (s) => s.journal.length >= 10 }
     ];
 
@@ -1099,6 +1206,7 @@
     }
     function checkTrophies() {
       for (const t of TROPHIES) if (!state.trophies[t.id] && t.ok(state)) unlock(t.id);
+      checkUnlocks();
     }
 
     function gainXp(n) {
@@ -1640,7 +1748,10 @@
       const screenWidth = screenEl.clientWidth;
       const fromLeft = Math.random() < 0.5;
       let gx = fromLeft ? -40 : screenWidth + 10;
-      const targetX = fromLeft ? Math.min(screenWidth - 70, posX + 46) : Math.max(6, posX - 46);
+      const himW = spriteEl.offsetWidth || 50, herW = 52;
+      let targetX = fromLeft ? posX - herW - 6 : posX + himW + 6;
+      if (targetX < 4 || targetX > screenWidth - herW - 4) targetX = fromLeft ? posX + himW + 6 : posX - herW - 6;
+      targetX = Math.max(4, Math.min(screenWidth - herW - 4, targetX));
 
       if (!state.sulk) spriteEl.style.transform = fromLeft ? 'scaleX(-1)' : 'scaleX(1)';
 
@@ -2022,6 +2133,272 @@
     document.querySelectorAll('.tab').forEach((t) => t.addEventListener('click', () => { bookTab = t.dataset.tab; renderBook(); }));
 
     // =====================================================================
+    //  Garde-robe : accessoires + compagnon
+    // =====================================================================
+    const SLOTS = [
+      { id: 'tete', label: '🎩 Tête' }, { id: 'yeux', label: '🕶️ Yeux' }, { id: 'visage', label: '😊 Visage' },
+      { id: 'cou', label: '🧣 Cou' }, { id: 'dos', label: '🪽 Dos' }, { id: 'compagnon', label: '🐾 Ami' }
+    ];
+    const Lv = (n) => ({ type: 'level', n });
+    const Tr = (id) => ({ type: 'trophy', id });
+    const Mo = (...months) => ({ type: 'season', months });
+    const SPECIAL = { type: 'special' };
+
+    // f = réglages de placement (w : largeur ×sprite, b : bas du chapeau en hauteur de tête,
+    //     x : centre horizontal, dy : décalage vertical)
+    const ITEMS = [
+      { id: 'capGulf', n: 'Casquette Gulf', s: 'tete', u: Lv(1), f: { w: 1.08, b: 0.43 } },
+      { id: 'capBeige', n: 'Casquette beige', s: 'tete', u: Lv(1), f: { w: 1.08, b: 0.43 } },
+      { id: 'beanie', n: 'Bonnet gris', s: 'tete', u: Lv(1), f: { w: 1.02, b: 0.47 } },
+      { id: 'headphones', n: 'Casque audio', s: 'tete', u: Lv(1), f: { w: 1.12, b: 0.78 } },
+      { id: 'strawHat', n: 'Chapeau de paille', s: 'tete', u: Lv(2), f: { w: 1.35, b: 0.42 } },
+      { id: 'fedora', n: 'Fedora', s: 'tete', u: Lv(3), f: { w: 1.3, b: 0.42 } },
+      { id: 'catEars', n: 'Oreilles de chat', s: 'tete', u: Lv(4), f: { w: 1.0, b: 0.4 } },
+      { id: 'bunnyEars', n: 'Oreilles de lapin', s: 'tete', u: Lv(4), f: { w: 0.95, b: 0.38 } },
+      { id: 'crown', n: 'Couronne', s: 'tete', u: Lv(5), f: { w: 0.6, b: 0.2 } },
+      { id: 'halo', n: 'Auréole', s: 'tete', u: Lv(7), f: { w: 0.7, b: -0.02 } },
+      { id: 'chefHat', n: 'Toque de chef', s: 'tete', u: Tr('meals_30'), f: { w: 0.95, b: 0.4 } },
+      { id: 'gradCap', n: 'Toque de diplômé', s: 'tete', u: Tr('codes_20'), f: { w: 1.25, b: 0.36 } },
+      { id: 'flowerCrown', n: 'Couronne de fleurs', s: 'tete', u: Tr('streak_7'), f: { w: 1.0, b: 0.3 } },
+      { id: 'partyHat', n: 'Chapeau de fête', s: 'tete', u: SPECIAL, f: { w: 0.45, b: 0.16, x: 0.56 } },
+      { id: 'witchHat', n: 'Chapeau de sorcier', s: 'tete', u: Mo(10), f: { w: 1.3, b: 0.42 } },
+      { id: 'santaHat', n: 'Bonnet de Noël', s: 'tete', u: Mo(12), f: { w: 1.18, b: 0.46 } },
+      { id: 'antlers', n: 'Bois de renne', s: 'tete', u: Mo(12), f: { w: 1.1, b: 0.26 } },
+      { id: 'elfHat', n: 'Bonnet de lutin', s: 'tete', u: Mo(12), f: { w: 1.05, b: 0.42 } },
+      { id: 'earmuffs', n: 'Cache-oreilles', s: 'tete', u: Mo(11, 12, 1, 2), f: { w: 1.1, b: 0.75 } },
+      { id: 'beanieBlue', n: 'Bonnet à pompon', s: 'tete', u: Mo(1, 2), f: { w: 1.02, b: 0.47 } },
+
+      { id: 'sunglasses', n: 'Lunettes de soleil', s: 'yeux', u: Lv(2) },
+      { id: 'heartGlasses', n: 'Lunettes cœur', s: 'yeux', u: Tr('first_hug') },
+      { id: 'thugGlasses', n: 'Lunettes « deal with it »', s: 'yeux', u: Tr('game_15') },
+
+      { id: 'blush', n: 'Joues roses', s: 'visage', u: Lv(3) },
+      { id: 'moustache', n: 'Moustache', s: 'visage', u: Lv(6), f: { w: 0.36, dy: 0.15, x: 0.64 } },
+
+      { id: 'scarfRed', n: 'Écharpe rouge', s: 'cou', u: Lv(1) },
+      { id: 'scarfGrey', n: 'Écharpe grise', s: 'cou', u: Lv(2) },
+      { id: 'scarfBlue', n: 'Écharpe bleue', s: 'cou', u: Lv(3) },
+      { id: 'scarfOrange', n: "Écharpe d'automne", s: 'cou', u: Mo(9, 10, 11) },
+      { id: 'necklaceTag', n: 'Plaque', s: 'cou', u: Lv(4), f: { w: 0.42, dy: -0.02 } },
+      { id: 'necklaceGold', n: 'Chaîne en or', s: 'cou', u: Lv(5), f: { w: 0.48, dy: -0.02 } },
+      { id: 'necklacePendant', n: 'Médaillon', s: 'cou', u: Lv(6), f: { w: 0.44, dy: -0.02 } },
+      { id: 'necklaceBlue', n: 'Pendentif bleu', s: 'cou', u: Lv(8), f: { w: 0.44, dy: -0.02 } },
+
+      { id: 'wings', n: "Ailes d'ange", s: 'dos', u: Lv(7) },
+      { id: 'batWings', n: 'Ailes de chauve-souris', s: 'dos', u: Mo(10) },
+
+      { id: 'petCat', n: 'Caramel le chat', s: 'compagnon', u: Lv(1), say: 'Miaou ! 🐱' },
+      { id: 'petDog', n: 'Biscuit le chien', s: 'compagnon', u: Lv(2), say: 'Ouaf ouaf ! 🐶' },
+      { id: 'petBunny', n: 'Flocon le lapin', s: 'compagnon', u: Lv(3), say: '*grignote* 🥕' },
+      { id: 'petGreyCat', n: 'Pixel le chat gris', s: 'compagnon', u: Lv(4), say: 'Mrrraou ! 😼' },
+      { id: 'petChick', n: 'Piou le poussin', s: 'compagnon', u: Lv(5), say: 'Piou piou ! 🐣' },
+      { id: 'petPanda', n: 'Bambou le panda', s: 'compagnon', u: Lv(6), say: '*mâchouille du bambou* 🎋' },
+      { id: 'petPenguin', n: 'Glaçon le pingouin', s: 'compagnon', u: Lv(7), say: '*dandine* 🐧' },
+      { id: 'petFrog', n: 'Kermi la grenouille', s: 'compagnon', u: Lv(8), say: 'Croâ ! 🐸' },
+      { id: 'petHedgehog', n: 'Choupi le hérisson', s: 'compagnon', u: Tr('days_30'), say: '*renifle* 🦔' }
+    ];
+    const ITEM = Object.fromEntries(ITEMS.map((i) => [i.id, i]));
+    const SLOT_FIT = {
+      tete: { w: 1.05, b: 0.42, x: 0.5 },
+      yeux: { w: 0.82, x: 0.6, at: 'eyeY', dy: 0.035 },
+      visage: { w: 0.7, x: 0.6, at: 'eyeY', dy: 0.125 },
+      cou: { w: 0.8, x: 0.5, at: 'neck', dy: -0.05, fromTop: true },
+      dos: { w: 1.75, x: 0.42, at: 'neck', dy: 0.08 }
+    };
+    const MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+
+    function unlockText(u) {
+      if (u.type === 'level') return `Niveau ${u.n}`;
+      if (u.type === 'trophy') { const t = TROPHIES.find((x) => x.id === u.id); return `Trophée « ${t ? t.t : u.id} »`; }
+      if (u.type === 'season') return 'En ' + u.months.map((m) => MONTHS[m - 1]).join(' / ');
+      return 'Un jour de fête';
+    }
+
+    function checkUnlocks(silent) {
+      const lvl = levelFor(state.xp);
+      const month = now().getMonth() + 1;
+      for (const it of ITEMS) {
+        if (state.owned[it.id]) continue;
+        const u = it.u;
+        const ok = (u.type === 'level' && lvl >= u.n) || (u.type === 'trophy' && !!state.trophies[u.id]) ||
+          (u.type === 'season' && u.months.includes(month)) || (u.type === 'special' && !!specialToday());
+        if (!ok) continue;
+        state.owned[it.id] = dayKey(now());
+        if (!silent) toast(`Nouveau dans la garde-robe : ${it.n}`, A[it.id]);
+      }
+    }
+
+    // ---- Placement des accessoires sur un sprite ----
+    const POSE_OF = {};
+    for (const k of Object.keys(window.ANCHORS || {})) POSE_OF[A[k]] = k;
+    const WEAR_SLOTS = ['dos', 'cou', 'visage', 'yeux', 'tete'];
+    const wearHosts = [];
+
+    function addWearHost(img, container, flip) {
+      const els = {};
+      for (const s of WEAR_SLOTS) {
+        const e = document.createElement('img');
+        e.className = 'wear' + (s === 'dos' ? ' behind' : '');
+        e.alt = '';
+        e.hidden = true;
+        container.appendChild(e);
+        els[s] = e;
+      }
+      wearHosts.push({ img, els, flip: flip || (() => (img.style.transform || '').includes('-1')) });
+    }
+
+    function syncWear() {
+      for (const h of wearHosts) {
+        const an = window.ANCHORS[POSE_OF[h.img.getAttribute('src')]];
+        const W = h.img.offsetWidth, H = h.img.offsetHeight;
+        const shown = an && W > 0 && h.img.style.visibility !== 'hidden';
+        const flip = shown && h.flip();
+        for (const s of WEAR_SLOTS) {
+          const el = h.els[s];
+          const it = ITEM[state.wear[s]];
+          if (!shown || !it) { el.hidden = true; continue; }
+          if (el.getAttribute('src') !== A[it.id]) el.src = A[it.id];
+          if (!el.naturalWidth) { el.hidden = true; continue; }
+          const f = { ...SLOT_FIT[s], ...(it.f || {}) };
+          const w = f.w * W;
+          const hgt = w * el.naturalHeight / el.naturalWidth;
+          const cx = (f.x ?? 0.5) * W;
+          let top;
+          if (s === 'tete') top = f.b * an.neck * H - hgt;
+          else top = (an[f.at] + f.dy) * H - (f.fromTop ? 0 : hgt / 2);
+          el.hidden = false;
+          el.style.width = w + 'px';
+          el.style.left = (h.img.offsetLeft + (flip ? W - cx : cx) - w / 2) + 'px';
+          el.style.top = (h.img.offsetTop + top) + 'px';
+          el.style.transform = flip ? 'scaleX(-1)' : '';
+        }
+      }
+    }
+
+    // ---- Compagnon qui le suit ----
+    const petEl = $('pet');
+    let petX = 10, petFace = 1, petT = 0;
+    function syncPet(dt) {
+      const it = ITEM[state.wear.compagnon];
+      const show = !!it && !game.active;
+      petEl.hidden = !show;
+      if (!show) return;
+      if (petEl.getAttribute('src') !== A[it.id]) petEl.src = A[it.id];
+      const pw = petEl.offsetWidth || 30;
+      const himL = spriteEl.offsetLeft, himW = spriteEl.offsetWidth;
+      const right = !(spriteEl.style.transform || '').includes('-1');
+      let target = right ? himL - pw - 2 : himL + himW + 2;
+      target = Math.max(2, Math.min(screenEl.clientWidth - pw - 2, target));
+      const dx = target - petX;
+      petX += dx * Math.min(1, dt * 2.5);
+      const moving = Math.abs(dx) > 3;
+      if (moving) petFace = dx > 0 ? 1 : -1;
+      petT += dt;
+      petEl.style.left = petX + 'px';
+      petEl.style.bottom = (26 + (moving ? Math.abs(Math.sin(petT * 11)) * 4 : 0)) + 'px';
+      petEl.style.transform = petFace < 0 ? 'scaleX(-1)' : '';
+    }
+    petEl.addEventListener('click', () => {
+      const it = ITEM[state.wear.compagnon];
+      if (!it || !canAct()) return;
+      showBubble(it.say, 1600, A[it.id]);
+      state.happy = clamp(state.happy + 2);
+      renderStats();
+      spawnHeart(petX + 'px', '60px', 'icoHeart');
+    });
+
+    let lastFrame = performance.now();
+    function frame(ts) {
+      const dt = Math.min(0.05, (ts - lastFrame) / 1000);
+      lastFrame = ts;
+      syncWear();
+      syncPet(dt);
+      requestAnimationFrame(frame);
+    }
+
+    // ---- Décor de saison ----
+    function seasonDeco() {
+      const m = now().getMonth() + 1;
+      const floor = { 10: 'decoPumpkin', 12: 'decoCandy', 2: 'decoHeart', 3: 'decoClover' }[m];
+      if (floor) {
+        const d = document.createElement('img');
+        d.className = 'deco-floor';
+        d.src = A[floor];
+        d.alt = '';
+        screenEl.appendChild(d);
+      }
+      if (specialToday()) {
+        const b = document.createElement('img');
+        b.className = 'deco-balloon';
+        b.src = A.decoBalloon;
+        b.alt = '';
+        screenEl.appendChild(b);
+      }
+      const fall = (m === 12 || m === 1) ? 'decoSnow' : ((m === 10 || m === 11) ? 'decoLeaf' : null);
+      if (!fall) return;
+      setInterval(() => {
+        if (document.hidden) return;
+        const f = document.createElement('img');
+        f.className = 'falling';
+        f.src = A[fall];
+        f.alt = '';
+        f.style.left = rand(0, 95) + '%';
+        f.style.setProperty('--drift', rand(-40, 40) + 'px');
+        f.style.setProperty('--rot', rand(-200, 200) + 'deg');
+        screenEl.appendChild(f);
+        setTimeout(() => f.remove(), 7200);
+      }, 1400);
+    }
+
+    // ---- Fenêtre garde-robe ----
+    const closet = $('closet');
+    let closetSlot = 'tete';
+
+    function renderCloset() {
+      const owned = ITEMS.filter((i) => state.owned[i.id]).length;
+      $('closetTitle').textContent = `👕 Garde-robe · ${owned}/${ITEMS.length}`;
+      const pet = ITEM[state.wear.compagnon];
+      $('previewPet').hidden = !pet;
+      if (pet) $('previewPet').src = A[pet.id];
+      $('closetTabs').replaceChildren(...SLOTS.map((sl) => {
+        const b = el('button', 'tab', sl.label);
+        b.setAttribute('role', 'tab');
+        b.setAttribute('aria-selected', String(sl.id === closetSlot));
+        b.addEventListener('click', () => { closetSlot = sl.id; renderCloset(); });
+        return b;
+      }));
+      const grid = $('closetGrid');
+      const none = el('button', 'w-item' + (state.wear[closetSlot] ? '' : ' on'));
+      none.append(el('span', 'w-none', '∅'), el('span', 'w-name', 'Rien'));
+      none.addEventListener('click', () => equip(closetSlot, null));
+      grid.replaceChildren(none, ...ITEMS.filter((i) => i.s === closetSlot).map((it) => {
+        const have = !!state.owned[it.id];
+        const b = el('button', 'w-item' + (have ? '' : ' locked') + (state.wear[closetSlot] === it.id ? ' on' : ''));
+        const img = el('img');
+        img.src = A[it.id];
+        img.alt = '';
+        b.append(img, el('span', 'w-name', have ? it.n : '🔒 ' + unlockText(it.u)));
+        b.title = have ? it.n : `${it.n} — ${unlockText(it.u)}`;
+        b.disabled = !have;
+        b.addEventListener('click', () => equip(closetSlot, state.wear[closetSlot] === it.id ? null : it.id));
+        return b;
+      }));
+    }
+
+    function equip(slot, id) {
+      state.wear[slot] = id;
+      if (slot === 'compagnon' && id) { petX = spriteEl.offsetLeft - 30; showBubble(`${ITEM[id].n} est là ! ${ITEM[id].say}`, 2000); }
+      checkTrophies();
+      saveState();
+      renderCloset();
+    }
+
+    $('btnStyle').addEventListener('click', () => { renderCloset(); closet.hidden = false; $('closetClose').focus(); });
+    $('closetClose').addEventListener('click', () => { closet.hidden = true; });
+    closet.addEventListener('click', (e) => { if (e.target === closet) closet.hidden = true; });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closet.hidden = true; });
+
+    // =====================================================================
     //  Démarrage
     // =====================================================================
     function startDay() {
@@ -2064,10 +2441,18 @@
     updateConditions(true);
     applyPhase();
     spriteEl.style.left = posX + 'px';
+    for (const it of ITEMS) if (it.u.type === 'level' && it.u.n <= 1 && !state.owned[it.id]) state.owned[it.id] = dayKey(now());
+    addWearHost(spriteEl, spriteEl.parentElement);
+    addWearHost(catcherEl, gameEl);
+    addWearHost($('hugHimImg'), hugVisual, () => true);
+    addWearHost($('previewHim'), $('preview'), () => false);
+    $('previewHim').src = A.himStand;
+    seasonDeco();
     renderPoops();
     renderStats();
     refreshHim(true);
     checkTrophies();
+    requestAnimationFrame(frame);
     const welcomed = welcomeBack(away);
     scheduleGirlVisit(welcomed ? rand(4500, 5500) : rand(2200, 3500));
     setInterval(tick, 6000);
