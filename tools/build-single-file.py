@@ -27,6 +27,11 @@ html = re.sub(r'href="(img/[^"]+\.png)"', lambda m: 'href="' + uri(m.group(1)) +
 html = html.replace('  <link rel="manifest" href="manifest.webmanifest">\n', '')
 
 if artifact:
+    # pas de téléchargement de fichier dans un artefact : on retire le bouton et son code
+    start = html.index("    $('exportFile').addEventListener('click'")
+    end = html.index("    $('exportCode').addEventListener('click'")
+    html = html[:start] + html[end:]
+    html = re.sub(r'\s*<button class="btn" id="exportFile">.*?</button>', '', html, count=1)
     # la plateforme fournit déjà doctype / head / body : on ne garde que le contenu
     head = html[html.index('<head>') + len('<head>'):html.index('</head>')]
     body = html[html.index('<body>') + len('<body>'):html.index('</body>')]
