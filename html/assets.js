@@ -163,18 +163,20 @@ window.ASSETS = {
 };
 
 // Repères de chaque pose (fractions de l'image) pour placer les accessoires :
-// neck = bas de la tête, eyeY = haut des lunettes.
+// top/skin = haut des cheveux / début du front, cx/hw = centre/largeur de la tête,
+// eyeY/eyeB = haut/bas des lunettes, ex/ew = centre/largeur des lunettes,
+// neck = col du t-shirt, sx/sw = centre/largeur du t-shirt.
 window.ANCHORS = {
-  himStand: { neck: 0.5706, eyeY: 0.3129 },
-  himWalk: { neck: 0.5723, eyeY: 0.3072 },
-  himRun: { neck: 0.5796, eyeY: 0.3057 },
-  himJump: { neck: 0.5118, eyeY: 0.3294 },
-  himSit: { neck: 0.6508, eyeY: 0.3571 },
-  himRead: { neck: 0.5959, eyeY: 0.3493 },
-  himPhone: { neck: 0.6027, eyeY: 0.3288 },
-  himDrink: { neck: 0.58, eyeY: 0.3176 },
-  himSport: { neck: 0.5473, eyeY: 0.3176 },
-  himEat: { neck: 0.58, eyeY: 0.3289 },
-  himWork: { neck: 0.6181, eyeY: 0.3611 },
-  himWash: { neck: 0.5862, eyeY: 0.3103 }
+  himStand: { top: 0.0, skin: 0.153, cx: 0.483, hw: 0.813, eyeY: 0.301, eyeB: 0.423, ex: 0.626, ew: 0.747, neck: 0.571, sx: 0.5, sw: 0.626 },
+  himWalk: { top: 0.0, skin: 0.157, cx: 0.5, hw: 0.846, eyeY: 0.301, eyeB: 0.416, ex: 0.632, ew: 0.736, neck: 0.572, sx: 0.467, sw: 0.451 },
+  himRun: { top: 0.0, skin: 0.159, cx: 0.494, hw: 0.833, eyeY: 0.306, eyeB: 0.42, ex: 0.6, ew: 0.667, neck: 0.58, sx: 0.489, sw: 0.6 },
+  himJump: { top: 0.0, skin: 0.135, cx: 0.439, hw: 0.697, eyeY: 0.245, eyeB: 0.34, ex: 0.52, ew: 0.67, neck: 0.512, sx: 0.525, sw: 0.485 },
+  himSit: { top: 0.0, skin: 0.198, cx: 0.513, hw: 0.872, eyeY: 0.357, eyeB: 0.484, ex: 0.673, ew: 0.654, neck: 0.651, sx: 0.455, sw: 0.526 },
+  himRead: { top: 0.0, skin: 0.212, cx: 0.512, hw: 0.929, eyeY: 0.349, eyeB: 0.466, ex: 0.671, ew: 0.659, neck: 0.596, sx: 0.512, sw: 0.6 },
+  himPhone: { top: 0.0, skin: 0.185, cx: 0.5, hw: 0.837, eyeY: 0.322, eyeB: 0.445, ex: 0.674, ew: 0.651, neck: 0.603, sx: 0.494, sw: 0.593 },
+  himDrink: { top: 0.0, skin: 0.169, cx: 0.488, hw: 0.833, eyeY: 0.318, eyeB: 0.426, ex: 0.619, ew: 0.762, neck: 0.581, sx: 0.482, sw: 0.607 },
+  himSport: { top: 0.0, skin: 0.169, cx: 0.472, hw: 0.807, eyeY: 0.318, eyeB: 0.432, ex: 0.591, ew: 0.705, neck: 0.547, sx: 0.466, sw: 0.591 },
+  himEat: { top: 0.0, skin: 0.174, cx: 0.475, hw: 0.875, eyeY: 0.309, eyeB: 0.476, ex: 0.64, ew: 0.62, neck: 0.577, sx: 0.475, sw: 0.6 },
+  himWork: { top: 0.0, skin: 0.208, cx: 0.522, hw: 0.868, eyeY: 0.361, eyeB: 0.486, ex: 0.56, ew: 0.879, neck: 0.618, sx: 0.516, sw: 0.593 },
+  himWash: { top: 0.0, skin: 0.166, cx: 0.439, hw: 0.673, eyeY: 0.31, eyeB: 0.421, ex: 0.607, ew: 0.561, neck: 0.586, sx: 0.571, sw: 0.694 }
 };

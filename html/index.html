@@ -3174,45 +3174,49 @@
     const Mo = (...months) => ({ type: 'season', months });
     const SPECIAL = { type: 'special' };
 
-    // f = réglages de placement (w : largeur ×sprite, b : bas du chapeau en hauteur de tête,
-    //     x : centre horizontal, dy : décalage vertical)
+    // Placement (fractions de l'image de la pose, repères dans ANCHORS) :
+    //  tête  : w = largeur × largeur de tête, b = bas du chapeau entre le front (0) et le haut des lunettes (1),
+    //          ou t = bas de l'objet entre le haut des cheveux (0) et le front (1) pour ce qui se pose dessus
+    //  yeux  : w = largeur × largeur des lunettes, dy = décalage vertical
+    //  visage: joues sous les lunettes
+    //  cou   : w = largeur × largeur du t-shirt, dy = décalage par rapport au col
+    //  dos   : w = largeur × largeur du sprite
     const ITEMS = [
-      { id: 'capGulf', n: 'Casquette Gulf', s: 'tete', u: Lv(1), f: { w: 1.08, b: 0.43 } },
-      { id: 'capBeige', n: 'Casquette beige', s: 'tete', u: Lv(1), f: { w: 1.08, b: 0.43 } },
-      { id: 'beanie', n: 'Bonnet gris', s: 'tete', u: Lv(1), f: { w: 1.02, b: 0.47 } },
-      { id: 'headphones', n: 'Casque audio', s: 'tete', u: Lv(1), f: { w: 1.12, b: 0.78 } },
-      { id: 'strawHat', n: 'Chapeau de paille', s: 'tete', u: Lv(2), f: { w: 1.35, b: 0.42 } },
-      { id: 'fedora', n: 'Fedora', s: 'tete', u: Lv(3), f: { w: 1.3, b: 0.42 } },
-      { id: 'catEars', n: 'Oreilles de chat', s: 'tete', u: Lv(4), f: { w: 1.0, b: 0.4 } },
-      { id: 'bunnyEars', n: 'Oreilles de lapin', s: 'tete', u: Lv(4), f: { w: 0.95, b: 0.38 } },
-      { id: 'crown', n: 'Couronne', s: 'tete', u: Lv(5), f: { w: 0.6, b: 0.2 } },
-      { id: 'halo', n: 'Auréole', s: 'tete', u: Lv(7), f: { w: 0.7, b: -0.02 } },
-      { id: 'chefHat', n: 'Toque de chef', s: 'tete', u: Tr('meals_30'), f: { w: 0.95, b: 0.4 } },
-      { id: 'gradCap', n: 'Toque de diplômé', s: 'tete', u: Tr('codes_20'), f: { w: 1.25, b: 0.36 } },
-      { id: 'flowerCrown', n: 'Couronne de fleurs', s: 'tete', u: Tr('streak_7'), f: { w: 1.0, b: 0.3 } },
-      { id: 'partyHat', n: 'Chapeau de fête', s: 'tete', u: SPECIAL, f: { w: 0.45, b: 0.16, x: 0.56 } },
-      { id: 'witchHat', n: 'Chapeau de sorcier', s: 'tete', u: Mo(10), f: { w: 1.3, b: 0.42 } },
-      { id: 'santaHat', n: 'Bonnet de Noël', s: 'tete', u: Mo(12), f: { w: 1.18, b: 0.46 } },
-      { id: 'antlers', n: 'Bois de renne', s: 'tete', u: Mo(12), f: { w: 1.1, b: 0.26 } },
-      { id: 'elfHat', n: 'Bonnet de lutin', s: 'tete', u: Mo(12), f: { w: 1.05, b: 0.42 } },
-      { id: 'earmuffs', n: 'Cache-oreilles', s: 'tete', u: Mo(11, 12, 1, 2), f: { w: 1.1, b: 0.75 } },
-      { id: 'beanieBlue', n: 'Bonnet à pompon', s: 'tete', u: Mo(1, 2), f: { w: 1.02, b: 0.47 } },
+      { id: 'capGulf', n: 'Casquette Gulf', s: 'tete', u: Lv(1), f: { w: 1.18, b: 0.62, dx: 0.04 } },
+      { id: 'capBeige', n: 'Casquette beige', s: 'tete', u: Lv(1), f: { w: 1.18, b: 0.62, dx: 0.04 } },
+      { id: 'beanie', n: 'Bonnet gris', s: 'tete', u: Lv(1), f: { w: 1.1, b: 0.72 } },
+      { id: 'headphones', n: 'Casque audio', s: 'tete', u: Lv(1), f: { w: 1.22, b: 1.85 } },
+      { id: 'strawHat', n: 'Chapeau de paille', s: 'tete', u: Lv(2), f: { w: 1.55, b: 0.42 } },
+      { id: 'fedora', n: 'Fedora', s: 'tete', u: Lv(3), f: { w: 1.45, b: 0.45 } },
+      { id: 'catEars', n: 'Oreilles de chat', s: 'tete', u: Lv(4), f: { w: 1.05, t: 0.55 } },
+      { id: 'bunnyEars', n: 'Oreilles de lapin', s: 'tete', u: Lv(4), f: { w: 0.85, t: 0.5 } },
+      { id: 'crown', n: 'Couronne', s: 'tete', u: Lv(5), f: { w: 0.62, t: 0.55 } },
+      { id: 'halo', n: 'Auréole', s: 'tete', u: Lv(7), f: { w: 0.78, t: -0.12 } },
+      { id: 'chefHat', n: 'Toque de chef', s: 'tete', u: Tr('meals_30'), f: { w: 1.05, b: 0.45 } },
+      { id: 'gradCap', n: 'Toque de diplômé', s: 'tete', u: Tr('codes_20'), f: { w: 1.35, b: 0.4 } },
+      { id: 'flowerCrown', n: 'Couronne de fleurs', s: 'tete', u: Tr('streak_7'), f: { w: 1.08, t: 0.95 } },
+      { id: 'partyHat', n: 'Chapeau de fête', s: 'tete', u: SPECIAL, f: { w: 0.5, t: 0.5, dx: 0.08 } },
+      { id: 'witchHat', n: 'Chapeau de sorcier', s: 'tete', u: Mo(10), f: { w: 1.45, b: 0.45 } },
+      { id: 'santaHat', n: 'Bonnet de Noël', s: 'tete', u: Mo(12), f: { w: 1.3, b: 0.68 } },
+      { id: 'antlers', n: 'Bois de renne', s: 'tete', u: Mo(12), f: { w: 1.15, t: 0.6 } },
+      { id: 'elfHat', n: 'Bonnet de lutin', s: 'tete', u: Mo(12), f: { w: 1.15, b: 0.62 } },
+      { id: 'earmuffs', n: 'Cache-oreilles', s: 'tete', u: Mo(11, 12, 1, 2), f: { w: 1.2, b: 1.75 } },
+      { id: 'beanieBlue', n: 'Bonnet à pompon', s: 'tete', u: Mo(1, 2), f: { w: 1.1, b: 0.72 } },
 
-      { id: 'sunglasses', n: 'Lunettes de soleil', s: 'yeux', u: Lv(2) },
-      { id: 'heartGlasses', n: 'Lunettes cœur', s: 'yeux', u: Tr('first_hug') },
-      { id: 'thugGlasses', n: 'Lunettes « deal with it »', s: 'yeux', u: Tr('game_15') },
+      { id: 'sunglasses', n: 'Lunettes de soleil', s: 'yeux', u: Lv(2), f: { w: 1.08 } },
+      { id: 'heartGlasses', n: 'Lunettes cœur', s: 'yeux', u: Tr('first_hug'), f: { w: 1.02, dy: 0.01 } },
+      { id: 'thugGlasses', n: 'Lunettes « deal with it »', s: 'yeux', u: Tr('game_15'), f: { w: 1.1 } },
 
       { id: 'blush', n: 'Joues roses', s: 'visage', u: Lv(3) },
-      { id: 'moustache', n: 'Moustache', s: 'visage', u: Lv(6), f: { w: 0.36, dy: 0.15, x: 0.64 } },
 
       { id: 'scarfRed', n: 'Écharpe rouge', s: 'cou', u: Lv(1) },
       { id: 'scarfGrey', n: 'Écharpe grise', s: 'cou', u: Lv(2) },
       { id: 'scarfBlue', n: 'Écharpe bleue', s: 'cou', u: Lv(3) },
       { id: 'scarfOrange', n: "Écharpe d'automne", s: 'cou', u: Mo(9, 10, 11) },
-      { id: 'necklaceTag', n: 'Plaque', s: 'cou', u: Lv(4), f: { w: 0.42, dy: -0.02 } },
-      { id: 'necklaceGold', n: 'Chaîne en or', s: 'cou', u: Lv(5), f: { w: 0.48, dy: -0.02 } },
-      { id: 'necklacePendant', n: 'Médaillon', s: 'cou', u: Lv(6), f: { w: 0.44, dy: -0.02 } },
-      { id: 'necklaceBlue', n: 'Pendentif bleu', s: 'cou', u: Lv(8), f: { w: 0.44, dy: -0.02 } },
+      { id: 'necklaceTag', n: 'Plaque', s: 'cou', u: Lv(4), f: { w: 0.5, dy: -0.015 } },
+      { id: 'necklaceGold', n: 'Chaîne en or', s: 'cou', u: Lv(5), f: { w: 0.58, dy: -0.015 } },
+      { id: 'necklacePendant', n: 'Médaillon', s: 'cou', u: Lv(6), f: { w: 0.52, dy: -0.015 } },
+      { id: 'necklaceBlue', n: 'Pendentif bleu', s: 'cou', u: Lv(8), f: { w: 0.52, dy: -0.015 } },
 
       { id: 'wings', n: "Ailes d'ange", s: 'dos', u: Lv(7) },
       { id: 'batWings', n: 'Ailes de chauve-souris', s: 'dos', u: Mo(10) },
@@ -3229,12 +3233,42 @@
     ];
     const ITEM = Object.fromEntries(ITEMS.map((i) => [i.id, i]));
     const SLOT_FIT = {
-      tete: { w: 1.05, b: 0.42, x: 0.5 },
-      yeux: { w: 0.82, x: 0.6, at: 'eyeY', dy: 0.035 },
-      visage: { w: 0.7, x: 0.6, at: 'eyeY', dy: 0.125 },
-      cou: { w: 0.8, x: 0.5, at: 'neck', dy: -0.05, fromTop: true },
-      dos: { w: 1.75, x: 0.42, at: 'neck', dy: 0.08 }
+      tete: { w: 1.15, b: 0.6, dx: 0 },
+      yeux: { w: 1.06, dy: 0 },
+      visage: { w: 0.92, dy: 0.012 },
+      cou: { w: 0.82, dy: -0.045 },
+      dos: { w: 1.65, dy: 0.06 }
     };
+
+    // position (en px dans l'image de la pose) d'un objet porté
+    function placeOn(slot, f, an, W, H, ratio) {
+      let w, cx, top;
+      if (slot === 'tete') {
+        w = f.w * an.hw * W;
+        cx = (an.cx + (f.dx || 0)) * W;
+        const bottom = f.t !== undefined
+          ? (an.top + f.t * (an.skin - an.top)) * H
+          : (an.skin + f.b * (an.eyeY - an.skin)) * H;
+        top = bottom - w * ratio;
+      } else if (slot === 'yeux') {
+        w = f.w * an.ew * W;
+        cx = an.ex * W;
+        top = (an.eyeY + (f.dy || 0)) * H - w * ratio * 0.18;
+      } else if (slot === 'visage') {
+        w = f.w * an.ew * W;
+        cx = an.ex * W;
+        top = (an.eyeB + (f.dy || 0)) * H;
+      } else if (slot === 'cou') {
+        w = f.w * an.sw * W;
+        cx = an.sx * W;
+        top = (an.neck + (f.dy || 0)) * H;
+      } else {
+        w = f.w * W;
+        cx = an.sx * W;
+        top = (an.neck + (f.dy || 0)) * H - w * ratio / 2;
+      }
+      return { w, cx, top };
+    }
     const MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
 
     function unlockText(u) {
@@ -3290,12 +3324,7 @@
           if (el.getAttribute('src') !== A[it.id]) el.src = A[it.id];
           if (!el.naturalWidth) { el.hidden = true; continue; }
           const f = { ...SLOT_FIT[s], ...(it.f || {}) };
-          const w = f.w * W;
-          const hgt = w * el.naturalHeight / el.naturalWidth;
-          const cx = (f.x ?? 0.5) * W;
-          let top;
-          if (s === 'tete') top = f.b * an.neck * H - hgt;
-          else top = (an[f.at] + f.dy) * H - (f.fromTop ? 0 : hgt / 2);
+          const { w, cx, top } = placeOn(s, f, an, W, H, el.naturalHeight / el.naturalWidth);
           el.hidden = false;
           el.style.width = w + 'px';
           el.style.left = (h.img.offsetLeft + (flip ? W - cx : cx) - w / 2) + 'px';
