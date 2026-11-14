@@ -1478,6 +1478,9 @@
     .confirm-actions .btn { flex-direction: row; justify-content: center; padding: 10px 6px; font-size: 13px; }
     #confirmOk.danger { background: var(--low); }
 
+    #book .tabs { gap: 4px; padding-left: 10px; padding-right: 10px; }
+    #book .tab { font-size: 11px; padding: 4px 1px; white-space: nowrap; }
+
     .race-no.two { font-size: 15px; letter-spacing: -0.5px; }
 
     .sun { position: absolute; top: 8px; left: 46%; font-size: 26px; z-index: 1; pointer-events: none; animation: sunSpin 30s linear infinite; }
@@ -1519,6 +1522,51 @@
     .note-row span { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--navy); }
     .note-row .btn { flex-direction: row; padding: 8px 16px; font-size: 13px; }
 
+    .topbar-right { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; gap: 6px; }
+    .topbar-right .icon-btn { position: static; transform: none; }
+    .topbar-right .icon-btn:active { transform: translateY(2px); }
+    .token-chip {
+      border: 1.5px solid #FFD166;
+      background: rgba(255, 209, 102, 0.18);
+      color: #fff;
+      border-radius: 10px;
+      padding: 1px 7px;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .shop-card { align-items: center; text-align: center; }
+    .shop-card img { aspect-ratio: auto; height: 44px; width: auto; object-fit: contain; background: none; }
+    .shop-emoji { font-size: 34px; line-height: 1.2; }
+    .price { font-weight: 800; color: var(--gulf-orange-deep); font-size: 13px; }
+    .shop-card.locked .price { color: var(--low); }
+    .postcards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
+    .postcard {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: 10px 6px;
+      border: 2px solid var(--navy);
+      border-radius: 10px;
+      background:
+        repeating-linear-gradient(135deg, var(--gulf-orange) 0 6px, #fff 6px 12px, var(--gulf-blue) 12px 18px, #fff 18px 24px) border-box;
+      background-clip: border-box;
+      box-shadow: inset 0 0 0 5px #fff;
+      position: relative;
+    }
+    .postcard::before { content: ""; position: absolute; inset: 5px; background: #FFFDF8; border-radius: 6px; z-index: 0; }
+    .postcard > * { position: relative; z-index: 1; }
+    .pc-emoji { font-size: 30px; }
+    .pc-city { font-family: 'Racing Sans One', sans-serif; color: var(--navy); font-size: 15px; }
+    .pc-date { font-family: 'Space Mono', monospace; font-size: 9.5px; color: var(--gulf-blue-deep); }
+    .postcard.locked { opacity: 0.5; filter: grayscale(1); }
+    .photos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .photos img { width: 100%; border-radius: 6px; box-shadow: 0 2px 6px rgba(30, 52, 86, 0.25); }
+    .photo-big { width: 100%; border-radius: 6px; box-shadow: 0 4px 14px rgba(30, 52, 86, 0.3); transform: rotate(-1.5deg); margin: 4px 0 8px; }
+
     @media (prefers-reduced-motion: reduce) {
       .star, .btn.alert { animation: none; }
     }
@@ -1536,7 +1584,10 @@
         <button class="icon-btn" id="btnSound" aria-label="Couper le son" title="Son">🔊</button>
       </div>
       <span class="brand">⛽ GULF · since 1901</span>
-      <button class="icon-btn" id="btnSettings" aria-label="Sauvegarde et réglages" title="Sauvegarde">💾</button>
+      <div class="topbar-right">
+        <button class="icon-btn" id="btnPhoto" aria-label="Prendre une photo souvenir" title="Photo souvenir">📸</button>
+        <button class="icon-btn" id="btnSettings" aria-label="Sauvegarde et réglages" title="Sauvegarde">💾</button>
+      </div>
     </div>
     <div class="nameplate">
       <span class="race-no" id="raceNo">1</span>
@@ -1545,11 +1596,12 @@
     <div class="subtitle"><span>tape, caresse, chatouille-le 💋</span></div>
 
     <div class="hud" aria-label="Progression">
-      <span class="chip" id="hudDays">🗓️ Jour 1</span>
+      <span class="chip" id="hudDays">🗓️ 1</span>
       <span class="chip" id="hudLevel">⭐ Niv. 1</span>
       <div class="xp-track" title="Expérience"><div class="xp-fill" id="xpFill"></div></div>
       <span class="chip" id="hudStreak" title="Jours d'affilée">🔥 1</span>
       <button class="chip daily-chip" id="hudDaily" title="Défis du jour">🎯 0/3</button>
+      <button class="chip token-chip" id="hudTokens" title="Jetons · boutique">⛽ 0</button>
     </div>
 
     <div class="screen-wrap">
@@ -1668,6 +1720,7 @@
         <button class="tab" role="tab" data-tab="trophies" aria-selected="true">🏆 Trophées</button>
         <button class="tab" role="tab" data-tab="memories" aria-selected="false">💌 Souvenirs</button>
         <button class="tab" role="tab" data-tab="album" aria-selected="false">📸 Album</button>
+        <button class="tab" role="tab" data-tab="cards" aria-selected="false">✈️ Cartes</button>
         <button class="tab" role="tab" data-tab="stats" aria-selected="false">📊 Stats</button>
       </div>
       <div class="tab-body" id="bookBody"></div>
@@ -1749,6 +1802,8 @@
           <li><span>🌙</span><div>La nuit il dort : laisse-le… ou réveille-le</div></li>
           <li><span>🍽️</span><div><b>Manger</b> : choisis un plat puis <b>glisse-le jusqu'à lui</b> (ou tape-le, il va le chercher)</div></li>
           <li><span>💌</span><div><b>À deux → Mot doux</b> : un message qui arrive sur l'autre téléphone relié</div></li>
+          <li><span>⛽</span><div><b>Jetons</b> (en haut) : gagnés aux jeux et défis, à dépenser à la boutique</div></li>
+          <li><span>📸</span><div><b>Photo souvenir</b> de la scène, rangée dans le carnet</div></li>
           <li><span>🎾</span><div><b>Lance le ballon</b> à son compagnon : il le rapporte</div></li>
           <li><span>💾</span><div>Tout est sauvegardé tout seul · 🔔 notifications dans 💾</div></li>
         </ul>
@@ -1771,6 +1826,37 @@
           <div class="note-row"><span id="noteCount">0 / 200</span><button class="btn cloud-main" id="noteSend">Envoyer 💌</button></div>
           <p class="save-msg" id="noteMsg" role="status"></p>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="shop" hidden role="dialog" aria-modal="true" aria-labelledby="shopTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="shopTitle">⛽ La boutique</h2>
+        <button class="close" id="shopClose" aria-label="Fermer">✕</button>
+      </div>
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" data-shop="treats" aria-selected="true">🍰 Gourmandises</button>
+        <button class="tab" role="tab" data-shop="items" aria-selected="false">🎩 Accessoires</button>
+      </div>
+      <div class="tab-body">
+        <p class="empty" id="shopBalance"></p>
+        <div class="moments" id="shopGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="photoModal" hidden role="dialog" aria-modal="true" aria-labelledby="photoTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="photoTitle">📸 Photo souvenir</h2>
+        <button class="close" id="photoClose" aria-label="Fermer">✕</button>
+      </div>
+      <div class="tab-body">
+        <img class="photo-big" id="photoImg" alt="Photo souvenir">
+        <p class="empty" id="photoMsg"></p>
+        <button class="btn wide-btn cloud-main" id="photoShare" hidden>📤 Partager la photo</button>
       </div>
     </div>
   </div>
@@ -1972,8 +2058,8 @@
         sick: false, sulk: false, poops: [], digest: 0,
         xp: 0, bestScore: 0, streak: 0,
         bornAt: Date.now(), lastSeen: null, lastVisitDay: null,
-        counters: { hugs: 0, meals: 0, runs: 0, codes: 0, sleeps: 0, heals: 0, games: 0, kisses: 0, visits: 0, washes: 0, cleaned: 0, moments: 0, strokes: 0, tickles: 0, wishes: 0, answers: 0, cuddles: 0, herKisses: 0, dailyDone: 0, fetches: 0, selfies: 0, notesSent: 0, races: 0, notesGot: 0 },
-        bestGuess: 0, bestMemory: 0, bestMemoryStars: 0, bestDance: 0, bestDanceStars: 0, bestRace: 0,
+        counters: { hugs: 0, meals: 0, runs: 0, codes: 0, sleeps: 0, heals: 0, games: 0, kisses: 0, visits: 0, washes: 0, cleaned: 0, moments: 0, strokes: 0, tickles: 0, wishes: 0, answers: 0, cuddles: 0, herKisses: 0, dailyDone: 0, fetches: 0, selfies: 0, notesSent: 0, races: 0, notesGot: 0, purchases: 0, photos: 0 },
+        bestGuess: 0, bestMemory: 0, bestMemoryStars: 0, bestDance: 0, bestDanceStars: 0, bestRace: 0, tokens: 0, postcards: {},
         trophies: {}, journal: [], name: null,
         album: {}, decor: 'auto', playedAt: 0, sound: true, seenHelp: false, lastAsk: null, daily: null,
         owned: {}, wear: { tete: null, yeux: null, visage: null, cou: null, dos: null, compagnon: null }
@@ -2105,6 +2191,9 @@
       { id: 'dance_3', e: '🪩', t: 'Rois de la piste', d: '3 étoiles à la Danse', ok: (s) => s.bestDanceStars >= 3 },
       { id: 'race_25', e: '🏎️', t: 'Pilote Gulf', d: '25 points à la Course Gulf', ok: (s) => (s.bestRace || 0) >= 25 },
       { id: 'note_1', e: '💌', t: 'Facteur de l’amour', d: 'Recevoir un mot doux', ok: (s) => s.counters.notesGot >= 1 },
+      { id: 'postcards_8', e: '✈️', t: 'Globe-trotteurs', d: '8 cartes postales', ok: (s) => Object.keys(s.postcards || {}).length >= 8 },
+      { id: 'shop_5', e: '🛍️', t: 'Client fidèle', d: '5 achats à la boutique', ok: (s) => s.counters.purchases >= 5 },
+      { id: 'photo_5', e: '📷', t: 'Photographe', d: '5 photos souvenirs', ok: (s) => s.counters.photos >= 5 },
       { id: 'memories_10', e: '📖', t: 'Album souvenir', d: '10 souvenirs dans le carnet', ok: (s) => s.journal.length >= 10 }
     ];
 
@@ -2128,6 +2217,7 @@
       const after = levelFor(state.xp);
       if (after > before) {
         toast(rankFor(after) !== rankFor(before) ? `Niveau ${after} : ${rankFor(after)} ! 🏁` : `Niveau ${after} ! Bravo 🎉`, A.icoGrow);
+        if (typeof earn === 'function') earn(10, 'cadeau de niveau');
         try { sfx.level(); buzz([30, 50, 30]); } catch (e) { /* init */ }
         setTimeout(() => {
           showBubble(`Niveau ${after} ! 🎉`, 2200);
@@ -2180,7 +2270,7 @@
       if (typeof renderRank === 'function') renderRank();
       $('xpFill').style.width = Math.round(((state.xp - lo) / (hi - lo)) * 100) + '%';
       const days = daysTogether();
-      $('hudDays').textContent = CONFIG.coupleStart ? `💑 ${days.toLocaleString('fr-FR')} j` : `🗓️ Jour ${days}`;
+      $('hudDays').textContent = CONFIG.coupleStart ? `💑 ${days.toLocaleString('fr-FR')} j` : `🗓️ ${days}`;
       $('hudDays').title = CONFIG.coupleStart ? 'Jours ensemble' : 'Jours depuis le début du jeu';
       $('hudStreak').textContent = `🔥 ${state.streak}`;
 
@@ -2791,6 +2881,7 @@
         state.happy = clamp(state.happy + 10);
         state.love = clamp(state.love + 5);
         toast('Souhait exaucé ! ⭐', A.icoHappy);
+        earn(3);
         sfx.coin();
         spawnHeart((spriteEl.offsetLeft + 10) + 'px', '100px', '⭐', true);
         wish = null;
@@ -3166,6 +3257,7 @@
       state.hunger = clamp(state.hunger - 8);
       state.counters.games++;
       gainXp(Math.max(2, s));
+      earn(Math.floor(s / 2), 'au mini-jeu');
       updateConditions(true);
       renderStats();
       checkTrophies();
@@ -3226,6 +3318,26 @@
         }
       }
 
+      if (bookTab === 'cards') {
+        const got = POSTCARDS.filter(([c]) => state.postcards[c]).length;
+        bookBody.appendChild(el('p', 'empty', `${got} / ${POSTCARDS.length} cartes postales · une par escapade à deux ✈️`));
+        const grid = el('div', 'postcards');
+        for (const [city, e] of POSTCARDS) {
+          const d = state.postcards[city];
+          const card = el('div', 'postcard' + (d ? '' : ' locked'));
+          card.append(el('span', 'pc-emoji', d ? e : '✉️'), el('span', 'pc-city', d ? city : '???'), el('span', 'pc-date', d ? formatDate(d) : 'Escapade à deux'));
+          grid.appendChild(card);
+        }
+        bookBody.appendChild(grid);
+        const photos = loadPhotos();
+        bookBody.appendChild(el('p', 'empty', photos.length ? `📷 ${photos.length} photo${photos.length > 1 ? 's' : ''} souvenir (bouton 📸 en haut)` : '📷 Pas encore de photo : bouton 📸 en haut'));
+        if (photos.length) {
+          const pg = el('div', 'photos');
+          for (const ph of [...photos].reverse()) { const im = el('img'); im.src = ph.src; im.alt = 'Photo du ' + formatDate(ph.d); pg.appendChild(im); }
+          bookBody.appendChild(pg);
+        }
+      }
+
       if (bookTab === 'album') {
         const got = MOMENTS.filter((m) => state.album[m.id]).length;
         bookBody.appendChild(el('p', 'empty', `${got} / ${MOMENTS.length} moments à deux`));
@@ -3255,7 +3367,7 @@
           ['🤲 Caresses', c.strokes], ['😂 Chatouilles', c.tickles], ['🧞 Envies exaucées', c.wishes], ['🔮 Record gauche/droite', `${state.bestGuess} / 5`],
           ['🧠 Record Mémoire', state.bestMemory ? `${state.bestMemory} coups` : '—'], ['🪩 Record Danse', `${state.bestDance} pts`],
           ['🎾 Balles rapportées', c.fetches], ['📸 Selfies', c.selfies],
-          ['🏁 Rang', rankFor(levelFor(state.xp))], ['🏎️ Record Course', `${state.bestRace || 0} pts`], ['💌 Mots doux reçus', c.notesGot],
+          ['🏁 Rang', rankFor(levelFor(state.xp))], ['⛽ Jetons', state.tokens || 0], ['✈️ Cartes postales', Object.keys(state.postcards || {}).length], ['🏎️ Record Course', `${state.bestRace || 0} pts`], ['💌 Mots doux reçus', c.notesGot],
           ['🏃 Runs', c.runs], ['💻 Sessions de code', c.codes], ['😴 Siestes', c.sleeps],
           ['💊 Soins', c.heals], ['🚶‍♀️ Visites', c.visits], ['🎮 Parties', c.games]
         ];
@@ -3676,7 +3788,7 @@
     function doMoment(m) {
       doAction({
         img: sceneOf(m.id), scene: true, caption: m.cap, delta: m.d, duration: 2800, xp: 6, counter: 'moments',
-        after: () => addToAlbum(m.id)
+        after: () => { addToAlbum(m.id); if (m.id === 'voyage') sendPostcard(); }
       });
     }
 
@@ -3733,8 +3845,8 @@
     $('gamesClose').addEventListener('click', () => { gamesModal.hidden = true; });
     gamesModal.addEventListener('click', (e) => { if (e.target === gamesModal) gamesModal.hidden = true; });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') gamesModal.hidden = true; });
-    $('pickCatch').addEventListener('click', () => { gamesModal.hidden = true; startCatchGame(); });
-    $('pickGuess').addEventListener('click', () => { gamesModal.hidden = true; startGuessGame(); });
+    $('pickCatch').addEventListener('click', () => { gamesModal.hidden = true; if (!canAct()) return toast('Attends la fin de sa visite 😍'); startCatchGame(); });
+    $('pickGuess').addEventListener('click', () => { gamesModal.hidden = true; if (!canAct()) return toast('Attends la fin de sa visite 😍'); startGuessGame(); });
 
     const guessEl = $('guess');
     const guessHim = $('guessHim');
@@ -3800,6 +3912,7 @@
       state.energy = clamp(state.energy - 5);
       state.counters.games++;
       gainXp(2 + w * 2);
+      earn(w * 2, 'au mini-jeu');
       updateConditions(true);
       renderStats();
       checkTrophies();
@@ -4241,7 +4354,7 @@
       const fav = f === favoriteFood();
       const d = { ...f.d };
       if (fav) d.happy = (d.happy || 0) + 10;
-      doAction({ img: f.img(), caption: fav ? `${f.n} ?! Mon préféré 😍` : f.cap, delta: d, duration: 1600, xp: fav ? 5 : 3, counter: 'meals' });
+      doAction({ img: f.img(), emoji: f.drag, caption: fav ? `${f.n} ?! Mon préféré 😍` : f.cap, delta: d, duration: 1600, xp: fav ? 5 : 3, counter: 'meals' });
     }
 
     $('foodClose').addEventListener('click', () => { foodModal.hidden = true; });
@@ -4344,6 +4457,7 @@
         if (!c || dl.done[id] || dailyProgress(c) < c.n) continue;
         dl.done[id] = true;
         toast(`🎯 Défi réussi : ${c.t}`);
+        earn(5);
         sfx.coin();
         gainXp(10);
       }
@@ -4352,6 +4466,7 @@
         state.counters.dailyDone++;
         state.love = clamp(state.love + 10);
         toast('🏁 Tous les défis du jour réussis ! +25 XP');
+        earn(10, 'bonus des défis');
         gainXp(25);
       }
       const nDone = dl.picks.filter((id) => dl.done[id]).length;
@@ -4719,6 +4834,7 @@
       state.counters.games++;
       sfx.level();
       gainXp(4 + stars * 3);
+      earn(stars * 4, 'au Mémoire');
       updateConditions(true);
       renderStats();
       showDeltas(before);
@@ -4862,6 +4978,7 @@
       state.counters.games++;
       sfx.level();
       gainXp(4 + stars * 3);
+      earn(stars * 4, 'à la Danse');
       updateConditions(true);
       renderStats();
       showDeltas(before);
@@ -4875,8 +4992,8 @@
       }, 2300);
     }
 
-    $('pickMemory').addEventListener('click', () => { gamesModal.hidden = true; startMemory(); });
-    $('pickDance').addEventListener('click', () => { gamesModal.hidden = true; startDance(); });
+    $('pickMemory').addEventListener('click', () => { gamesModal.hidden = true; if (!canAct()) return toast('Attends la fin de sa visite 😍'); startMemory(); });
+    $('pickDance').addEventListener('click', () => { gamesModal.hidden = true; if (!canAct()) return toast('Attends la fin de sa visite 😍'); startDance(); });
 
     // =====================================================================
     //  Application installable + notifications
@@ -5285,6 +5402,7 @@
       state.counters.races++;
       sfx.level();
       gainXp(4 + stars * 3);
+      earn(Math.floor(s / 2) + stars, 'à la Course');
       updateConditions(true);
       renderStats();
       showDeltas(before);
@@ -5299,7 +5417,239 @@
         refreshHim(true);
       }, 2400);
     }
-    $('pickRace').addEventListener('click', () => { gamesModal.hidden = true; startRace(); });
+    $('pickRace').addEventListener('click', () => { gamesModal.hidden = true; if (!canAct()) return toast('Attends la fin de sa visite 😍'); startRace(); });
+
+
+    // =====================================================================
+    //  Jetons ⛽ + boutique
+    // =====================================================================
+    function earn(n, why) {
+      if (!n) return;
+      state.tokens = (state.tokens || 0) + n;
+      renderTokens();
+      if (why) setTimeout(() => toast(`+${n} ⛽ ${why}`), 300);
+    }
+    function renderTokens() { $('hudTokens').textContent = `⛽ ${state.tokens || 0}`; }
+
+    const TREATS = [
+      { id: 'cake', n: 'Part de gâteau', drag: '🍰', price: 15, d: { hunger: 20, happy: 26 }, cap: 'Un gâteau rien que pour moi ?! 🍰' },
+      { id: 'sushi', n: 'Plateau sushi', drag: '🍣', price: 12, d: { hunger: 32, happy: 14 }, cap: 'Sushi time ! 🍣' },
+      { id: 'icecream', n: 'Glace', drag: '🍦', price: 8, d: { hunger: 8, happy: 16, energy: 4 }, cap: 'Une glace, la vie est belle 🍦' },
+      { id: 'fries', n: 'Frites', drag: '🍟', price: 6, d: { hunger: 18, happy: 10, energy: -2 }, cap: 'Des frites !!! 🍟' },
+      { id: 'strawberry', n: 'Fraises', drag: '🍓', price: 5, d: { hunger: 8, happy: 8, energy: 6 }, cap: 'Fraises toutes fraîches 🍓' },
+      { id: 'energy', n: 'Boisson énergie', drag: '🧃', price: 10, d: { energy: 30, happy: 4 }, cap: 'Plein d’énergie ! ⚡' }
+    ];
+    const shopModal = $('shop');
+    let shopTab = 'treats';
+
+    function accessoryPrice(it) { return it.u.type === 'level' ? 25 * it.u.n : null; }
+
+    function renderShop() {
+      $('shopBalance').textContent = `Tu as ${state.tokens || 0} ⛽ · gagne-en avec les mini-jeux, les défis et ses envies`;
+      document.querySelectorAll('#shop .tab').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.shop === shopTab)));
+      const grid = $('shopGrid');
+      if (shopTab === 'treats') {
+        grid.replaceChildren(...TREATS.map((t) => {
+          const b = el('button', 'm-card f-card shop-card' + ((state.tokens || 0) < t.price ? ' locked' : ''));
+          b.append(el('span', 'shop-emoji', t.drag), el('span', 'm-name', t.n), el('span', 'm-sub', deltaText(t.d)), el('span', 'price', `${t.price} ⛽`));
+          b.disabled = (state.tokens || 0) < t.price;
+          b.addEventListener('click', () => buyTreat(t));
+          return b;
+        }));
+      } else {
+        const list = ITEMS.filter((it) => !state.owned[it.id] && accessoryPrice(it));
+        if (!list.length) { grid.replaceChildren(el('p', 'empty', 'Tous les accessoires à acheter sont déjà à lui 🎉')); return; }
+        grid.replaceChildren(...list.map((it) => {
+          const price = accessoryPrice(it);
+          const b = el('button', 'm-card f-card shop-card' + ((state.tokens || 0) < price ? ' locked' : ''));
+          const img = el('img');
+          img.src = A[it.id];
+          img.alt = '';
+          b.append(img, el('span', 'm-name', it.n), el('span', 'm-sub', `sinon au niveau ${it.u.n}`), el('span', 'price', `${price} ⛽`));
+          b.disabled = (state.tokens || 0) < price;
+          b.addEventListener('click', () => buyItem(it, price));
+          return b;
+        }));
+      }
+    }
+
+    function buyTreat(t) {
+      if ((state.tokens || 0) < t.price) return;
+      if (state.hunger > 92 && t.d.hunger > 10) { shopModal.hidden = true; return feed(t); }
+      state.tokens -= t.price;
+      state.counters.purchases++;
+      renderTokens();
+      saveState();
+      shopModal.hidden = true;
+      sfx.coin();
+      spawnFood({ ...t, img: () => null });
+    }
+
+    function buyItem(it, price) {
+      if ((state.tokens || 0) < price) return;
+      state.tokens -= price;
+      state.counters.purchases++;
+      state.owned[it.id] = dayKey(now());
+      renderTokens();
+      saveState();
+      sfx.coin();
+      toast(`Nouveau dans la garde-robe : ${it.n}`, A[it.id]);
+      checkTrophies();
+      renderShop();
+    }
+
+    $('hudTokens').addEventListener('click', () => { renderShop(); shopModal.hidden = false; });
+    $('shopClose').addEventListener('click', () => { shopModal.hidden = true; });
+    shopModal.addEventListener('click', (e) => { if (e.target === shopModal) shopModal.hidden = true; });
+    document.querySelectorAll('#shop .tab').forEach((t) => t.addEventListener('click', () => { shopTab = t.dataset.shop; renderShop(); }));
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') shopModal.hidden = true; });
+
+    // =====================================================================
+    //  Cartes postales (escapades)
+    // =====================================================================
+    const POSTCARDS = [
+      ['Paris', '🗼'], ['Rome', '🏛️'], ['Londres', '💂'], ['Barcelone', '⛱️'], ['Lisbonne', '🚋'], ['Amsterdam', '🌷'],
+      ['Le Mans', '🏁'], ['Monaco', '🏎️'], ['New York', '🗽'], ['Tokyo', '🗾'], ['Marrakech', '🕌'], ['Santorin', '🌅'],
+      ['Montréal', '🍁'], ['Bali', '🌴'], ['Reykjavik', '🌌'], ['Venise', '🛶']
+    ];
+    function sendPostcard() {
+      const left = POSTCARDS.filter(([c]) => !state.postcards[c]);
+      const [city, e] = left.length ? pick(left) : pick(POSTCARDS);
+      const fresh = !state.postcards[city];
+      if (fresh) state.postcards[city] = dayKey(now());
+      setTimeout(() => toast(fresh ? `✈️ Nouvelle carte postale : ${city} ${e}` : `✈️ Retour à ${city} ${e}`), 2900);
+      if (fresh) addMemory(`✈️ Escapade à ${city} ${e}`, 'special');
+    }
+
+    // =====================================================================
+    //  📸 Photo souvenir
+    // =====================================================================
+    const PHOTOS_KEY = 'cheriotchi_photos';
+    const photoModal = $('photoModal');
+    let lastPhoto = null;
+
+    function loadPhotos() { try { return JSON.parse(localStorage.getItem(PHOTOS_KEY) || '[]'); } catch (e) { return []; } }
+    function storePhoto(dataUrl) {
+      const list = loadPhotos();
+      list.push({ d: dayKey(now()), src: dataUrl });
+      while (list.length) {
+        try { localStorage.setItem(PHOTOS_KEY, JSON.stringify(list.slice(-12))); return; } catch (e) { list.shift(); }
+      }
+    }
+
+    function drawImgEl(ctx, img, sx, sy) {
+      if (!img || img.hidden || !img.complete || !img.naturalWidth) return;
+      const cs = getComputedStyle(img);
+      if (cs.visibility === 'hidden' || cs.display === 'none' || Number(cs.opacity) === 0) return;
+      const r = img.getBoundingClientRect();
+      if (!r.width) return;
+      const flip = new DOMMatrixReadOnly(cs.transform === 'none' ? undefined : cs.transform).a < 0;
+      ctx.save();
+      ctx.globalAlpha = Number(cs.opacity) || 1;
+      if (flip) { ctx.translate(r.left - sx + r.width, r.top - sy); ctx.scale(-1, 1); ctx.drawImage(img, 0, 0, r.width, r.height); }
+      else ctx.drawImage(img, r.left - sx, r.top - sy, r.width, r.height);
+      ctx.restore();
+    }
+
+    async function takePhoto() {
+      if (game.active) return;
+      const sr = screenEl.getBoundingClientRect();
+      const W = Math.round(sr.width), H = Math.round(sr.height);
+      const scale = 2, pad = 14, bottom = 46;
+      const cv = document.createElement('canvas');
+      cv.width = (W + pad * 2) * scale;
+      cv.height = (H + pad + bottom) * scale;
+      const c = cv.getContext('2d');
+      c.scale(scale, scale);
+      // cadre polaroïd aux couleurs Gulf
+      c.fillStyle = '#FFFFFF'; c.fillRect(0, 0, W + pad * 2, H + pad + bottom);
+      c.fillStyle = '#F26A21'; c.fillRect(0, H + pad + bottom - 8, W + pad * 2, 8);
+      c.fillStyle = '#1E3456'; c.fillRect(0, H + pad + bottom - 11, W + pad * 2, 3);
+      c.save();
+      c.translate(pad, pad);
+      c.beginPath(); c.rect(0, 0, W, H); c.clip();
+      // fond
+      const ph = phase();
+      c.fillStyle = ph === 'night' ? '#1B2541' : (ph === 'dusk' ? '#FFE6CC' : '#FFFFFF');
+      c.fillRect(0, 0, W, H);
+      const bd = $('backdrop');
+      if (!bd.hidden && bd.complete && bd.naturalWidth) {
+        const k = Math.max(W / bd.naturalWidth, H / bd.naturalHeight) * 1.03;
+        const dw = bd.naturalWidth * k, dh = bd.naturalHeight * k;
+        c.globalAlpha = 0.7;
+        c.filter = 'blur(1.2px)';
+        c.drawImage(bd, (W - dw) / 2, (H - dh) * 0.85, dw, dh);
+        c.filter = 'none';
+        c.globalAlpha = 1;
+      }
+      if (ph === 'night') { c.fillStyle = 'rgba(27,37,65,0.82)'; c.fillRect(0, 0, W, H); }
+      if (screenEl.classList.contains('rain') && ph !== 'night') { c.fillStyle = 'rgba(70,90,115,0.28)'; c.fillRect(0, 0, W, H); }
+      c.fillStyle = 'rgba(30,52,86,0.12)'; c.fillRect(0, H - 27, W, 27);
+      // tout ce qui est visible : décor, lui, elle, accessoires, compagnon, ballon, cacas
+      const sel = '.deco-floor, .deco-balloon, .sprite-layer img, .poop';
+      const imgs = [...screenEl.querySelectorAll(sel)].filter((x) => x.tagName === 'IMG');
+      imgs.sort((a, b) => (Number(getComputedStyle(a).zIndex) || 0) - (Number(getComputedStyle(b).zIndex) || 0));
+      for (const im of imgs) drawImgEl(c, im, sr.left, sr.top);
+      c.restore();
+      // légende
+      c.fillStyle = '#1E3456';
+      c.font = '700 15px "Racing Sans One", "Baloo 2", sans-serif';
+      c.textBaseline = 'middle';
+      c.fillText(petNameEl.textContent.trim().slice(0, 28) || 'Mon Chéri-o-tchi', pad, H + pad + 17);
+      c.font = '11px "Space Mono", monospace';
+      c.textAlign = 'right';
+      c.fillText(now().toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }), W + pad, H + pad + 17);
+      // flash
+      const fl = el('div', 'flash');
+      screenEl.appendChild(fl);
+      setTimeout(() => fl.remove(), 600);
+      sfx.coin();
+      lastPhoto = cv;
+      let small;
+      try { small = cv.toDataURL('image/jpeg', 0.72); }
+      catch (e) { toast('Photo impossible en ouvrant le jeu comme simple fichier 😕'); return; }
+      storePhoto(small);
+      state.counters.photos++;
+      checkTrophies();
+      $('photoImg').src = small;
+      $('photoMsg').textContent = 'Rangée dans le carnet 📖';
+      $('photoShare').hidden = !(navigator.canShare && navigator.share);
+      photoModal.hidden = false;
+    }
+
+    $('btnPhoto').addEventListener('click', () => { takePhoto().catch(() => toast('Photo impossible 😕')); });
+    $('photoClose').addEventListener('click', () => { photoModal.hidden = true; });
+    photoModal.addEventListener('click', (e) => { if (e.target === photoModal) photoModal.hidden = true; });
+    $('photoShare').addEventListener('click', async () => {
+      if (!lastPhoto) return;
+      try {
+        const blob = await new Promise((r) => lastPhoto.toBlob(r, 'image/jpeg', 0.9));
+        const file = new File([blob], `cheriotchi-${dayKey(new Date())}.jpg`, { type: 'image/jpeg' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file], title: 'Chéri-o-tchi' });
+        else $('photoMsg').textContent = 'Partage indisponible ici : fais un appui long sur la photo pour l’enregistrer.';
+      } catch (e) { /* partage annulé */ }
+    });
+
+    // =====================================================================
+    //  Réveil du matin
+    // =====================================================================
+    function morningWake() {
+      const h = now().getHours();
+      if (!isNewDay || h < 6 || h >= 11) return;
+      setTimeout(() => {
+        if (!canAct() || himMode() !== 'normal') return;
+        strikePose(A.himJump, 'pose-jump', 1000);
+        showBubble(pick(['Bien dormi ? ☀️ Un café ?', 'Bonjour toi ☀️', '*s’étire* Bonne journée ! 🌅']), 2600);
+        flashMood(A.himHappy, 2000);
+        const w = WISHES.find((x) => x.id === 'meals');
+        if (w && !wish) {
+          wish = { ...w, e: '☕', say: 'Un café pour bien démarrer ? ☕', base: state.counters.meals, until: Date.now() + WISH_TIME };
+          lastWishAt = Date.now();
+          wishEl.textContent = '☕';
+          wishEl.hidden = false;
+        }
+      }, 1200);
+    }
 
     // =====================================================================
     //  Démarrage
@@ -5360,6 +5710,8 @@
     cloudInit(loadedPlayed);
     renderSoundBtn();
     checkDaily();
+    renderTokens();
+    morningWake();
     if (!state.seenHelp && !window.__noHelp) setTimeout(() => { helpModal.hidden = false; }, 900);
     const welcomed = welcomeBack(away);
     scheduleGirlVisit(welcomed ? rand(4500, 5500) : rand(2200, 3500));
