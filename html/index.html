@@ -9,6 +9,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#A9D6E5">
   <title>Chéri-o-tchi</title>
+  <link rel="icon" type="image/png" href="img/icones/eggHim.png">
+  <link rel="apple-touch-icon" href="img/icones/eggHim.png">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Space+Mono:wght@400;700&display=swap');
 
@@ -257,10 +259,28 @@
 
     .mood {
       position: absolute;
-      top: 8px;
-      right: 12px;
-      font-size: 20px;
+      top: 6px;
+      right: 8px;
+      height: 36px;
+      width: auto;
       z-index: 6;
+      filter: drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff) drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff);
+    }
+
+    .poop {
+      position: absolute;
+      bottom: 24px;
+      height: 22px;
+      width: auto;
+      z-index: 3;
+      cursor: pointer;
+      animation: wobble 1.6s ease-in-out infinite;
+      touch-action: manipulation;
+    }
+
+    @keyframes wobble {
+      0%, 100% { transform: scaleY(1); }
+      50% { transform: scaleY(0.9) scaleX(1.06); }
     }
 
     .bubble {
@@ -286,6 +306,16 @@
       transform: translateY(0) scale(1);
     }
 
+    .bubble.with-face {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding-left: 4px;
+    }
+
+    .bubble-face { height: 30px; width: auto; flex-shrink: 0; }
+    .bubble:not(.with-face) .bubble-face { display: none; }
+
     .sprite-layer {
       position: absolute;
       inset: 0;
@@ -295,9 +325,8 @@
     .sprite {
       position: absolute;
       bottom: 26px;
-      width: 64px;
-      height: auto;
-      image-rendering: pixelated;
+      height: 84px;
+      width: auto;
       cursor: pointer;
       user-select: none;
       -webkit-user-drag: none;
@@ -305,11 +334,14 @@
       touch-action: manipulation;
     }
 
-    .sprite.sleeping { width: 104px; bottom: 22px; image-rendering: auto; }
-    .sprite.sickly { filter: saturate(0.55) hue-rotate(35deg) brightness(1.03); }
+    .sprite.pose-sit { height: 68px; }
+    .sprite.pose-lie { height: 50px; bottom: 24px; }
+    .sprite.pose-sleep { height: 72px; bottom: 22px; }
+    .sprite.pose-jump { height: 88px; }
+    .sprite.sickly { filter: saturate(0.7) hue-rotate(25deg); }
 
     .sprite-her {
-      width: 58px;
+      height: 80px;
       z-index: 3;
       opacity: 0;
       pointer-events: none;
@@ -341,6 +373,8 @@
       width: auto;
       image-rendering: auto;
     }
+
+    .action-visual img.bust { height: 136px; margin-bottom: 34px; }
 
     .action-emoji {
       font-size: 96px;
@@ -379,7 +413,6 @@
     .hug-visual img {
       height: 150px;
       width: auto;
-      image-rendering: pixelated;
     }
 
     .hug-visual img.hug-him { margin-right: -14px; transform: scaleX(-1); }
@@ -445,9 +478,8 @@
     .game-catcher {
       position: absolute;
       bottom: 8px;
-      width: 54px;
-      height: auto;
-      image-rendering: pixelated;
+      height: 70px;
+      width: auto;
       pointer-events: none;
     }
 
@@ -484,6 +516,8 @@
       align-items: center;
       gap: 8px;
     }
+
+    .stat-ico { height: 18px; width: 18px; object-fit: contain; }
 
     .stat-label {
       width: 84px;
@@ -543,8 +577,6 @@
       -webkit-touch-callout: none;
       user-select: none;
     }
-
-    .btn.wide { grid-column: span 4; }
 
     .btn span.emoji { font-size: 18px; }
     .btn:hover { background: var(--gulf-blue); }
@@ -617,6 +649,9 @@
     }
 
     .toast.show { transform: translate(-50%, 0); }
+    .toast { display: flex; align-items: center; gap: 8px; }
+    .toast img { height: 24px; width: auto; }
+    .toast img:not([src]), .toast img[src=""] { display: none; }
 
     /* ---- Carnet (modale) ---- */
     .modal {
@@ -773,8 +808,9 @@
         <div class="sky" id="sky"><div class="moon">🌙</div></div>
         <div class="scanlines"></div>
         <div class="floor"></div>
-        <div class="mood" id="mood">😊</div>
-        <div class="bubble" id="bubble"></div>
+        <img class="mood" id="mood" alt="humeur">
+        <div class="bubble" id="bubble"><img class="bubble-face" id="bubbleFace" alt=""><span id="bubbleText"></span></div>
+        <div id="poops"></div>
         <div class="sprite-layer">
           <img class="sprite" id="sprite" alt="lui">
           <img class="sprite sprite-her" id="spriteHer" alt="toi">
@@ -799,19 +835,19 @@
 
     <div class="stats">
       <div class="stat-row">
-        <div class="stat-label">🍔 Faim</div>
+        <div class="stat-label"><img class="stat-ico" data-ico="icoHunger" alt=""> Faim</div>
         <div class="bar-track"><div class="bar-fill" id="bar-hunger"></div></div>
       </div>
       <div class="stat-row">
-        <div class="stat-label">⚡ Énergie</div>
+        <div class="stat-label"><img class="stat-ico" data-ico="icoTired" alt=""> Énergie</div>
         <div class="bar-track"><div class="bar-fill" id="bar-energy"></div></div>
       </div>
       <div class="stat-row">
-        <div class="stat-label">💙 Bonheur</div>
+        <div class="stat-label"><img class="stat-ico" data-ico="icoHappy" alt=""> Bonheur</div>
         <div class="bar-track"><div class="bar-fill" id="bar-happy"></div></div>
       </div>
       <div class="stat-row">
-        <div class="stat-label">💕 Amour</div>
+        <div class="stat-label"><img class="stat-ico" data-ico="icoLove" alt=""> Amour</div>
         <div class="bar-track"><div class="bar-fill" id="bar-love"></div></div>
       </div>
     </div>
@@ -821,16 +857,17 @@
       <button class="btn" id="btnRun"><span class="emoji">🏃</span>Courir</button>
       <button class="btn" id="btnCode"><span class="emoji">💻</span>Coder</button>
       <button class="btn" id="btnSleep"><span class="emoji">😴</span>Dodo</button>
-      <button class="btn wide" id="btnGame"><span class="emoji">🎮</span>Jouer</button>
-      <button class="btn wide" id="btnHeal"><span class="emoji">💊</span>Soigner</button>
-      <button class="btn wide" id="btnBook"><span class="emoji">📖</span>Carnet</button>
+      <button class="btn" id="btnGame"><span class="emoji">🎮</span>Jouer</button>
+      <button class="btn" id="btnWash"><span class="emoji">🧼</span>Laver</button>
+      <button class="btn" id="btnHeal"><span class="emoji">💊</span>Soigner</button>
+      <button class="btn" id="btnBook"><span class="emoji">📖</span>Carnet</button>
       <button class="btn btn-hug" id="btnHug"><span class="emoji">🥰</span>Câlin de ta copine</button>
     </div>
 
     <div class="footer-note"><span>nourris-le, câline-le, sinon il boude ⛽</span></div>
   </div>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"><img id="toastIco" alt=""><span id="toastText"></span></div>
 
   <div class="modal" id="book" hidden role="dialog" aria-modal="true" aria-labelledby="bookTitle">
     <div class="modal-card">
@@ -860,10 +897,10 @@
       // Dates spéciales ('MM-JJ'). Le message s'affiche à sa visite ce jour-là
       // et rejoint le carnet de souvenirs.
       specialDates: {
-        '07-08': { msg: "Joyeux anniversaire Stéphane 🎂🎉", fx: ['🎂', '🎉', '🎁'] }, // ⚠️ date à vérifier
-        // '05-20': { msg: "Joyeux anniversaire à nous deux 💑", fx: ['💑', '💍', '💕'] },
-        '02-14': { msg: "Joyeuse Saint-Valentin mon amour 💘", fx: ['💘', '🌹', '💋'] },
-        '12-25': { msg: "Joyeux Noël mon cœur 🎄", fx: ['🎄', '🎁', '⭐'] },
+        '07-08': { msg: "Joyeux anniversaire Stéphane 🎂🎉", fx: ['icoCake', 'icoGift', '🎉'] }, // ⚠️ date à vérifier
+        // '05-20': { msg: "Joyeux anniversaire à nous deux 💑", fx: ['💑', 'icoLove', '💍'] },
+        '02-14': { msg: "Joyeuse Saint-Valentin mon amour 💘", fx: ['icoLove', '🌹', 'icoHeart'] },
+        '12-25': { msg: "Joyeux Noël mon cœur 🎄", fx: ['🎄', 'icoGift', '⭐'] },
         '01-01': { msg: "Bonne année à nous deux 🥂", fx: ['🥂', '🎆', '✨'] }
       },
 
@@ -949,10 +986,10 @@
     function freshState() {
       return {
         hunger: 78, energy: 78, happy: 78, love: 78,
-        sick: false, sulk: false,
+        sick: false, sulk: false, poops: [], digest: 0,
         xp: 0, bestScore: 0, streak: 0,
         bornAt: Date.now(), lastSeen: null, lastVisitDay: null,
-        counters: { hugs: 0, meals: 0, runs: 0, codes: 0, sleeps: 0, heals: 0, games: 0, kisses: 0, visits: 0 },
+        counters: { hugs: 0, meals: 0, runs: 0, codes: 0, sleeps: 0, heals: 0, games: 0, kisses: 0, visits: 0, washes: 0, cleaned: 0 },
         trophies: {}, journal: [], name: null
       };
     }
@@ -984,6 +1021,7 @@
         state.counters = { ...base.counters, ...(d.counters || {}) };
         state.trophies = d.trophies || {};
         state.journal = Array.isArray(d.journal) ? d.journal : [];
+        state.poops = Array.isArray(d.poops) ? d.poops.slice(0, 3) : [];
         if (d.name) petNameEl.textContent = d.name;
       } catch (e) { /* stockage indisponible */ }
     }
@@ -998,12 +1036,16 @@
       const hours = Math.min(gap / HOUR_MS, 72);
       let t = fromMs;
       let left = hours;
+      let dayHours = 0;
       while (left > 0) {
         const dt = Math.min(1, left);
         if (phaseAt(new Date(t).getHours()) === 'night') {
           state.energy += 8 * dt; state.hunger -= 2.5 * dt; state.happy -= 1 * dt; state.love -= 1.5 * dt;
         } else {
           state.hunger -= 5 * dt; state.energy -= 3 * dt; state.happy -= 4 * dt; state.love -= 3 * dt;
+          dayHours += dt;
+          state.happy -= state.poops.length * 1.5 * dt;
+          if (dayHours >= 5 && state.poops.length < 3) { dayHours -= 5; addPoop(); }
         }
         state.hunger = clamp(state.hunger); state.energy = clamp(state.energy);
         state.happy = clamp(state.happy); state.love = clamp(state.love);
@@ -1044,6 +1086,8 @@
       { id: 'perfect', e: '🌟', t: 'Au top du top', d: 'Toutes les jauges au-dessus de 90', ok: (s) => Math.min(s.hunger, s.energy, s.happy, s.love) > 90 },
       { id: 'night_owl', e: '🦉', t: 'Couche-tard', d: "S'occuper de lui entre minuit et 5 h", ok: (s) => !!s.trophies.night_owl },
       { id: 'special', e: '🎁', t: 'Jour spécial', d: 'Ouvrir le jeu un jour de fête', ok: (s) => !!s.trophies.special },
+      { id: 'washes_10', e: '🧼', t: 'Propre comme un sou neuf', d: '10 bains', ok: (s) => s.counters.washes >= 10 },
+      { id: 'cleaned_20', e: '💩', t: 'Ramasse-crottes', d: '20 cacas ramassés', ok: (s) => s.counters.cleaned >= 20 },
       { id: 'memories_10', e: '📖', t: 'Album souvenir', d: '10 souvenirs dans le carnet', ok: (s) => s.journal.length >= 10 }
     ];
 
@@ -1051,7 +1095,7 @@
       if (state.trophies[id]) return;
       state.trophies[id] = dayKey(now());
       const t = TROPHIES.find((x) => x.id === id);
-      if (t) toast(`🏆 Trophée débloqué : ${t.e} ${t.t}`);
+      if (t) toast(`Trophée débloqué : ${t.e} ${t.t}`, A.icoTrophy);
     }
     function checkTrophies() {
       for (const t of TROPHIES) if (!state.trophies[t.id] && t.ok(state)) unlock(t.id);
@@ -1063,10 +1107,11 @@
       state.xp += n;
       const after = levelFor(state.xp);
       if (after > before) {
-        toast(`⭐ Niveau ${after} ! Bravo 🎉`);
+        toast(`Niveau ${after} ! Bravo 🎉`, A.icoGrow);
         setTimeout(() => {
           showBubble(`Niveau ${after} ! 🎉`, 2200);
-          ['⭐', '🎉', '✨'].forEach((e, i) => setTimeout(() => spawnHeart(spriteEl.style.left, `${70 + i * 12}px`, e, true), i * 180));
+          strikePose(A.himJump, 'pose-jump', 1400);
+          ['icoGrow', '🎉', '✨'].forEach((e, i) => setTimeout(() => spawnHeart(spriteEl.style.left, `${70 + i * 12}px`, e, true), i * 180));
         }, 400);
       }
     }
@@ -1103,15 +1148,8 @@
       $('bar-love').style.width = state.love + '%';
       $('bar-love').style.background = getComputedStyle(document.documentElement).getPropertyValue('--love');
 
-      const avg = (state.hunger + state.energy + state.happy + state.love) / 4;
-      const mode = himMode();
-      if (mode === 'sick') moodEl.textContent = '🤒';
-      else if (mode === 'sleep') moodEl.textContent = '😴';
-      else if (mode === 'sulk') moodEl.textContent = '😤';
-      else if (avg > 65) moodEl.textContent = '😊';
-      else if (avg > 40) moodEl.textContent = '😐';
-      else if (avg > 20) moodEl.textContent = '😟';
-      else moodEl.textContent = '😢';
+      const face = moodFace();
+      if (moodEl.getAttribute('src') !== face) moodEl.src = face;
 
       $('btnHeal').classList.toggle('alert', state.sick);
 
@@ -1148,17 +1186,40 @@
       }
     }
 
-    function showBubble(text, ms) {
-      bubbleEl.textContent = text;
+    let moodOverride = null, moodOverrideUntil = 0;
+    function moodFace() {
+      if (moodOverride && Date.now() < moodOverrideUntil) return moodOverride;
+      const avg = (state.hunger + state.energy + state.happy + state.love) / 4;
+      const mode = himMode();
+      if (mode === 'sick') return A.himSick;
+      if (mode === 'sleep') return A.icoTired;
+      if (mode === 'sulk') return A.himAngry;
+      if (state.energy < 25) return A.himTired;
+      if (avg > 55 && state.poops.length < 2) return A.himHappy;
+      return A.himSad;
+    }
+    function flashMood(face, ms) {
+      moodOverride = face; moodOverrideUntil = Date.now() + ms;
+      moodEl.src = face;
+      setTimeout(() => { moodEl.src = moodFace(); }, ms + 20);
+    }
+
+    const bubbleFace = $('bubbleFace');
+    function showBubble(text, ms, face) {
+      $('bubbleText').textContent = text;
+      bubbleEl.classList.toggle('with-face', !!face);
+      if (face) bubbleFace.src = face;
       bubbleEl.classList.add('show');
       clearTimeout(showBubble._t);
       showBubble._t = setTimeout(() => bubbleEl.classList.remove('show'), ms || 2200);
     }
 
     function spawnHeart(leftPx, bottomPx, emoji, big) {
-      const heart = document.createElement('div');
+      const isIco = typeof emoji === 'string' && emoji.startsWith('ico') && A[emoji];
+      const heart = document.createElement(isIco ? 'img' : 'div');
       heart.className = 'heart' + (big ? ' big' : '');
-      heart.textContent = emoji || '💙';
+      if (isIco) { heart.src = A[emoji]; heart.alt = ''; heart.style.height = big ? '26px' : '20px'; }
+      else heart.textContent = emoji || '💙';
       heart.style.left = leftPx;
       heart.style.bottom = bottomPx;
       screenEl.appendChild(heart);
@@ -1167,8 +1228,8 @@
 
     const toastQueue = [];
     let toastBusy = false;
-    function toast(text) {
-      toastQueue.push(text);
+    function toast(text, icon) {
+      toastQueue.push([text, icon]);
       if (!toastBusy) nextToast();
     }
     function nextToast() {
@@ -1176,7 +1237,8 @@
       const el = $('toast');
       if (!t) { toastBusy = false; return; }
       toastBusy = true;
-      el.textContent = t;
+      $('toastText').textContent = t[0];
+      if (t[1]) $('toastIco').src = t[1]; else $('toastIco').removeAttribute('src');
       el.classList.add('show');
       setTimeout(() => { el.classList.remove('show'); setTimeout(nextToast, 400); }, 2600);
     }
@@ -1215,13 +1277,38 @@
 
     let walkFrame = 0, walkTimer = null, bounceTimer = null, fxTimer = null, bounceUp = false;
     let currentMode = null;
+    let pauseUntil = 0;
+
+    const POSES = ['pose-sit', 'pose-lie', 'pose-sleep', 'pose-jump'];
+    function setPose(src, pose) {
+      spriteEl.src = src;
+      spriteEl.classList.remove(...POSES);
+      if (pose) spriteEl.classList.add(pose);
+    }
 
     function stopHim() {
       clearInterval(walkTimer); clearInterval(bounceTimer); clearInterval(fxTimer);
       currentMode = null;
+      pauseUntil = 0;
     }
 
     function walkSpeed() { return state.energy < 25 ? 0 : (state.energy < 55 ? 1 : 2); }
+
+    // Petites pauses de vie pendant qu'il se promène (lire, téléphone, boire…)
+    const IDLE_PAUSES = [
+      { src: () => A.himRead, text: 'Un petit chapitre 📖' },
+      { src: () => A.himPhone, text: 'Je regarde mes messages 📱' },
+      { src: () => A.himDrink, text: "Une gorgée d'eau 💧" },
+      { src: () => A.himSport, text: 'Allez, quelques haltères 💪' }
+    ];
+
+    function strikePose(src, pose, ms) {
+      if (busy || !currentMode || !currentMode.startsWith('normal')) return;
+      pauseUntil = Date.now() + ms;
+      setPose(src, pose);
+      spriteEl.style.bottom = '';
+      setTimeout(() => { if (Date.now() >= pauseUntil && currentMode) refreshHim(true); }, ms + 30);
+    }
 
     function refreshHim(force) {
       if (busy) return;
@@ -1230,17 +1317,16 @@
       if (!force && key === currentMode) return;
       stopHim();
       currentMode = key;
-      spriteEl.classList.remove('sleeping', 'sickly');
+      spriteEl.classList.remove('sickly');
       spriteEl.style.bottom = '';
       const screenWidth = screenEl.clientWidth;
 
       if (mode === 'sleep') {
-        spriteEl.src = A.sleepBig;
-        spriteEl.classList.add('sleeping');
-        posX = (screenWidth - 104) / 2;
+        setPose(A.himSleep, 'pose-sleep');
+        posX = (screenWidth - 60) / 2;
         spriteEl.style.left = posX + 'px';
         spriteEl.style.transform = 'none';
-        fxTimer = setInterval(() => spawnHeart((posX + 70) + 'px', '90px', '💤'), 1700);
+        fxTimer = setInterval(() => spawnHeart((posX + 50) + 'px', '84px', '💤'), 2400);
         return;
       }
 
@@ -1248,27 +1334,39 @@
       spriteEl.style.left = posX + 'px';
 
       if (mode === 'sick') {
-        spriteEl.src = A.sick || A.idle;
-        if (!A.sick) spriteEl.classList.add('sickly');
+        setPose(A.himLie, 'pose-lie');
+        spriteEl.classList.add('sickly');
         spriteEl.style.transform = 'scaleX(1)';
-        fxTimer = setInterval(() => spawnHeart((posX + 30) + 'px', '95px', pick(['🤒', '🤧', '🌡️'])), 2600);
+        fxTimer = setInterval(() => spawnHeart((posX + 30) + 'px', '70px', pick(['icoSick', '🤧', 'icoSick'])), 2600);
         return;
       }
 
       if (mode === 'sulk') {
-        spriteEl.src = A.sulk || A.back;
-        spriteEl.style.transform = 'scaleX(1)';
-        fxTimer = setInterval(() => spawnHeart((posX + 30) + 'px', '95px', pick(['💢', '😤', '🌧️'])), 3000);
+        setPose(A.himSit, 'pose-sit');
+        spriteEl.style.transform = 'scaleX(-1)';
+        fxTimer = setInterval(() => spawnHeart((posX + 30) + 'px', '90px', pick(['💢', 'icoStress', '🌧️'])), 3000);
         return;
       }
 
       const speed = walkSpeed();
-      if (speed === 0) { spriteEl.src = A.idle; return; }
+      if (speed === 0) {
+        setPose(A.himSit, 'pose-sit');
+        fxTimer = setInterval(() => spawnHeart((posX + 30) + 'px', '90px', 'icoTired'), 3200);
+        return;
+      }
 
+      setPose(A.himStand, null);
+      const frames = speed === 2 ? [A.himWalk, A.himRun] : [A.himStand, A.himWalk];
       walkTimer = setInterval(() => {
+        if (Date.now() < pauseUntil) return;
+        if (speed === 1 && Math.random() < 0.006) {
+          const p = pick(IDLE_PAUSES);
+          strikePose(p.src(), null, 3800);
+          if (!bubbleEl.classList.contains('show')) showBubble(p.text, 2000);
+          return;
+        }
         walkFrame = 1 - walkFrame;
-        if (speed === 2) spriteEl.src = walkFrame === 0 ? A.run : A.walk2;
-        else spriteEl.src = walkFrame === 0 ? A.walk1 : A.walk2;
+        setPose(frames[walkFrame], null);
 
         const maxX = screenEl.clientWidth - spriteEl.clientWidth - 12;
         posX += direction * (speed === 2 ? 8 : 4.5);
@@ -1279,11 +1377,40 @@
       }, speed === 2 ? 130 : 190);
 
       bounceTimer = setInterval(() => {
+        if (Date.now() < pauseUntil) return;
         bounceUp = !bounceUp;
         spriteEl.style.bottom = bounceUp ? '29px' : '26px';
       }, speed === 2 ? 70 : 100);
     }
 
+    // ---- Cacas ----
+    const poopsEl = $('poops');
+    function addPoop() {
+      if (state.poops.length >= 3) return;
+      state.poops.push(Math.round(rand(8, 82)));
+    }
+    function renderPoops() {
+      poopsEl.replaceChildren(...state.poops.map((x, i) => {
+        const img = document.createElement('img');
+        img.className = 'poop';
+        img.src = A.icoPoop;
+        img.alt = 'caca';
+        img.style.left = x + '%';
+        img.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (game.active) return;
+          state.poops.splice(i, 1);
+          state.counters.cleaned++;
+          state.happy = clamp(state.happy + 3);
+          gainXp(1);
+          spawnHeart(x + '%', '40px', '✨');
+          renderPoops();
+          renderStats();
+          checkTrophies();
+        });
+        return img;
+      }));
+    }
     // =====================================================================
     //  Le temps qui passe (jeu ouvert)
     // =====================================================================
@@ -1306,6 +1433,19 @@
         state.energy = clamp(state.energy - rand(0.4, 1.2));
         state.happy = clamp(state.happy - rand(0.4, 1.2) * (state.sick ? 2 : 1));
         state.love = clamp(state.love - rand(0.2, 0.7));
+        // digestion : après les repas, un petit caca finit par arriver
+        state.happy = clamp(state.happy - state.poops.length * 0.5);
+        if (state.digest >= 45 && state.poops.length < 3 && Math.random() < 0.2) {
+          state.digest -= 45;
+          addPoop();
+          renderPoops();
+          showBubble('Oups... 💩', 1800);
+        }
+        if (state.poops.length >= 3 && !state.sick && Math.random() < 0.06) {
+          state.sick = true;
+          state.sulk = false;
+          showBubble("C'est pas très propre ici... 🤢", 2400);
+        }
       }
       updateConditions();
       renderStats();
@@ -1343,6 +1483,7 @@
 
       if (img) {
         actionImg.src = img; actionImg.hidden = false; actionEmoji.hidden = true;
+        actionImg.classList.toggle('bust', img === A.himSick);
       } else {
         actionImg.hidden = true; actionEmoji.textContent = emoji || '✨'; actionEmoji.hidden = false;
       }
@@ -1354,6 +1495,7 @@
       state.happy = clamp(state.happy + (delta.happy || 0));
       state.love = clamp(state.love + (delta.love || 0));
       if (counter) state.counters[counter]++;
+      if (counter === 'meals') state.digest += Math.max(0, delta.hunger || 0);
       afterCare();
       if (after) after();
       gainXp(xp || 0);
@@ -1379,7 +1521,9 @@
       { img: A.foodPizza, caption: 'Une part de pizza, miam ! 🍕', delta: { hunger: 28, happy: 14, energy: -2 } },
       { img: A.foodBurger, caption: 'Un bon gros burger ! 🍔', delta: { hunger: 30, happy: 10, energy: -2 } },
       { img: A.foodDrumstick, caption: 'Ça creuse, ce poulet ! 🍗', delta: { hunger: 26, happy: 8, energy: 2 } },
-      { img: A.foodWater, caption: "Un grand verre d'eau 💧", delta: { hunger: 6, happy: 4, energy: 14 } }
+      { img: A.foodWater, caption: "Un grand verre d'eau 💧", delta: { hunger: 6, happy: 4, energy: 14 } },
+      { img: A.himEat, caption: 'Le burger du chef 🍔', delta: { hunger: 30, happy: 12, energy: -2 } },
+      { img: A.himDrink, caption: 'Un smoothie bien frais 🥤', delta: { hunger: 10, happy: 6, energy: 12 } }
     ];
     let lastFoodIndex = -1;
     $('btnCoffee').addEventListener('click', () => {
@@ -1420,13 +1564,22 @@
     $('btnHeal').addEventListener('click', () => {
       if (!state.sick) return refuse('Il pète la forme, pas besoin 💪');
       doAction({
-        img: A.sickBig, emoji: '💊', caption: 'Une tisane, un médoc, et au lit 🍵',
+        img: A.himSick, caption: 'Une tisane, un médoc, et au lit 🍵',
         delta: { energy: 10, happy: 12, love: 6, hunger: 10 }, duration: 2200, xp: 4, counter: 'heals',
         after: () => {
           state.sick = false;
           state.hunger = Math.max(state.hunger, 20);
           setTimeout(() => showBubble('Merci, ça va mieux 🥹', 2200), 2300);
         }
+      });
+    });
+
+    $('btnWash').addEventListener('click', () => {
+      const n = state.poops.length;
+      doAction({
+        img: A.himWash, caption: n ? 'Grand ménage et petite douche 🧼' : 'Petite douche, tout propre 🫧',
+        delta: { happy: 8 + n * 4, energy: 4 }, duration: 1800, xp: 2 + n, counter: 'washes',
+        after: () => { state.counters.cleaned += n; state.poops = []; renderPoops(); }
       });
     });
 
@@ -1437,6 +1590,7 @@
       if (mode === 'sleep') {
         awakeUntil = Date.now() + 60 * 1000;
         showBubble("Hein ?! J'dormais... 😪", 2000);
+        setTimeout(() => flashMood(A.himSurprised, 1800), 0);
         refreshHim(true);
         renderStats();
         return;
@@ -1452,8 +1606,8 @@
       gainXp(1);
       renderStats();
       checkTrophies();
-      showBubble('💙', 900);
-      spawnHeart(spriteEl.style.left, '70px', '💙');
+      flashMood(A.himHappy, 900);
+      spawnHeart(spriteEl.style.left, '80px', pick(['💙', 'icoHeart', '💋']));
     });
 
     // =====================================================================
@@ -1492,19 +1646,19 @@
 
       spriteHerEl.style.left = gx + 'px';
       spriteHerEl.style.bottom = '26px';
-      spriteHerEl.src = A.herWalk1;
+      spriteHerEl.src = A.herWalk;
       spriteHerEl.style.transform = fromLeft ? 'scaleX(1)' : 'scaleX(-1)';
       spriteHerEl.classList.add('visible');
 
       let frame = 0;
       const herWalkTimer = setInterval(() => {
         frame = 1 - frame;
-        spriteHerEl.src = frame === 0 ? A.herWalk1 : A.herWalk2;
+        spriteHerEl.src = frame === 0 ? A.herWalk : A.herStand;
         gx += fromLeft ? 7.5 : -7.5;
         spriteHerEl.style.left = gx + 'px';
         if (fromLeft ? gx >= targetX : gx <= targetX) {
           clearInterval(herWalkTimer);
-          spriteHerEl.src = A.herIdle;
+          spriteHerEl.src = A.herStand;
           girlArrived(fromLeft);
         }
       }, 160);
@@ -1538,8 +1692,9 @@
       spriteHerEl.style.transform = herIsRightOfHim ? 'scaleX(-1)' : 'scaleX(1)';
 
       const v = visitMessage();
-      if (v.big && A.herGift) spriteHerEl.src = A.herGift;
-      showBubble(v.msg, v.big ? 3600 : 2600);
+      const herFace = state.sick ? A.herSad : (state.sulk ? A.herSurprised : A.herHappy);
+      showBubble(v.msg, v.big ? 3600 : 2600, herFace);
+      flashMood(state.sick ? A.himSick : A.himHappy, v.big ? 3400 : 2000);
       state.love = clamp(state.love + (v.big ? 24 : 10));
       state.happy = clamp(state.happy + (v.big ? 20 : 6));
       state.counters.visits++;
@@ -1551,10 +1706,11 @@
       let blinkFrame = 0;
       const blinkTimer = setInterval(() => {
         if (!spriteHerEl.classList.contains('visible')) { clearInterval(blinkTimer); return; }
-        if (v.big && A.herGift) return;
+        if (!v.big) return;
         blinkFrame = 1 - blinkFrame;
-        spriteHerEl.src = blinkFrame === 0 ? A.herIdle : A.herIdleAlt;
-      }, 900);
+        spriteHerEl.src = blinkFrame === 0 ? A.herJump : A.herStand;
+      }, 420);
+      if (v.big) spriteHerEl.src = A.herJump;
 
       setTimeout(() => {
         clearInterval(blinkTimer);
@@ -1570,7 +1726,7 @@
       let frame = 0;
       const exitTimer = setInterval(() => {
         frame = 1 - frame;
-        spriteHerEl.src = frame === 0 ? A.herWalk1 : A.herWalk2;
+        spriteHerEl.src = frame === 0 ? A.herWalk : A.herStand;
         gx += cameFromLeft ? -7.5 : 7.5;
         spriteHerEl.style.left = gx + 'px';
         if (cameFromLeft ? gx <= -50 : gx >= screenWidth + 20) {
@@ -1635,7 +1791,7 @@
       { e: '💋', v: 1, w: 4 }, { e: '☕', v: 1, w: 3 }, { e: '💕', v: 2, w: 2 }, { e: '🐛', v: -2, w: 2 }
     ];
     const GAME_TIME = 20;
-    const CATCHER_W = 54;
+    const CATCHER_W = 44;
 
     function pickItem() {
       const total = GAME_ITEMS.reduce((s, i) => s + i.w, 0);
@@ -1672,7 +1828,8 @@
       game.spawnAcc = 0;
       game.frameAcc = 0;
       game.x = game.targetX = (screenEl.clientWidth - CATCHER_W) / 2;
-      catcherEl.src = A.catchPose || A.walk1;
+      catcherEl.src = A.himStand;
+      game.jumpUntil = 0;
       catcherEl.style.left = game.x + 'px';
       $('gameScore').textContent = '💋 0';
       $('gameTime').textContent = '⏱ ' + GAME_TIME;
@@ -1729,9 +1886,10 @@
       catcherEl.style.left = game.x + 'px';
       if (Math.abs(game.x - prevX) > 0.3) {
         catcherEl.style.transform = game.x > prevX ? 'scaleX(1)' : 'scaleX(-1)';
-        if (!A.catchPose) {
-          game.frameAcc += dt;
-          if (game.frameAcc > 0.15) { game.frameAcc = 0; catcherEl.src = catcherEl.src === A.walk1 ? A.walk2 : A.walk1; }
+        game.frameAcc += dt;
+        if (game.frameAcc > 0.15 && ts > game.jumpUntil) {
+          game.frameAcc = 0;
+          catcherEl.src = catcherEl.getAttribute('src') === A.himWalk ? A.himStand : A.himWalk;
         }
       }
 
@@ -1745,6 +1903,7 @@
         const caught = it.y + 22 >= catchTop && it.y < H - 10 && cx >= game.x - 6 && cx <= game.x + CATCHER_W + 6;
         if (caught) {
           game.score = Math.max(0, game.score + it.type.v);
+          if (it.type.v > 0) { catcherEl.src = A.himJump; game.jumpUntil = ts + 220; }
           spawnHeart(it.x + 'px', (H - it.y - 10) + 'px', it.type.v > 0 ? `+${it.type.v}` : '🐛 -2');
         }
         if (caught || it.y > H) { it.el.remove(); game.items.splice(i, 1); }
@@ -1842,6 +2001,7 @@
           ['🔥 Série en cours', `${state.streak} j`],
           ['🎮 Record mini-jeu', state.bestScore],
           ['🥰 Câlins', c.hugs], ['💋 Bisous', c.kisses], ['🍽️ Repas', c.meals],
+          ['🧼 Bains', c.washes], ['💩 Cacas ramassés', c.cleaned],
           ['🏃 Runs', c.runs], ['💻 Sessions de code', c.codes], ['😴 Siestes', c.sleeps],
           ['💊 Soins', c.heals], ['🚶‍♀️ Visites', c.visits], ['🎮 Parties', c.games]
         ];
@@ -1888,9 +2048,10 @@
     }
 
     makeStars();
-    $('hugHerImg').src = A.herIdle;
-    $('hugHimImg').src = A.idle;
-    spriteHerEl.src = A.herIdle;
+    $('hugHerImg').src = A.herStand;
+    $('hugHimImg').src = A.himStand;
+    spriteHerEl.src = A.herStand;
+    document.querySelectorAll('[data-ico]').forEach((img) => { img.src = A[img.dataset.ico]; });
     loadState();
     const away = catchUp(state.lastSeen);
     startDay();
@@ -1903,6 +2064,7 @@
     updateConditions(true);
     applyPhase();
     spriteEl.style.left = posX + 'px';
+    renderPoops();
     renderStats();
     refreshHim(true);
     checkTrophies();
