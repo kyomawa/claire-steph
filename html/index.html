@@ -56,6 +56,7 @@
       <button class="chip daily-chip" id="hudDaily" title="Défis du jour">🎯 0/3</button>
       <button class="chip token-chip" id="hudTokens" title="Jetons · boutique">⛽ 0</button>
     </div>
+    <div class="hud-tip" id="hudTip" hidden role="status"></div>
 
     <div class="screen-wrap">
       <div class="screen" id="screen">
@@ -68,6 +69,7 @@
         <div class="floor" style="pointer-events:none"></div>
         <img class="mood" id="mood" alt="humeur" title="Son statut">
         <button class="alert-badge" id="alertBadge" hidden aria-label="Il a besoin de toi">⚠️</button>
+        <button class="advent-badge" id="btnAdvent" hidden aria-label="Calendrier de l'Avent" title="Calendrier de l'Avent">🎄</button>
         <div class="caprice" id="caprice" hidden>
           <div class="ask-q"><span>😤 Caprice</span><b id="capriceText"></b></div>
           <div class="ask-btns">
@@ -113,6 +115,23 @@
             <button class="guess-btn" id="guessLeft" aria-label="Gauche">⬅️</button>
             <button class="guess-btn" id="guessRight" aria-label="Droite">➡️</button>
           </div>
+        </div>
+        <div class="mini bugs" id="bugs" hidden>
+          <div class="mini-head" id="bugsInfo"></div>
+          <div class="bugs-grid" id="bugsGrid"></div>
+          <div class="mini-msg" id="bugsMsg"></div>
+        </div>
+        <div class="mini recipe" id="recipe" hidden>
+          <div class="mini-head" id="recipeInfo"></div>
+          <div class="recipe-pads" id="recipePads"></div>
+          <div class="mini-msg" id="recipeMsg"></div>
+        </div>
+        <div class="mini lights" id="lights" hidden>
+          <div class="mini-head" id="lightsInfo"></div>
+          <div class="lights-gantry" id="lightsGantry"></div>
+          <div class="lights-time" id="lightsTime"></div>
+          <div class="mini-msg" id="lightsMsg"></div>
+          <div class="lights-road" aria-hidden="true"><span>🏎️</span></div>
         </div>
         <div class="game" id="game">
           <div class="game-hud"><span id="gameScore">💋 0</span><span id="gameTime">⏱ 20</span></div>
@@ -257,29 +276,86 @@
         <button class="close" id="helpClose" aria-label="Fermer">✕</button>
       </div>
       <div class="tab-body">
+        <h3 class="help-h">👆 Le toucher</h3>
         <ul class="help-list">
           <li><span>💋</span><div><b>Tape sur lui</b> : un bisou</div></li>
           <li><span>😂</span><div><b>Tape 3 fois vite</b> : chatouilles</div></li>
           <li><span>🤲</span><div><b>Frotte-le avec le doigt</b> : caresses</div></li>
           <li><span>🫂</span><div><b>Reste appuyé sur lui</b> : petit câlin</div></li>
           <li><span>👆</span><div><b>Tape par terre</b> : il marche jusque-là</div></li>
-          <li><span>💭</span><div><b>Bulle au-dessus de lui</b> : une envie, à exaucer en 2 min</div></li>
-          <li><span>🙂</span><div><b>Tape sa tête en haut à droite</b> : il te dit ce qui ne va pas</div></li>
-          <li><span>💌</span><div><b>Tape-la quand elle passe</b> : bisou envoyé</div></li>
           <li><span>💩</span><div><b>Tape un caca</b> pour le ramasser (ou 🧼 Laver)</div></li>
-          <li><span>🎯</span><div><b>Défis du jour</b> en haut, et une <b>question du jour</b></div></li>
-          <li><span>🌙</span><div>La nuit il dort : laisse-le… ou réveille-le</div></li>
+        </ul>
+        <h3 class="help-h">🍔 Prendre soin de lui</h3>
+        <ul class="help-list">
+          <li><span class="help-dot"></span><div><b>Une pastille sur un bouton</b> : c'est ce dont il a besoin maintenant (rouge = urgent)</div></li>
           <li><span>🍽️</span><div><b>Manger</b> : choisis un plat puis <b>glisse-le jusqu'à lui</b> (ou tape-le, il va le chercher)</div></li>
-          <li><span>💌</span><div><b>À deux → Mot doux</b> : un message qui arrive sur l'autre téléphone relié</div></li>
-          <li><span>🏁</span><div><b>Touche son numéro de course</b> : sa carrière, le Grand Prix du jour, ses compétences et l'histoire</div></li>
-          <li><span>💡</span><div>La nuit, <b>éteins la lumière</b> (bouton Dodo) ; dès 21 h, Dodo le couche</div></li>
+          <li><span>🌙</span><div>La nuit il dort : <b>éteins la lumière</b> (bouton Dodo). Dès 21 h, Dodo le couche</div></li>
           <li><span>⚠️</span><div>Quand il t'appelle, réponds vite : un appel ignoré 45 min = un soin oublié</div></li>
-          <li><span>⛽</span><div><b>Jetons</b> (en haut) : gagnés aux jeux et défis, à dépenser à la boutique</div></li>
+          <li><span>🙂</span><div><b>Tape sa tête en haut à droite</b> : ce qui va et ce qui ne va pas</div></li>
+          <li><span>💭</span><div><b>Bulle au-dessus de lui</b> : une envie, à exaucer en 2 min</div></li>
+        </ul>
+        <h3 class="help-h">🎮 Jouer et progresser</h3>
+        <ul class="help-list">
+          <li><span>🎮</span><div><b>Jouer</b> : 8 mini-jeux, chacun entraîne une compétence. Après 3 parties du même jeu dans la journée, les gains baissent</div></li>
+          <li><span>🏁</span><div><b>Touche son numéro de course</b> : sa carrière, le Grand Prix du jour, ses compétences et l'histoire</div></li>
+          <li><span>🎯</span><div><b>Défis du jour</b> en haut, et une <b>question du jour</b></div></li>
+          <li><span>⛽</span><div><b>Jetons</b> : gagnés aux jeux et défis, à dépenser à la boutique</div></li>
+          <li><span>ℹ️</span><div><b>Touche 🗓️ ⭐ 🔥 en haut</b> : l'explication et le prochain objectif</div></li>
+        </ul>
+        <h3 class="help-h">💑 Ensemble</h3>
+        <ul class="help-list">
+          <li><span>💌</span><div><b>Tape-la quand elle passe</b> : bisou envoyé</div></li>
+          <li><span>💑</span><div><b>À deux</b> : moments à deux, et <b>mots doux</b> qui arrivent sur l'autre téléphone relié</div></li>
           <li><span>📸</span><div><b>Photo souvenir</b> de la scène, rangée dans le carnet</div></li>
           <li><span>🎾</span><div><b>Lance le ballon</b> à son compagnon : il le rapporte</div></li>
+          <li><span>🎄</span><div>En décembre : le <b>calendrier de l'Avent</b> (bouton 🎄 en haut)</div></li>
           <li><span>💾</span><div>Tout est sauvegardé tout seul · 🔔 notifications dans 💾</div></li>
         </ul>
         <button class="btn wide-btn cloud-main" id="helpOk">C'est parti ! 🏁</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="awayModal" hidden role="dialog" aria-modal="true" aria-labelledby="awayTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="awayTitle">🕰️ Pendant ton absence</h2>
+        <button class="close" id="awayClose" aria-label="Fermer">✕</button>
+      </div>
+      <div class="tab-body" id="awayBody"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="newsModal" hidden role="dialog" aria-modal="true" aria-labelledby="newsTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="newsTitle">✨ Quoi de neuf ?</h2>
+        <button class="close" id="newsClose" aria-label="Fermer">✕</button>
+      </div>
+      <div class="tab-body">
+        <ul class="help-list">
+          <li><span>🐛</span><div><b>3 nouveaux mini-jeux</b> : Chasse aux bugs, Recette à deux et Feux de départ</div></li>
+          <li><span class="help-dot"></span><div><b>Les boutons s'allument</b> quand il a besoin de quelque chose</div></li>
+          <li><span>ℹ️</span><div><b>Touche 🗓️ ⭐ 🔥 en haut</b> pour savoir où tu en es et ce qui arrive ensuite</div></li>
+          <li><span>🕰️</span><div><b>Un résumé</b> de ce qui s'est passé pendant ton absence</div></li>
+          <li><span>🎄</span><div>Dès le 1er décembre : <b>un calendrier de l'Avent</b>, une surprise par jour</div></li>
+          <li><span>❓</span><div>L'aide est maintenant <b>rangée par thèmes</b></div></li>
+        </ul>
+        <button class="btn wide-btn cloud-main" id="newsOk">Je découvre ! 🏁</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="adventModal" hidden role="dialog" aria-modal="true" aria-labelledby="adventTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="adventTitle">🎄 Calendrier de l'Avent</h2>
+        <button class="close" id="adventClose" aria-label="Fermer">✕</button>
+      </div>
+      <div class="tab-body">
+        <p class="advent-sub" id="adventSub"></p>
+        <div class="advent-reveal" id="adventReveal" hidden></div>
+        <div class="advent-grid" id="adventGrid"></div>
       </div>
     </div>
   </div>
@@ -389,7 +465,11 @@
           <button class="m-card g-card" id="pickDance"><span class="g-ico">🪩💃🕺</span><span class="m-name">Danse avec elle</span><span class="m-sub">tape en rythme</span><span class="m-sub" id="bestDanceTxt"></span></button>
           <button class="m-card g-card" id="pickRace"><span class="g-ico">🏎️🏁</span><span class="m-name">Course Gulf</span><span class="m-sub">évite les plots, ramasse le carburant</span><span class="m-sub" id="bestRaceTxt"></span></button>
           <button class="m-card g-card" id="pickGuess"><span class="g-ico">⬅️🤔➡️</span><span class="m-name">Gauche ou droite ?</span><span class="m-sub">5 manches · devine où il regarde</span><span class="m-sub" id="bestGuess"></span></button>
+          <button class="m-card g-card" id="pickBugs"><span class="g-ico">🐛💻🔨</span><span class="m-name">Chasse aux bugs</span><span class="m-sub">20 s · tape les bugs, pas les bombes</span><span class="m-sub" id="bestBugsTxt"></span></button>
+          <button class="m-card g-card" id="pickRecipe"><span class="g-ico">🍅🧀🌿</span><span class="m-name">Recette à deux</span><span class="m-sub">retiens l’ordre des ingrédients</span><span class="m-sub" id="bestRecipeTxt"></span></button>
+          <button class="m-card g-card" id="pickLights"><span class="g-ico">🚦🏁</span><span class="m-name">Feux de départ</span><span class="m-sub">3 départs · tes réflexes</span><span class="m-sub" id="bestLightsTxt"></span></button>
         </div>
+        <p class="games-note" id="gamesNote"></p>
       </div>
     </div>
   </div>
@@ -513,6 +593,11 @@
   <script src="js/37-career.js"></script>
   <script src="js/38-week.js"></script>
   <script src="js/39-quality.js"></script>
+  <script src="js/40-game-bugs.js"></script>
+  <script src="js/41-game-recipe.js"></script>
+  <script src="js/42-game-lights.js"></script>
+  <script src="js/43-clarity.js"></script>
+  <script src="js/44-advent.js"></script>
 
 </body>
 

@@ -20,6 +20,7 @@ function freshState() {
     trophies: {}, journal: [], name: null,
     album: {}, decor: 'auto', playedAt: 0, sound: true, seenHelp: false, lastAsk: null, daily: null,
     tutorial: null, vibrate: true, reduceMotion: false,
+    bestBugs: 0, bestRecipe: 0, bestLights: 0, advent: {}, newsSeen: null,
     owned: {}, wear: { tete: null, yeux: null, visage: null, cou: null, dos: null, compagnon: null }
   };
 }

@@ -53,5 +53,33 @@ const CONFIG = {
     "Je t'aime plus que les frites 🍟 (et c'est beaucoup)",
     "Dodo tôt ce soir, promis ? 😴",
     "Tu es mon soleil, même la nuit ☀️🌙"
+  ],
+
+  // Calendrier de l'Avent (1er → 24 décembre) : un mot par case, à personnaliser librement.
+  adventMessages: [
+    "Le compte à rebours commence… et j'ai déjà hâte 🎄",
+    "Un chocolat chaud et toi : mon combo préféré ☕",
+    "Tu es mon plus beau cadeau, et je n'ai même pas attendu Noël 🎁",
+    "Chaque jour avec toi compte double 💕",
+    "Mon vœu de Noël ? Toi, en pyjama, un dimanche matin ⭐",
+    "Je t'aime plus que les biscuits de Noël (et ça veut tout dire) 🍪",
+    "Plaid + série + toi = soirée parfaite 🛋️",
+    "Viens là que je te réchauffe les mains 🧣",
+    "Tu brilles plus que toutes les guirlandes ✨",
+    "Petit rappel : tu es génial 💪",
+    "Le seul cadeau que je veux sous le sapin, c'est toi 🎄",
+    "On décore le sapin ensemble ? Je te laisse l'étoile ⭐",
+    "Même sous la neige, mon cœur fait vroum vroum 🏎️",
+    "Merci pour tous nos petits moments 💛",
+    "Attention : bataille de boules de neige imminente ❄️",
+    "Tu es mon endroit au chaud quand il fait froid 🏡",
+    "Une balade au marché de Noël, main dans la main ? 🥨",
+    "Encore une semaine… je compte les dodos avec toi 😴",
+    "Je suis tellement fière de toi 🌟",
+    "Toi + moi + un film de Noël = 💯",
+    "Le jour le plus court de l'année, et pourtant parfait avec toi ☀️",
+    "Plus que deux dodos… et des bisous à volonté 💋",
+    "Demain c'est le grand soir… sors ton plus beau pull moche 🎅",
+    "Joyeux réveillon mon amour : le plus beau cadeau, c'est nous 🎁💕"
   ]
 };

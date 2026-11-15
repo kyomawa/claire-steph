@@ -85,7 +85,7 @@ Les points s'effacent doucement (demi-vie ~1,5 jour). La catégorie dominante de
 - **XP** → niveaux → rangs de pilote → accessoires.
 - **Jetons ⛽** : mini-jeux, défis du jour, envies exaucées, niveaux → boutique.
 - Anti-farm : à partir de la **4ᵉ partie du même mini-jeu dans la journée**, les gains sont
-  divisés par 2, puis par 4 à partir de la 7ᵉ.
+  divisés par 2, puis par 4 à partir de la 7ᵉ (affiché sur la carte du jeu : « gains ×0,5 aujourd'hui »).
 
 ## 10. Motion design
 
@@ -104,6 +104,7 @@ Les points s'effacent doucement (demi-vie ~1,5 jour). La catégorie dominante de
 **Compétences** (0 à 100) : 🏎️ Pilotage, 💪 Endurance, 🍳 Cuisine, 💻 Code, 💘 Charme.
 Chaque activité en entraîne une ou deux (courir → endurance + pilotage, coder → code,
 moment « Cuisine » → cuisine, câlins et mots doux → charme, Course Gulf → pilotage…).
+Chaque mini-jeu affiche la compétence qu'il entraîne (voir § 16).
 Au plus **+6 par compétence et par jour**, et progresser devient plus dur près de 100.
 
 ## 12. Grand Prix du jour et championnat
@@ -139,3 +140,37 @@ première victoire, Monaco, victoire au Mans…), chacun avec un petit texte et 
 - **Mini-jeux** : « ✕ Quitter » à tout moment, sans récompense ni pénalité.
 - **Pendant une visite** : toucher un bouton affiche « Attends la fin de sa visite » au lieu de ne rien faire.
 - **Fenêtres** : une seule apparition automatique à la fois ; retour / Échap ferme la fenêtre du dessus.
+- **Pastilles sur les boutons** : orange = conseillé (faim < 35, caca à ramasser, amour ou bonheur < 35,
+  énergie < 25), rouge qui pulse = il t'appelle (soin oublié si rien n'est fait en 45 min).
+  Rien n'est conseillé pendant qu'il dort, sauf éteindre la lumière.
+- **Pastilles du haut** (🗓️ ⭐ 🔥) : on les touche pour une explication et le prochain objectif
+  (XP manquante, ce qui se débloque au niveau suivant, bonus de la série).
+- **Résumé d'absence** : après 3 h ou plus, une fenêtre dit ce qui s'est passé (sommeil, cacas,
+  maladie, appels sans réponse), l'évolution des 4 jauges et propose les gestes utiles en un toucher.
+- **Quoi de neuf ?** : après une mise à jour, une fenêtre présente les nouveautés une seule fois.
+- **Aide** rangée en 4 thèmes : le toucher, prendre soin de lui, jouer et progresser, ensemble.
+
+## 16. Les mini-jeux
+
+| Jeu | Principe | Compétence | Étoiles |
+|---|---|---|---|
+| 💋 Attrape les bisous | 20 s, glisser pour attraper bisous et cafés, éviter les bugs | 💪 Endurance | selon le score |
+| 🧠 Mémoire | 6 paires | 💻 Code | ≤ 9 coups : 3 · ≤ 13 : 2 |
+| 🪩 Danse avec elle | taper en rythme | 💘 Charme, 💪 Endurance | ≥ 80 % : 3 · ≥ 50 % : 2 |
+| 🏎️ Course Gulf | 40 s, éviter les plots, ramasser le carburant | 🏎️ Pilotage | selon le score |
+| ⬅️ Gauche ou droite | 5 manches de devinette | 💘 Charme | — |
+| 🐛 Chasse aux bugs | 20 s, écraser 🐛 (+1) et 🪲 (+2), éviter 💣 (−2), ☕ = +2 s | 💻 Code | ≥ 18 pts : 3 · ≥ 11 : 2 |
+| 🍳 Recette à deux | refaire l'ordre des ingrédients, un de plus à chaque plat (3 au départ) | 🍳 Cuisine, 💘 Charme | ≥ 6 plats : 3 · ≥ 3 : 2 |
+| 🚦 Feux de départ | 3 départs : taper dès que les 5 feux s'éteignent, faux départ si trop tôt | 🏎️ Pilotage | < 0,33 s : 3 · < 0,45 s : 2 |
+
+Récompenses communes : bonheur, amour, XP (4 + 3 × étoiles) et jetons (4 × étoiles), réduits par l'anti-farm.
+Records et trophées : 🐞 22 pts aux bugs, 👨‍🍳 6 plats, 🚦 moins de 0,30 s.
+
+## 17. Calendrier de l'Avent
+
+- Du 1er au 24 décembre, un bouton 🎄 apparaît dans l'écran (pastille rouge s'il reste une case).
+- Une case par jour, et les cases oubliées restent ouvrables jusqu'au 31 décembre.
+- Surprises : jetons (10 à 30), XP, gourmandises et moments (chocolat chaud, plaid, boules de neige…)
+  qui remontent les jauges, mots doux rangés dans le carnet ; le 24, grand cadeau de 50 jetons.
+- Les 24 mots sont dans `CONFIG.adventMessages` (`html/js/00-config.js`), à personnaliser librement.
+- Trophée 🎄 « Esprit de Noël » pour les 24 cases.

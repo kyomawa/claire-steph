@@ -33,6 +33,9 @@
     game_memory: { code: 1 },
     game_guess: { charme: 0.5 },
     game_catch: { endurance: 0.5 },
+    game_bugs: { code: 2 },
+    game_recipe: { cuisine: 2, charme: 0.5 },
+    game_lights: { pilotage: 1.5 },
     fetches: { endurance: 0.5 },
     notes: { charme: 1 }
   };

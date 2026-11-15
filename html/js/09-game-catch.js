@@ -30,12 +30,7 @@ function setIntro(lines) {
 
 function startCatchGame() {
   if (!canAct()) return;
-  busy = true;
-  game.active = true;
-  stopHim();
-  bubbleEl.classList.remove('show');
-  spriteEl.style.visibility = 'hidden';
-  afterCare();
+  beginGame();
 
   game.score = 0;
   game.items = [];
@@ -157,12 +152,8 @@ function endGame() {
   renderStats();
   checkTrophies();
 
-  setTimeout(() => {
+  endGameLater(() => {
     gameEl.classList.remove('show');
     gameIntro.hidden = true;
-    spriteEl.style.visibility = '';
-    game.active = false;
-    busy = false;
-    refreshHim(true);
   }, 2400);
 }

@@ -30,6 +30,8 @@ npm run build:single         # cheriotchi-autonome.html, à ouvrir sans serveur
 
 Pour changer l'équilibrage (vitesse de la faim, horaires de dodo…), tout est dans
 `RULES` en haut de `html/js/engine/sim.js` : le jeu **et** les notifications suivent.
+Les textes perso (mots du jour, dates spéciales, mots du calendrier de l'Avent) sont dans
+`html/js/00-config.js`.
 
 Les sauvegardes en ligne vont dans `data/` (une petite fiche JSON par code).
 
@@ -82,8 +84,9 @@ Avant chaque mise en ligne, `npm test` doit être tout vert.
 
 - **Contrôles du code** (`tools/check.js`) : erreurs de syntaxe, deux fonctions du même nom,
   élément de la page introuvable, image ou fichier manquant, identifiant en double.
-- **Tests** : règles du moteur, carrière, et 17 parcours dans un vrai navigateur (repas, alertes,
-  Grand Prix, nuit, absence, sauvegarde abîmée, rechargement, réglages…).
+- **Tests** : règles du moteur, carrière, et 26 parcours dans un vrai navigateur (repas, alertes,
+  Grand Prix, nuit, absence, sauvegarde abîmée, rechargement, réglages, les 8 mini-jeux,
+  pastilles, calendrier de l'Avent…).
 - **Test singe** : des centaines de tapes au hasard (jour, nuit, malade, boudeur, partie neuve) ;
   il échoue si une erreur apparaît, si une jauge devient « NaN » ou si le jeu reste bloqué.
 
@@ -93,6 +96,8 @@ Dans le jeu lui-même :
   (la boucle de vie et la garde-robe continuent).
 - **Chien de garde** : une action bloquée depuis 25 s se débloque toute seule, un mini-jeu
   oublié est fermé au bout de 6 min. Bouton « ✕ Quitter » pendant les mini-jeux.
+- **Mini-jeux séparés** : chaque partie a un numéro ; la fin d'une ancienne partie (quittée)
+  ne peut jamais couper la suivante.
 - **Sauvegarde protégée** : valeurs remises d'aplomb au chargement et à chaque écriture,
   écritures regroupées (≤ 1 par seconde), et si le téléphone est plein, les vieilles photos
   sont retirées pour garder la partie.

@@ -16,6 +16,17 @@ test('les compétences montent avec les activités, plafonnées par jour', () =>
   assert.ok(s.skillDay.day === '2026-11-15' && s.skills.endurance > C.DAILY_CAP, 'nouveau jour, nouvelle marge');
 });
 
+test('chaque mini-jeu entraîne au moins une compétence', () => {
+  for (const g of ['catch', 'memory', 'dance', 'race', 'guess', 'bugs', 'recipe', 'lights']) {
+    const s = C.ensure({});
+    const gains = C.train(s, 'game_' + g, 'd');
+    assert.ok(Object.values(gains).some((v) => v > 0), g);
+  }
+  const s = C.ensure({});
+  C.train(s, 'game_bugs', 'd'); C.train(s, 'game_recipe', 'd'); C.train(s, 'game_lights', 'd');
+  assert.ok(s.skills.code > 1.9 && s.skills.cuisine > 1.9 && s.skills.pilotage > 1.4);
+});
+
 test('progresser est plus dur en haut de l’échelle', () => {
   const lo = C.ensure({}), hi = C.ensure({ skills: { endurance: 90 } });
   const a = C.train(lo, 'runs', 'd').endurance, b = C.train(hi, 'runs', 'd').endurance;

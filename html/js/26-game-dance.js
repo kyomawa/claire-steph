@@ -8,12 +8,7 @@ const dance = { notes: [], start: 0, score: 0, beat: -1, raf: 0, combo: 0 };
 
 function startDance() {
   if (!canAct()) return;
-  busy = true;
-  game.active = true;
-  stopHim();
-  bubbleEl.classList.remove('show');
-  spriteEl.style.visibility = 'hidden';
-  afterCare();
+  beginGame();
   $('danceHim').src = A.himStand;
   $('danceHer').src = A.herStand;
   $('danceMsg').textContent = 'Tape quand le cercle touche le rond !';
@@ -137,13 +132,7 @@ function endDance() {
   renderStats();
   showDeltas(before);
   checkTrophies();
-  setTimeout(() => {
-    danceEl.hidden = true;
-    spriteEl.style.visibility = '';
-    game.active = false;
-    busy = false;
-    refreshHim(true);
-  }, 2300);
+  endGameLater(() => { danceEl.hidden = true; }, 2300);
 }
 
 $('pickMemory').addEventListener('click', () => { gamesModal.hidden = true; if (!canAct()) return toast('Attends la fin de sa visite 😍'); startMemory(); });

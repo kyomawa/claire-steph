@@ -13,7 +13,7 @@ function startDay() {
 
 function welcomeBack(hours, events) {
   const missed = (events || []).filter((e) => e.type === 'mistake').length;
-  if (missed) setTimeout(() => toast(`Pendant ton absence : ${missed} soin${missed > 1 ? 's' : ''} oublié${missed > 1 ? 's' : ''} 📋`), 1600);
+  if (missed && hours < 3) setTimeout(() => toast(`Pendant ton absence : ${missed} soin${missed > 1 ? 's' : ''} oublié${missed > 1 ? 's' : ''} 📋`), 1600);
   if (hours < 1) return;
   const h = Math.round(hours);
   const absent = h >= 24 ? `${Math.round(h / 24)} jour${h >= 48 ? 's' : ''}` : `${h} h`;
@@ -34,7 +34,7 @@ document.querySelectorAll('[data-ico]').forEach((img) => { img.src = A[img.datas
 loadState();
 const loadedPlayed = playedOf(state);
 requestPersist();
-const preAbsence = { state: JSON.parse(JSON.stringify(state)), from: state.lastSeen };
+const preAbsence = { state: JSON.parse(JSON.stringify(state)), from: state.lastSeen, gauges: snap() };
 const away = catchUp(state.lastSeen);
 handleSimEvents(away.events, true);
 lastPersonality = Sim.personality(state);

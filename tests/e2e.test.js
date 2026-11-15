@@ -174,6 +174,101 @@ const ok = (name) => { n++; console.log('✓', name); };
     assert.ok(!(await t.isVisible('#coachTip')), 'tutoriel passé : plus de bulle');
     ok('réglages conservés');
 
+    // nouveaux mini-jeux : partie complète, record et compétence entraînée
+    const g = await open('?heure=15', { ...STATE, tutorial: 'done' });
+    await idle(g);
+    await g.click('#btnGame');
+    assert.strictEqual(await g.locator('.g-card.is-new').count(), 3, 'trois jeux marqués « nouveau »');
+    await g.click('#pickBugs');
+    await g.waitForTimeout(1500);
+    await g.evaluate(() => { const c = bugHunt.cells[4]; c.kind = BUG_KINDS[0]; c.until = performance.now() + 5000; c.b.classList.add('up'); });
+    await g.click('#bugsGrid .bug-cell >> nth=4');
+    assert.strictEqual(await g.evaluate(() => bugHunt.score), 1, 'un bug écrasé = 1 point');
+    await g.evaluate(() => { bugHunt.end = performance.now(); });
+    await g.waitForFunction(() => !game.active && !busy, null, { timeout: 10000 });
+    assert.deepStrictEqual(await g.evaluate(() => [state.bestBugs, bugsEl.hidden, state.skills.code > 0]), [1, true, true]);
+    ok('mini-jeu Chasse aux bugs');
+
+    await g.click('#btnGame');
+    await g.click('#pickRecipe');
+    await g.waitForFunction(() => cook.phase === 'play', null, { timeout: 10000 });
+    await g.evaluate(() => cook.seq.forEach((k) => pressPad(k)));
+    await g.waitForFunction(() => cook.phase === 'play' && cook.round === 2, null, { timeout: 10000 });
+    await g.evaluate(() => pressPad((cook.seq[0] + 1) % 4));
+    await g.waitForFunction(() => !game.active && !busy, null, { timeout: 10000 });
+    assert.deepStrictEqual(await g.evaluate(() => [state.bestRecipe, state.skills.cuisine > 0]), [1, true]);
+    ok('mini-jeu Recette à deux');
+
+    await g.click('#btnGame');
+    await g.click('#pickLights');
+    for (let i = 0; i < 3; i++) {
+      await g.waitForFunction(() => reflex.phase === 'arm', null, { timeout: 10000 });
+      if (i === 1) { await g.mouse.click(200, 300); continue; }       // faux départ
+      await g.evaluate(() => { reflexStop(); reflex.phase = 'go'; reflex.t0 = performance.now() - 300; });
+      await g.mouse.click(200, 300);
+    }
+    await g.waitForFunction(() => !game.active && !busy, null, { timeout: 10000 });
+    const lt = await g.evaluate(() => [reflex.times[1], state.bestLights, state.skills.pilotage > 0]);
+    assert.strictEqual(lt[0], null, 'faux départ compté');
+    assert.ok(lt[1] >= 300 && lt[1] < 400 && lt[2], 'meilleur temps enregistré');
+    ok('mini-jeu Feux de départ');
+
+    // quitter un nouveau mini-jeu : rien ne reste en route
+    await g.click('#btnGame');
+    await g.click('#pickBugs');
+    await g.waitForTimeout(600);
+    await g.click('#quitGame');
+    await g.waitForTimeout(300);
+    assert.deepStrictEqual(await g.evaluate(() => [game.active, busy, bugsEl.hidden, bugHunt.over]), [false, false, true, true]);
+    ok('quitter un nouveau mini-jeu');
+
+    // un minuteur de fin d'une partie quittée ne coupe pas la partie suivante
+    await g.evaluate(() => { endGameLater(() => {}, 400); quitGame(); });
+    await g.click('#btnGame');
+    await g.click('#pickRecipe');
+    await g.waitForTimeout(700);
+    assert.deepStrictEqual(await g.evaluate(() => [game.active, recipeEl.hidden]), [true, false]);
+    await g.click('#quitGame');
+    ok('parties bien séparées');
+
+    // pastilles : le bouton utile s'allume
+    await g.evaluate(() => { state.hunger = 20; state.poops = [30]; state.alerts = { sick: { since: Date.now(), counted: false } }; state.sick = true; renderStats(); });
+    assert.deepStrictEqual(await g.evaluate(() => ['btnCoffee', 'btnWash', 'btnHeal'].map((id) => [$(id).classList.contains('need'), $(id).classList.contains('need-urgent')])), [[true, false], [true, false], [true, true]]);
+    await g.evaluate(() => { state.hunger = 80; state.poops = []; state.alerts = {}; state.sick = false; renderStats(); });
+    assert.strictEqual(await g.locator('.buttons .btn.need').count(), 0);
+    ok('pastilles sur les boutons');
+
+    // explications du HUD
+    await g.click('#hudLevel');
+    assert.ok((await g.textContent('#hudTip')).includes('XP pour le niveau'));
+    await g.click('#hudStreak');
+    assert.ok((await g.textContent('#hudTip')).includes('Demain'));
+    ok('explications du HUD');
+
+    // résumé d'absence (plus de 3 h)
+    const aw = await open('?heure=15', { ...STATE, tutorial: 'done', hunger: 40, lastSeen: Date.now() - 6 * 3600e3 });
+    await aw.waitForTimeout(900);
+    assert.ok(await aw.isVisible('#awayModal'), 'résumé affiché');
+    assert.ok((await aw.textContent('#awayTitle')).includes('6 h'));
+    assert.ok((await aw.textContent('#awayBody')).includes('Faim'));
+    ok('résumé d’absence');
+
+    // calendrier de l'Avent : seulement en décembre, une case par jour
+    const nov = await open('?heure=15&date=11-20', STATE);
+    assert.ok(!(await nov.isVisible('#btnAdvent')), 'pas de calendrier en novembre');
+    const adv = await open('?heure=15&date=12-03', STATE);
+    assert.ok(await adv.isVisible('#btnAdvent'));
+    await adv.click('#btnAdvent');
+    const before = await adv.evaluate(() => state.tokens || 0);
+    await adv.click('#adventGrid .advent-door >> nth=0');
+    assert.strictEqual(await adv.evaluate(() => state.tokens || 0), before + 10);
+    assert.deepStrictEqual(await adv.evaluate(() => [document.querySelectorAll('.advent-door.ready').length, document.querySelectorAll('.advent-door.locked').length, $('adventReveal').hidden]), [2, 21, false]);
+    await adv.evaluate(() => saveNow());
+    await adv.reload();
+    await adv.waitForTimeout(900);
+    assert.ok(await adv.evaluate(() => !!adventOpened()[1] && !canOpenDoor(1) && canOpenDoor(3) && !canOpenDoor(4)));
+    ok('calendrier de l’Avent');
+
     assert.deepStrictEqual(errors, [], 'aucune erreur JavaScript');
     ok('aucune erreur JavaScript');
     console.log(`\n${n} tests de bout en bout OK`);

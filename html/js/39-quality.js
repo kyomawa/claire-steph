@@ -59,10 +59,56 @@ function saveWithRoom(key, value) {
   }
 }
 
+// ---- Socle commun des mini-jeux ----
+// Chaque partie a un numéro : un minuteur de fin d'une ancienne partie
+// (quittée, ou remplacée par une nouvelle) ne touche jamais la partie en cours.
+const MINI = [];                       // jeux ajoutés plus tard : { el, stop }
+function registerMini(def) { MINI.push(def); }
+function beginGame() {
+  busy = true;
+  game.active = true;
+  game.session = (game.session || 0) + 1;
+  stopHim();
+  bubbleEl.classList.remove('show');
+  spriteEl.style.visibility = 'hidden';
+  afterCare();
+  return game.session;
+}
+function endGameLater(hide, ms, then) {
+  const session = game.session;
+  setTimeout(() => {
+    if (game.session !== session || !game.active) return;
+    try { hide(); } catch (e) { logError('fin de mini-jeu : ' + e.message); }
+    spriteEl.style.visibility = '';
+    game.active = false;
+    busy = false;
+    refreshHim(true);
+    if (then) then();
+  }, ms);
+}
+// récompenses communes : jauges, compétences, personnalité, XP, jetons
+function rewardGame(o) {
+  const before = snap();
+  for (const k of ['hunger', 'energy', 'happy', 'love']) if (o[k]) state[k] = clamp(state[k] + o[k]);
+  state.counters.games++;
+  sfx.level();
+  const mult = playMult(o.id);
+  trainFor(o.activity, mult);
+  if (o.pers) act(o.pers, o.persPts || 2);
+  gainXp(Math.round((4 + o.stars * 3) * mult));
+  earn(Math.round(o.stars * 4 * mult) + geekBonus(), o.label);
+  updateConditions(true);
+  renderStats();
+  showDeltas(before);
+  checkTrophies();
+}
+
 // ---- Quitter un mini-jeu (sans récompense) ----
 function quitGame() {
   if (!game.active) return;
+  game.session = (game.session || 0) + 1;
   game.running = false;
+  for (const g of MINI) { try { g.stop(); } catch (e) { /* ignoré */ } g.el.hidden = true; }
   if (Array.isArray(game.items)) { game.items.forEach((it) => it.el && it.el.remove()); game.items = []; }
   gameEl.classList.remove('show');
   gameIntro.hidden = true;

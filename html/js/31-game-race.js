@@ -8,12 +8,7 @@ const race = { on: false };
 
 function startRace() {
   if (!canAct()) return;
-  busy = true;
-  game.active = true;
-  stopHim();
-  bubbleEl.classList.remove('show');
-  spriteEl.style.visibility = 'hidden';
-  afterCare();
+  beginGame();
   raceEl.hidden = false;
   const dpr = window.devicePixelRatio || 1;
   const W = screenEl.clientWidth, H = screenEl.clientHeight;
@@ -199,14 +194,10 @@ function endRace() {
   renderStats();
   showDeltas(before);
   checkTrophies();
-  setTimeout(() => {
+  endGameLater(() => {
     race.on = false;
     cancelAnimationFrame(race.raf);
     raceEl.hidden = true;
-    spriteEl.style.visibility = '';
-    game.active = false;
-    busy = false;
-    refreshHim(true);
   }, 2400);
 }
 $('pickRace').addEventListener('click', () => { gamesModal.hidden = true; if (!canAct()) return toast('Attends la fin de sa visite 😍'); startRace(); });

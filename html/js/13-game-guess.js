@@ -11,6 +11,7 @@ $('btnGame').addEventListener('click', () => {
   $('bestMemoryTxt').textContent = state.bestMemory ? `Record : ${state.bestMemory} coups` : 'Pas encore joué';
   $('bestDanceTxt').textContent = `Record : ${state.bestDance} pts`;
   $('bestRaceTxt').textContent = `Record : ${state.bestRace || 0} pts`;
+  if (typeof renderGamesMeta === 'function') renderGamesMeta();
   gamesModal.hidden = false;
 });
 $('gamesClose').addEventListener('click', () => { gamesModal.hidden = true; });
@@ -24,12 +25,7 @@ const guess = { round: 0, wins: 0, locked: false };
 
 function startGuessGame() {
   if (!canAct()) return;
-  busy = true;
-  game.active = true;
-  stopHim();
-  bubbleEl.classList.remove('show');
-  spriteEl.style.visibility = 'hidden';
-  afterCare();
+  beginGame();
   guess.round = 0;
   guess.wins = 0;
   guessEl.hidden = false;
@@ -89,11 +85,5 @@ function endGuessGame() {
   updateConditions(true);
   renderStats();
   checkTrophies();
-  setTimeout(() => {
-    guessEl.hidden = true;
-    spriteEl.style.visibility = '';
-    game.active = false;
-    busy = false;
-    refreshHim(true);
-  }, 2200);
+  endGameLater(() => { guessEl.hidden = true; }, 2200);
 }

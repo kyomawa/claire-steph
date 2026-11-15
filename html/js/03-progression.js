@@ -56,7 +56,11 @@ const TROPHIES = [
   { id: 'lemans', e: '🌙', t: 'Vainqueur au Mans', d: 'Gagner le Grand Prix du Mans', ok: (s) => s.career && (s.career.winsAt.lemans || 0) >= 1 },
   { id: 'story', e: '📖', t: 'Le rêve réalisé', d: 'Finir l’histoire « Le rêve du Mans »', ok: (s) => !!(s.career && s.career.chapters.c7) },
   { id: 'week_s', e: '📈', t: 'Semaine parfaite', d: 'Obtenir S au bilan de la semaine', ok: (s) => s.bestGrade === 'S' },
-  { id: 'memories_10', e: '📖', t: 'Album souvenir', d: '10 souvenirs dans le carnet', ok: (s) => s.journal.length >= 10 }
+  { id: 'memories_10', e: '📖', t: 'Album souvenir', d: '10 souvenirs dans le carnet', ok: (s) => s.journal.length >= 10 },
+  { id: 'bugs_22', e: '🐞', t: 'Débuggeur fou', d: '22 points à la Chasse aux bugs', ok: (s) => (s.bestBugs || 0) >= 22 },
+  { id: 'recipe_6', e: '👨‍🍳', t: 'Chef étoilé', d: '6 plats réussis à la Recette à deux', ok: (s) => (s.bestRecipe || 0) >= 6 },
+  { id: 'lights_300', e: '🚦', t: 'Réflexes de pilote', d: 'Moins de 0,30 s aux Feux de départ', ok: (s) => s.bestLights > 0 && s.bestLights < 300 },
+  { id: 'advent_24', e: '🎄', t: 'Esprit de Noël', d: 'Ouvrir les 24 cases du calendrier de l’Avent', ok: (s) => Object.keys((s.advent || {})[String(now().getFullYear())] || {}).length >= 24 }
 ];
 
 function unlock(id) {

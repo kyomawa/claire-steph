@@ -21,6 +21,7 @@ function renderStats() {
 
   $('btnHeal').classList.toggle('alert', state.sick);
   if (typeof renderLife === 'function') renderLife();
+  if (typeof renderNeeds === 'function') renderNeeds();
 
   const lvl = levelFor(state.xp);
   const lo = xpFloor(lvl), hi = xpFloor(lvl + 1);

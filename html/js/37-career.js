@@ -72,17 +72,11 @@ function endGP() {
   renderStats();
   showDeltas(before);
   checkTrophies();
-  setTimeout(() => {
+  endGameLater(() => {
     race.on = false;
     cancelAnimationFrame(race.raf);
     raceEl.hidden = true;
-    spriteEl.style.visibility = '';
-    game.active = false;
-    busy = false;
-    refreshHim(true);
-    openCareer();
-    checkChapters();
-  }, 2600);
+  }, 2600, () => { openCareer(); checkChapters(); });
 }
 
 // ---- Fenêtre carrière ----

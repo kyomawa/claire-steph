@@ -9,12 +9,7 @@ function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.fl
 
 function startMemory() {
   if (!canAct()) return;
-  busy = true;
-  game.active = true;
-  stopHim();
-  bubbleEl.classList.remove('show');
-  spriteEl.style.visibility = 'hidden';
-  afterCare();
+  beginGame();
   const icons = shuffle(MEM_ICONS.filter((k) => A[k]).slice()).slice(0, 6);
   mem.cards = shuffle([...icons, ...icons].map((k) => ({ k, done: false })));
   mem.open = [];
@@ -86,11 +81,5 @@ function endMemory() {
   renderStats();
   showDeltas(before);
   checkTrophies();
-  setTimeout(() => {
-    memEl.hidden = true;
-    spriteEl.style.visibility = '';
-    game.active = false;
-    busy = false;
-    refreshHim(true);
-  }, 2200);
+  endGameLater(() => { memEl.hidden = true; }, 2200);
 }
