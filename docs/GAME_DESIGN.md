@@ -161,7 +161,12 @@ première victoire, Monaco, victoire au Mans…), chacun avec un petit texte et 
   Les joueurs qui ont déjà nourri et câliné ne la voient pas.
 - **Réglages** (⚙️) : sons, vibrations, animations réduites. Conservés d'une fois sur l'autre.
 - **Mini-jeux** : « ✕ Quitter » à tout moment, sans récompense ni pénalité.
-- **Pendant une visite** : toucher un bouton affiche « Attends la fin de sa visite » au lieu de ne rien faire.
+- **Ses visites, discrètes** : elle passe d'elle-même environ toutes les 6 à 10 minutes (réglable dans ⚙️ :
+  souvent 2–4 min, de temps en temps 6–10 min, rarement 15–25 min, ou seulement pour apporter un mot doux),
+  un peu moins souvent si la complicité est basse, et **seulement si on ne touche à rien depuis 15 s**.
+  À l'ouverture du jeu, elle ne vient que si elle a quelque chose à dire (mot du jour, jour de fête, mot doux)
+  ou après 2 h sans visite. Une visite dure environ 5 s ; elle fait parfois une petite activité (3 fois sur 10).
+- **Pendant une visite** : toucher un bouton la fait partir aussitôt (😘) et le bouton fait son effet.
 - **Fenêtres** : une seule apparition automatique à la fois ; retour / Échap ferme la fenêtre du dessus.
 - **La phrase du moment** (sous le titre) : une seule phrase dit ce qu'il vit et ce qu'il lui faut,
   dans cet ordre de priorité : malade → il dort (lumière ?) → appel urgent (« Il a faim depuis 12 min ») →

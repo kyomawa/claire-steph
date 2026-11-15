@@ -1951,3 +1951,5 @@ body { background: transparent; }
 .palm-sub { font-size: 11px; color: var(--gulf-blue-deep); font-weight: 700; min-height: 13px; }
 .seasons-list { margin: 0; padding-left: 18px; color: var(--navy); font-size: 13px; line-height: 1.6; }
 .sk-how { font-size: 11px; color: var(--gulf-blue-deep); font-weight: 700; margin: -4px 0 4px; }
+.pref-select { justify-content: space-between; flex-wrap: wrap; gap: 6px; }
+.pref-select select { font-family: inherit; font-weight: 700; font-size: 13px; color: var(--navy); border: 2px solid var(--navy); border-radius: 10px; padding: 4px 8px; background: #fff; }

@@ -311,7 +311,7 @@
         </ul>
         <h3 class="help-h">💑 Ensemble</h3>
         <ul class="help-list">
-          <li><span>💌</span><div><b>Tape-la quand elle passe</b> : bisou envoyé</div></li>
+          <li><span>💌</span><div><b>Elle passe de temps en temps</b> : tape-la pour un bisou. Touche un bouton et elle te laisse jouer (fréquence dans ⚙️)</div></li>
           <li><span>💑</span><div><b>À deux</b> : moments à deux, et <b>mots doux</b> qui arrivent sur l'autre téléphone relié</div></li>
           <li><span>📸</span><div><b>Photo souvenir</b> de la scène, rangée dans le carnet</div></li>
           <li><span>🎾</span><div><b>Lance le ballon</b> à son compagnon : il le rapporte</div></li>
@@ -350,6 +350,7 @@
         </ul>
         <h3 class="help-h">✨ Récemment</h3>
         <ul class="help-list">
+          <li><span>💕</span><div><b>Ses visites sont plus discrètes</b> : jamais pendant que tu joues, et touche un bouton pour qu'elle te laisse faire (réglable dans ⚙️)</div></li>
           <li><span>📝</span><div><b>La phrase sous le titre</b> dit ce qu'il vit et ce qu'il lui faut</div></li>
           <li><span>👆</span><div><b>Reste appuyé sur un bouton</b> pour savoir ce qu'il fait ; touche une jauge pour la comprendre</div></li>
           <li><span>🐛</span><div><b>3 nouveaux mini-jeux</b>, et dès le 1er décembre <b>un calendrier de l'Avent</b> 🎄</div></li>
@@ -538,6 +539,14 @@
           <label class="pref"><input type="checkbox" id="prefSound"> 🔊 Sons</label>
           <label class="pref"><input type="checkbox" id="prefVibrate"> 📳 Vibrations</label>
           <label class="pref"><input type="checkbox" id="prefMotion"> 🐢 Animations réduites</label>
+          <label class="pref pref-select">💕 Ses visites
+            <select id="prefVisits">
+              <option value="souvent">Souvent</option>
+              <option value="normal">De temps en temps</option>
+              <option value="rare">Rarement</option>
+              <option value="jamais">Seulement pour un mot doux</option>
+            </select>
+          </label>
         </div>
         <p class="tip">📱 Astuce : ajoute le jeu à l'écran d'accueil (Partager → « Sur l'écran d'accueil »). Évite la navigation privée, qui efface tout.</p>
         <details class="manual">

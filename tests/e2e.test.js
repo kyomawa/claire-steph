@@ -361,6 +361,31 @@ const ok = (name) => { n++; console.log('✓', name); };
     assert.deepStrictEqual(await se.evaluate(() => [state.career.seasons.length, state.career.seasons[0].pos, state.career.season.races, !!state.trophies.champion]), [1, 1, 0, true]);
     ok('fin de championnat');
 
+    // ses visites : rares, jamais pendant qu'on joue, et écourtées dès qu'on touche un bouton
+    {
+      const d = new Date();
+      const dk = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const vctx = await browser.newContext({ viewport: { width: 400, height: 1000 } });
+      await vctx.addInitScript('window.__noHelp = true;');
+      await vctx.addInitScript(`if(!sessionStorage.x){sessionStorage.x=1;localStorage.setItem('cheriotchi_state', ${JSON.stringify(JSON.stringify({ ...STATE, lastVisitDay: dk, tutorial: 'done', lastVisitAt: Date.now() }))})}`);
+      const v = await vctx.newPage();
+      v.on('pageerror', (e) => errors.push(e.message));
+      await v.goto(base + '?heure=15');
+      await v.waitForTimeout(3200);
+      assert.strictEqual(await v.evaluate(() => girlBusy), false, 'pas de visite d’accueil : elle vient de passer');
+      assert.ok(await v.evaluate(() => nextVisitAt - Date.now() > 5 * 60000), 'prochaine visite dans plusieurs minutes');
+      await v.evaluate(() => { nextVisitAt = 0; lastTouchAt = Date.now(); });
+      await v.waitForTimeout(4500);
+      assert.strictEqual(await v.evaluate(() => girlBusy), false, 'pas de visite pendant qu’on joue');
+      await v.evaluate(() => { lastTouchAt = Date.now() - 20000; });
+      await v.waitForFunction(() => girlBusy && !!visit, null, { timeout: 8000 });
+      await v.click('#btnCoffee');
+      await v.waitForFunction(() => !$('food').hidden, null, { timeout: 3000 });
+      assert.deepStrictEqual(await v.evaluate(() => [girlBusy, busy, spriteHerEl.classList.contains('visible')]), [false, false, false]);
+      await vctx.close();
+      ok('ses visites : rares et écourtables');
+    }
+
     assert.deepStrictEqual(errors, [], 'aucune erreur JavaScript');
     ok('aucune erreur JavaScript');
     console.log(`\n${n} tests de bout en bout OK`);

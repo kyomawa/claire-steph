@@ -138,6 +138,7 @@ setInterval(guard(() => {
     hugVisual.classList.remove('show');
     spriteHerEl.classList.remove('visible');
     spriteEl.style.visibility = '';
+    if (typeof visit !== 'undefined') visit = null;
     busy = false;
     girlBusy = false;
     busySince = 0;
@@ -238,7 +239,9 @@ function applyPrefs() {
   $('prefVibrate').checked = state.vibrate !== false;
   $('prefMotion').checked = !!state.reduceMotion;
   $('prefSound').checked = state.sound !== false;
+  $('prefVisits').value = state.visitFreq in VISIT_EVERY ? state.visitFreq : 'normal';
 }
+$('prefVisits').addEventListener('change', (e) => { state.visitFreq = e.target.value; planNextVisit(); saveState(); });
 $('prefVibrate').addEventListener('change', (e) => { state.vibrate = e.target.checked; if (state.vibrate) buzz(30); saveState(); });
 $('prefMotion').addEventListener('change', (e) => { state.reduceMotion = e.target.checked; applyPrefs(); saveState(); });
 $('prefSound').addEventListener('change', (e) => { state.sound = e.target.checked; renderSoundBtn(); saveState(); });
