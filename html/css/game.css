@@ -1903,3 +1903,51 @@ body { background: transparent; }
 /* le bouton désigné par la phrase du moment clignote */
 .flash-hint { animation: hintFlash 0.55s var(--ease-in-out, ease-in-out) 3 !important; }
 @keyframes hintFlash { 0%, 100% { box-shadow: 0 0 0 0 rgba(242, 106, 33, 0), 0 3px 0 var(--navy); } 50% { box-shadow: 0 0 0 6px rgba(242, 106, 33, 0.65), 0 3px 0 var(--navy); } }
+
+/* ---- Carrière de pilote : onglets, pneus, résultat, garage, classement ---- */
+.career-tabs { gap: 4px; padding: 0 12px 10px; }
+.career-tabs .tab { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 1px 3px; font-size: 10.5px; line-height: 1.15; white-space: nowrap; }
+.career-tabs .t-ico { font-size: 16px; line-height: 1.1; }
+.gp-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.gp-chip { font-size: 11.5px; font-weight: 800; color: var(--navy); background: #fff; border: 1.5px solid var(--navy); border-radius: 10px; padding: 1px 8px; }
+.gp-chip.wet { background: #DDEFFB; border-color: #2F6FA8; color: #1D4F7A; }
+.gp-chip.dry { background: #FFF6E0; border-color: #C98A12; color: #7A520A; }
+.gp-sub { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: var(--navy); margin-top: 4px; }
+.gp-help.small { font-size: 11.5px; }
+.tire-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.tire { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 7px 4px 5px; background: #fff; border: 2px solid var(--navy); border-radius: 12px; box-shadow: 0 3px 0 var(--navy); font-family: inherit; color: var(--navy); cursor: pointer; }
+.tire.on { background: #FFF1E6; border-color: var(--gulf-orange); box-shadow: 0 3px 0 var(--gulf-orange); }
+.tire-ico { font-size: 18px; line-height: 1; }
+.tire-name { font-weight: 800; font-size: 12px; }
+.tire-fx { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; }
+.tire-tag { position: absolute; top: -8px; right: -4px; background: #2F855A; color: #fff; font-size: 9px; font-weight: 800; padding: 0 5px; border-radius: 7px; border: 1.5px solid var(--navy); }
+.gp-detail { background: #fff; border-radius: 10px; padding: 2px 10px; }
+.gp-detail td { padding: 3px 0; }
+.gp-detail td.neg { color: #C2410C; }
+.rival-line { font-weight: 800; color: var(--navy); background: #FFF6EE; border: 2px solid var(--gulf-orange); border-radius: 12px; padding: 7px 10px; font-size: 13px; margin-bottom: 8px; }
+.gp-explain { font-size: 11.5px; color: var(--gulf-blue-deep); font-weight: 700; margin: 0; }
+.garage-car { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-bottom: 10px; }
+.garage-canvas { border-radius: 12px; border: 2.5px solid var(--navy); box-shadow: 0 3px 0 var(--navy); max-width: 100%; }
+.garage-bonus { font-weight: 800; color: var(--navy); font-size: 13px; }
+.part { display: flex; align-items: center; gap: 10px; border: 2px solid var(--navy); border-radius: 12px; padding: 8px 10px; margin-bottom: 8px; background: #fff; }
+.part-ico { font-size: 22px; width: 28px; text-align: center; }
+.part-mid { flex: 1; min-width: 0; }
+.part-name { font-weight: 800; color: var(--navy); font-size: 13.5px; }
+.part-dots { color: var(--gulf-orange); letter-spacing: 2px; font-size: 13px; line-height: 1.2; }
+.part-desc { font-size: 11.5px; color: var(--gulf-blue-deep); font-weight: 700; line-height: 1.3; }
+.btn.part-buy { grid-column: auto; flex-direction: row; padding: 6px 10px; font-size: 12.5px; white-space: nowrap; min-width: 64px; }
+.btn.part-buy:disabled { opacity: 0.55; cursor: default; }
+.standings { width: 100%; border-collapse: collapse; font-size: 13px; color: var(--navy); }
+.standings td { padding: 4px 6px; border-bottom: 1px solid #E3EDF2; }
+.standings td.pos { width: 30px; text-align: center; font-weight: 800; }
+.standings td.pts { text-align: right; font-family: 'Space Mono', monospace; font-weight: 700; }
+.standings tr.me td { background: #FFF1E6; font-weight: 800; }
+.palmares { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.palm { border: 2px solid var(--navy); border-radius: 12px; padding: 6px 8px; background: #fff; color: var(--navy); }
+.palm.none { border-style: dashed; opacity: 0.7; }
+.palm-flag { font-size: 18px; line-height: 1; }
+.palm-name { font-weight: 800; font-size: 12.5px; }
+.palm-best { font-weight: 800; font-size: 13px; }
+.palm-sub { font-size: 11px; color: var(--gulf-blue-deep); font-weight: 700; min-height: 13px; }
+.seasons-list { margin: 0; padding-left: 18px; color: var(--navy); font-size: 13px; line-height: 1.6; }
+.sk-how { font-size: 11px; color: var(--gulf-blue-deep); font-weight: 700; margin: -4px 0 4px; }

@@ -40,15 +40,37 @@
     notes: { charme: 1 }
   };
 
+  // Chaque circuit a son caractère : poids des compétences (somme 0,85), pièce de la voiture
+  // qui compte le plus, risque de pluie (%), vitesse de la course, ambiance
   const CIRCUITS = [
-    { id: 'lemans', name: 'Le Mans', flag: '🇫🇷', icon: '🏁' },
-    { id: 'monaco', name: 'Monaco', flag: '🇲🇨', icon: '🏎️' },
-    { id: 'spa', name: 'Spa-Francorchamps', flag: '🇧🇪', icon: '🌲' },
-    { id: 'silverstone', name: 'Silverstone', flag: '🇬🇧', icon: '☔' },
-    { id: 'monza', name: 'Monza', flag: '🇮🇹', icon: '🍕' },
-    { id: 'suzuka', name: 'Suzuka', flag: '🇯🇵', icon: '🗾' },
-    { id: 'daytona', name: 'Daytona', flag: '🇺🇸', icon: '🌴' }
+    { id: 'lemans', name: 'Le Mans', flag: '🇫🇷', icon: '🏁', trait: 'Course de nuit : l’endurance compte double', w: { pilotage: 0.35, endurance: 0.4, charme: 0.1 }, part: 'fiabilite', rain: 25, speed: 1, night: true },
+    { id: 'monaco', name: 'Monaco', flag: '🇲🇨', icon: '🏎️', trait: 'Rues étroites entre les murs : le pilotage avant tout', w: { pilotage: 0.6, endurance: 0.15, charme: 0.1 }, part: 'pneus', rain: 15, speed: 0.92, walls: true },
+    { id: 'spa', name: 'Spa-Francorchamps', flag: '🇧🇪', icon: '🌲', trait: 'Météo capricieuse : la pluie arrive souvent', w: { pilotage: 0.45, endurance: 0.3, charme: 0.1 }, part: 'aero', rain: 50, speed: 1.08 },
+    { id: 'silverstone', name: 'Silverstone', flag: '🇬🇧', icon: '🏰', trait: 'Rapide, et souvent mouillé', w: { pilotage: 0.45, endurance: 0.3, charme: 0.1 }, part: 'aero', rain: 40, speed: 1.05 },
+    { id: 'monza', name: 'Monza', flag: '🇮🇹', icon: '🍕', trait: 'Le temple de la vitesse : le moteur fait tout', w: { pilotage: 0.4, endurance: 0.25, charme: 0.2 }, part: 'moteur', rain: 15, speed: 1.2 },
+    { id: 'suzuka', name: 'Suzuka', flag: '🇯🇵', icon: '🗾', trait: 'Technique : la piste est pleine d’obstacles', w: { pilotage: 0.55, endurance: 0.2, charme: 0.1 }, part: 'pneus', rain: 25, speed: 1, busy: true },
+    { id: 'daytona', name: 'Daytona', flag: '🇺🇸', icon: '🌴', trait: 'Ovale à fond : moteur et aspiration', w: { pilotage: 0.35, endurance: 0.3, charme: 0.2 }, part: 'moteur', rain: 10, speed: 1.15 }
   ];
+  const DEFAULT_W = { pilotage: 0.45, endurance: 0.25, charme: 0.1 };
+
+  // ---- La voiture (garage) ----
+  const PARTS = {
+    moteur: { name: 'Moteur', icon: '🔧', desc: 'Plus de vitesse en ligne droite' },
+    pneus: { name: 'Pneus', icon: '⚫', desc: 'Plus d’adhérence dans les virages' },
+    aero: { name: 'Aileron', icon: '🌬️', desc: 'Plus d’appui dans les courbes rapides' },
+    fiabilite: { name: 'Fiabilité', icon: '🔩', desc: 'Tient la distance sur les longues courses' }
+  };
+  const PART_COSTS = [30, 60, 100, 150, 220];   // prix des niveaux 1 → 5
+  const PART_MAX = PART_COSTS.length;
+
+  // ---- Pneus (choisis avant chaque Grand Prix) ----
+  const TIRES = {
+    tendres: { name: 'Tendres', icon: '🔴', dry: 6, wet: -10, speed: 1.12, desc: 'Les plus rapides sur le sec (la course va plus vite)' },
+    durs: { name: 'Durs', icon: '⚪', dry: 2, wet: -6, speed: 1, desc: 'Sûrs et réguliers' },
+    pluie: { name: 'Pluie', icon: '🔵', dry: -8, wet: 8, speed: 0.94, desc: 'Indispensables quand il pleut' }
+  };
+  const SEASON_REWARDS = [150, 100, 70, 40, 40, 40, 20, 20, 20, 20];
+
   const RIVALS = ['Vitesse Vincent', 'Turbo Tom', 'Nitro Nina', 'Drift Dylan', 'Max Pneus', 'Lola Lumière', 'Hugo Hybride', 'Ricky Ravito', 'Sam Slick'];
   const POINTS = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];
 
@@ -85,6 +107,10 @@
     if (!c.season) c.season = { month: null, points: 0, races: 0, wins: 0, podiums: 0 };
     if (!Array.isArray(c.seasons)) c.seasons = [];
     if (!c.chapters) c.chapters = {};
+    if (typeof c.rainWins !== 'number') c.rainWins = 0;
+    if (c.season.month && (!c.season.rivals || typeof c.season.rivals !== 'object')) c.season.rivals = rebuildRivals(c);
+    if (!s.car || typeof s.car !== 'object') s.car = {};
+    for (const k of Object.keys(PARTS)) if (typeof s.car[k] !== 'number' || !(s.car[k] >= 0)) s.car[k] = 0; else s.car[k] = clamp(Math.floor(s.car[k]), 0, PART_MAX);
     if (!s.history || typeof s.history !== 'object') s.history = {};
     return s;
   }
@@ -110,15 +136,47 @@
 
   function circuitOfDay(dayKey) { return CIRCUITS[((dayIndex(dayKey) % CIRCUITS.length) + CIRCUITS.length) % CIRCUITS.length]; }
 
-  // Performance du pilote : compétences + course jouée + forme du jour
-  function performance(skills, gameScore, energy, rnd) {
-    const r = rnd || Math.random;
-    let p = 0.45 * skills.pilotage + 0.25 * skills.endurance + 0.1 * skills.charme;
-    p += Math.min(45, gameScore * 1.5);
-    if (energy < 40) p -= 10;
-    p += (r() - 0.5) * 16;
-    return p;
+  // Bonus de la voiture : chaque niveau compte partout, la pièce clé du circuit compte en plus
+  function carBonus(car, circuit) {
+    if (!car) return 0;
+    const total = Object.keys(PARTS).reduce((a, k) => a + (car[k] || 0), 0);
+    const key = circuit && circuit.part ? (car[circuit.part] || 0) : 0;
+    return Math.round((total * 0.7 + key * 1.2) * 10) / 10;
   }
+  function tireBonus(tire, weather) { const t = TIRES[tire]; return t ? (weather === 'pluie' ? t.wet : t.dry) : 0; }
+  function bestTire(weather) { return weather === 'pluie' ? 'pluie' : 'tendres'; }
+  // Météo de la course : la même toute la journée, la pluie plus fréquente à Spa ou Silverstone
+  function gpWeather(dayKey, circuit) {
+    const h = ((dayIndex(dayKey) + 7) * 2654435761) >>> 0;
+    return h % 100 < ((circuit && circuit.rain) || 0) ? 'pluie' : 'sec';
+  }
+  function upgradeCost(level) { return level < PART_MAX ? PART_COSTS[level] : null; }
+  function upgrade(s, part) {
+    ensure(s);
+    if (!PARTS[part]) return null;
+    const lvl = s.car[part];
+    const cost = upgradeCost(lvl);
+    if (cost === null || (s.tokens || 0) < cost) return null;
+    s.tokens -= cost;
+    s.car[part] = lvl + 1;
+    return { part, level: lvl + 1, cost };
+  }
+
+  // Performance du pilote : compétences (selon le circuit) + course jouée + voiture + pneus + forme + chance
+  function performanceDetail(skills, gameScore, energy, rnd, o) {
+    const r = rnd || Math.random;
+    const w = (o && o.circuit && o.circuit.w) || DEFAULT_W;
+    const parts = {
+      skills: w.pilotage * skills.pilotage + w.endurance * skills.endurance + w.charme * skills.charme,
+      course: Math.min(45, gameScore * 1.5),
+      car: o ? carBonus(o.car, o.circuit) : 0,
+      tires: o ? tireBonus(o.tire, o.weather) : 0,
+      form: energy < 40 ? -10 : 0,
+      luck: (r() - 0.5) * 16
+    };
+    return { total: Object.values(parts).reduce((a, v) => a + v, 0), parts };
+  }
+  function performance(skills, gameScore, energy, rnd, o) { return performanceDetail(skills, gameScore, energy, rnd, o).total; }
 
   // Les rivaux progressent au fil du mois (manche n°1, 2, 3…)
   function rivals(round, rnd) {
@@ -132,32 +190,105 @@
     return { place, points: POINTS[place - 1] || 0, field };
   }
 
-  // Enregistre le résultat d'un Grand Prix et met à jour la saison
-  function recordGP(s, dayKey, circuit, place, points) {
+  // Petit générateur pseudo-aléatoire reproductible (pour reconstituer d'anciennes courses)
+  function seeded(seed) { let x = (Math.abs(Math.floor(seed)) % 2147483646) + 1; return () => { x = (x * 16807) % 2147483647; return (x - 1) / 2147483646; }; }
+  const zeroRivals = () => Object.fromEntries(RIVALS.map((n) => [n, 0]));
+  // Points des rivaux à une course : ils prennent les places que le pilote n'a pas prises
+  function addRivalPoints(rv, field, place, round, dayKey) {
+    if (Array.isArray(field)) {
+      field.forEach((d, i) => { if (!d.me) rv[d.name] = (rv[d.name] || 0) + (POINTS[i] || 0); });
+      return;
+    }
+    const order = rivals(round, seeded(dayIndex(dayKey))).sort((a, b) => b.perf - a.perf);
+    let pos = 1;
+    for (const d of order) {
+      if (pos === place) pos++;
+      rv[d.name] = (rv[d.name] || 0) + (POINTS[pos - 1] || 0);
+      pos++;
+    }
+  }
+  // Saison commencée avant le classement des rivaux : on rejoue ses courses
+  function rebuildRivals(c) {
+    const rv = zeroRivals();
+    Object.keys(c.gp || {}).filter((d) => d.startsWith(c.season.month)).sort()
+      .forEach((d, i) => addRivalPoints(rv, null, c.gp[d].place, i + 1, d));
+    return rv;
+  }
+  // Classement du championnat (à égalité, il passe devant)
+  function standings(s) {
     ensure(s);
     const c = s.career;
-    const month = dayKey.slice(0, 7);
-    let archived = null;
-    if (c.season.month && c.season.month !== month) {
-      archived = { ...c.season };
-      c.seasons.push(archived);
-      c.season = { month, points: 0, races: 0, wins: 0, podiums: 0 };
-    }
-    if (!c.season.month) c.season.month = month;
-    c.gp[dayKey] = { circuit: circuit.id, place, points };
-    c.races++; c.season.races++; c.season.points += points;
-    c.circuits[circuit.id] = (c.circuits[circuit.id] || 0) + 1;
-    if (place <= 3) { c.podiums++; c.season.podiums++; }
-    if (place === 1) { c.wins++; c.season.wins++; c.winsAt[circuit.id] = (c.winsAt[circuit.id] || 0) + 1; }
-    return archived;
+    const rv = c.season.rivals || zeroRivals();
+    const rows = RIVALS.map((name) => ({ name, pts: rv[name] || 0 }));
+    rows.push({ name: 'lui', pts: c.season.points, me: true });
+    return rows.sort((a, b) => b.pts - a.pts || (a.me ? -1 : (b.me ? 1 : 0)));
+  }
+  function myPosition(s) { return standings(s).findIndex((x) => x.me) + 1; }
+  // Le rival du moment : celui juste devant (ou le 2ᵉ s'il mène)
+  function rivalOf(s) {
+    const st = standings(s);
+    const i = st.findIndex((x) => x.me);
+    if (!s.career.season.races) return null;
+    if (i > 0) return { name: st[i - 1].name, gap: st[i - 1].pts - st[i].pts, ahead: true };
+    return { name: st[1].name, gap: st[0].pts - st[1].pts, ahead: false };
   }
 
-  // Titre de fin de saison selon les points du mois
+  // Titre de fin de saison selon la place au championnat
+  function seasonTitleFor(pos) {
+    if (pos === 1) return 'Champion du monde 🏆';
+    if (pos === 2) return 'Vice-champion 🥈';
+    if (pos === 3) return 'Podium du championnat 🥉';
+    if (pos <= 6) return 'Pilote confirmé 🏁';
+    return 'Saison d’apprentissage 🔰';
+  }
+  // (anciennes saisons, sans classement : selon les points)
   function seasonTitle(points) {
     if (points >= 300) return 'Champion du monde 🏆';
     if (points >= 180) return 'Vice-champion 🥈';
     if (points >= 90) return 'Pilote confirmé 🏁';
     return 'Saison d’apprentissage 🔰';
+  }
+  // Nouveau mois : la saison précédente est archivée avec sa place, son titre et sa récompense
+  function rollSeason(s, dayKey) {
+    ensure(s);
+    const c = s.career;
+    const month = dayKey.slice(0, 7);
+    if (!c.season.month || c.season.month === month) return null;
+    const st = standings(s);
+    const pos = st.findIndex((x) => x.me) + 1;
+    const archived = { month: c.season.month, points: c.season.points, races: c.season.races, wins: c.season.wins, podiums: c.season.podiums, pos, title: seasonTitleFor(pos), reward: c.season.races ? SEASON_REWARDS[pos - 1] : 0, top: st.slice(0, 3).map((x) => (x.me ? 'lui' : x.name)) };
+    c.seasons.push(archived);
+    if (c.seasons.length > 24) c.seasons.shift();
+    c.season = { month, points: 0, races: 0, wins: 0, podiums: 0, rivals: zeroRivals() };
+    return archived;
+  }
+
+  // Enregistre le résultat d'un Grand Prix et met à jour la saison
+  function recordGP(s, dayKey, circuit, place, points, field, o) {
+    ensure(s);
+    const c = s.career;
+    const archived = rollSeason(s, dayKey);
+    if (!c.season.month) c.season.month = dayKey.slice(0, 7);
+    if (!c.season.rivals) c.season.rivals = zeroRivals();
+    c.gp[dayKey] = { circuit: circuit.id, place, points };
+    if (o && o.weather) c.gp[dayKey].weather = o.weather;
+    c.races++; c.season.races++; c.season.points += points;
+    addRivalPoints(c.season.rivals, field, place, c.season.races, dayKey);
+    c.circuits[circuit.id] = (c.circuits[circuit.id] || 0) + 1;
+    if (place <= 3) { c.podiums++; c.season.podiums++; }
+    if (place === 1) {
+      c.wins++; c.season.wins++; c.winsAt[circuit.id] = (c.winsAt[circuit.id] || 0) + 1;
+      if (o && o.weather === 'pluie') c.rainWins++;
+    }
+    return archived;
+  }
+
+  // Palmarès : meilleur résultat sur chaque circuit
+  function palmares(s) {
+    ensure(s);
+    const best = {};
+    for (const g of Object.values(s.career.gp)) if (g && (!best[g.circuit] || g.place < best[g.circuit])) best[g.circuit] = g.place;
+    return CIRCUITS.map((ci) => ({ id: ci.id, name: ci.name, flag: ci.flag, best: best[ci.id] || null, races: s.career.circuits[ci.id] || 0, wins: s.career.winsAt[ci.id] || 0 }));
   }
 
   function nextChapters(s, level) {
@@ -200,5 +331,5 @@
   const STREAK_REWARDS = [5, 5, 10, 10, 15, 15, 40];
   function streakReward(streak) { return STREAK_REWARDS[(Math.max(1, streak) - 1) % 7]; }
 
-  return { SKILLS, TRAINING, DAILY_CAP, CIRCUITS, RIVALS, POINTS, CHAPTERS, STREAK_REWARDS, ensure, train, circuitOfDay, performance, rivals, classify, recordGP, seasonTitle, nextChapters, sample, weekReport, streakReward, dayIndex };
+  return { SKILLS, TRAINING, DAILY_CAP, CIRCUITS, RIVALS, POINTS, CHAPTERS, STREAK_REWARDS, PARTS, PART_COSTS, PART_MAX, TIRES, SEASON_REWARDS, ensure, train, circuitOfDay, performance, performanceDetail, carBonus, tireBonus, bestTire, gpWeather, upgradeCost, upgrade, rivals, classify, recordGP, rollSeason, standings, myPosition, rivalOf, seasonTitle, seasonTitleFor, palmares, nextChapters, sample, weekReport, streakReward, dayIndex };
 }));

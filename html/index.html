@@ -304,7 +304,7 @@
         <h3 class="help-h">🎮 Jouer et progresser</h3>
         <ul class="help-list">
           <li><span>🎮</span><div><b>Jouer</b> : 8 mini-jeux, chacun entraîne une compétence. Après 3 parties du même jeu dans la journée, les gains baissent</div></li>
-          <li><span>🏁</span><div><b>Touche son numéro de course</b> : sa carrière, le Grand Prix du jour, ses compétences et l'histoire</div></li>
+          <li><span>🏁</span><div><b>Touche son numéro de course</b> : sa carrière. Grand Prix du jour (météo, pneus), garage de la voiture, championnat contre 9 rivaux, compétences et histoire</div></li>
           <li><span>🎯</span><div><b>Défis du jour</b> en haut, et une <b>question du jour</b></div></li>
           <li><span>⛽</span><div><b>Jetons</b> : gagnés aux jeux et défis, à dépenser à la boutique</div></li>
           <li><span>ℹ️</span><div><b>Touche 🗓️ ⭐ 🔥 en haut</b> : l'explication et le prochain objectif</div></li>
@@ -340,20 +340,19 @@
         <button class="close" id="newsClose" aria-label="Fermer">✕</button>
       </div>
       <div class="tab-body">
-        <h3 class="help-h">🆕 Plus clair</h3>
+        <h3 class="help-h">🏁 Sa carrière de pilote</h3>
         <ul class="help-list">
-          <li><span>📝</span><div><b>Une phrase sous le titre</b> dit ce qu'il vit et ce qu'il lui faut. Touche-la : le bon bouton clignote</div></li>
-          <li><span>📊</span><div><b>Les jauges ont leur chiffre</b> ; touche-en une pour savoir ce qu'elle veut dire</div></li>
-          <li><span>👆</span><div><b>Reste appuyé sur un bouton</b> pour savoir ce qu'il fait ; grisé = pas possible pour l'instant</div></li>
-          <li><span>⚙️</span><div>Les <b>réglages</b> sont maintenant sous ⚙️ en haut à droite</div></li>
+          <li><span>🔧</span><div><b>Un garage</b> : améliore le moteur, les pneus, l'aileron et la fiabilité avec tes jetons. Ça se voit sur la voiture !</div></li>
+          <li><span>☔</span><div><b>Avant chaque Grand Prix</b> : la météo du jour et <b>le choix des pneus</b></div></li>
+          <li><span>🗺️</span><div><b>Chaque circuit a son caractère</b> : de nuit au Mans, entre les murs à Monaco, sous la pluie à Spa…</div></li>
+          <li><span>🏆</span><div><b>Un vrai championnat</b> contre 9 rivaux, un rival à battre, et une récompense à la fin du mois</div></li>
+          <li><span>📊</span><div>Après la course : <b>ce qui a compté</b> (ta course, ses compétences, sa voiture, tes pneus, la chance)</div></li>
         </ul>
-        <h3 class="help-h">✨ Et aussi</h3>
+        <h3 class="help-h">✨ Récemment</h3>
         <ul class="help-list">
-          <li><span>🐛</span><div><b>3 nouveaux mini-jeux</b> : Chasse aux bugs, Recette à deux et Feux de départ</div></li>
-          <li><span class="help-dot"></span><div><b>Les boutons s'allument</b> quand il a besoin de quelque chose</div></li>
-          <li><span>ℹ️</span><div><b>Touche 🗓️ ⭐ 🔥 en haut</b> pour savoir où tu en es</div></li>
-          <li><span>🕰️</span><div><b>Un résumé</b> de ce qui s'est passé pendant ton absence</div></li>
-          <li><span>🎄</span><div>Dès le 1er décembre : <b>un calendrier de l'Avent</b></div></li>
+          <li><span>📝</span><div><b>La phrase sous le titre</b> dit ce qu'il vit et ce qu'il lui faut</div></li>
+          <li><span>👆</span><div><b>Reste appuyé sur un bouton</b> pour savoir ce qu'il fait ; touche une jauge pour la comprendre</div></li>
+          <li><span>🐛</span><div><b>3 nouveaux mini-jeux</b>, et dès le 1er décembre <b>un calendrier de l'Avent</b> 🎄</div></li>
         </ul>
         <button class="btn wide-btn cloud-main" id="newsOk">Je découvre ! 🏁</button>
       </div>
@@ -428,6 +427,13 @@
       <div class="modal-head">
         <h2 id="careerTitle">🏁 Sa carrière</h2>
         <button class="close" id="careerClose" aria-label="Fermer">✕</button>
+      </div>
+      <div class="tabs career-tabs" role="tablist" id="careerTabs">
+        <button class="tab" role="tab" data-ctab="course" aria-selected="true"><span class="t-ico">🏁</span>Course</button>
+        <button class="tab" role="tab" data-ctab="garage" aria-selected="false"><span class="t-ico">🔧</span>Garage</button>
+        <button class="tab" role="tab" data-ctab="classement" aria-selected="false"><span class="t-ico">🏆</span>Classement</button>
+        <button class="tab" role="tab" data-ctab="pilote" aria-selected="false"><span class="t-ico">📊</span>Pilote</button>
+        <button class="tab" role="tab" data-ctab="histoire" aria-selected="false"><span class="t-ico">📖</span>Histoire</button>
       </div>
       <div class="tab-body" id="careerBody"></div>
     </div>

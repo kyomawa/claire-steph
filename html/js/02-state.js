@@ -21,6 +21,7 @@ function freshState() {
     album: {}, decor: 'auto', playedAt: 0, sound: true, seenHelp: false, lastAsk: null, daily: null,
     tutorial: null, vibrate: true, reduceMotion: false,
     bestBugs: 0, bestRecipe: 0, bestLights: 0, advent: {}, newsSeen: null,
+    car: { moteur: 0, pneus: 0, aero: 0, fiabilite: 0 },
     owned: {}, wear: { tete: null, yeux: null, visage: null, cou: null, dos: null, compagnon: null }
   };
 }

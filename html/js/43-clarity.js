@@ -160,7 +160,7 @@ function statusNow() {
   const h = now().getHours() + now().getMinutes() / 60;
   if (h >= 21 && h < Sim.RULES.bedtime) return { t: '🌙 Bientôt l’heure du dodo → 😴 Dodo', lvl: 'ok', btn: 'btnSleep' };
   const gp = gpStatus();
-  if (!gp.done && !gp.why) return { t: `🏁 GP de ${gp.circuit.name} ouvert → touche son n° ${$('raceNo').textContent}`, lvl: 'ok', btn: 'raceNo' };
+  if (!gp.done && !gp.why) return { t: `🏁 GP de ${gp.circuit.name}${gp.weather === 'pluie' ? ' (☔)' : ''} ouvert → touche son n° ${$('raceNo').textContent}`, lvl: 'ok', btn: 'raceNo' };
   if (state.daily && !state.daily.all) {
     const d = state.daily.picks.filter((id) => state.daily.done[id]).length;
     return { t: `🎯 Défis du jour : ${d}/${state.daily.picks.length} → touche 🎯`, lvl: 'ok', btn: 'hudDaily' };
@@ -330,7 +330,7 @@ $('awayClose').addEventListener('click', () => { awayModal.hidden = true; });
 awayModal.addEventListener('click', (e) => { if (e.target === awayModal) awayModal.hidden = true; });
 
 // ---- Quoi de neuf ? (une fois par mise à jour) ----
-const NEWS_V = '2026-11-clarte';
+const NEWS_V = '2026-11-pilote';
 const newsModal = $('newsModal');
 function closeNews() { newsModal.hidden = true; state.newsSeen = NEWS_V; saveState(); }
 $('newsOk').addEventListener('click', closeNews);

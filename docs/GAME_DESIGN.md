@@ -109,14 +109,37 @@ Au plus **+6 par compétence et par jour**, et progresser devient plus dur près
 
 ## 12. Grand Prix du jour et championnat
 
-- Un circuit par jour, en boucle : Le Mans, Monaco, Spa, Silverstone, Monza, Suzuka, Daytona.
+- Un circuit par jour, en boucle, **chacun avec son caractère** :
+
+| Circuit | Particularité | Pièce clé | Pluie |
+|---|---|---|---|
+| 🇫🇷 Le Mans | course de nuit (phares), l'endurance compte double | 🔩 Fiabilité | 25 % |
+| 🇲🇨 Monaco | entre les murs, le pilotage avant tout, course un peu plus lente | ⚫ Pneus | 15 % |
+| 🇧🇪 Spa-Francorchamps | météo capricieuse | 🌬️ Aileron | 50 % |
+| 🇬🇧 Silverstone | rapide et souvent mouillé | 🌬️ Aileron | 40 % |
+| 🇮🇹 Monza | le temple de la vitesse (course ×1,2) | 🔧 Moteur | 15 % |
+| 🇯🇵 Suzuka | technique, plus d'obstacles | ⚫ Pneus | 25 % |
+| 🇺🇸 Daytona | ovale à fond (course ×1,15) | 🔧 Moteur | 10 % |
+
+- **Météo de la course** : la même toute la journée (sec ou pluie), tirée selon le circuit.
+- **Pneus** à choisir avant le départ : tendres (+6 sur le sec, −10 sous la pluie, course plus rapide),
+  durs (+2 / −6), pluie (−8 / +8, course un peu plus lente). Sous la pluie sans pneus pluie, la voiture glisse.
 - Ouvert de 9 h à 22 h, s'il n'est pas malade et a au moins 30 d'énergie (la course en coûte 15).
-- On joue la Course Gulf ; le classement mélange **ses compétences** (pilotage 45 %, endurance 25 %,
-  charme 10 %), **le score de la course** et un peu de hasard, contre 9 rivaux qui progressent
-  au fil du mois.
-- Points façon F1 (25, 18, 15, 12, 10, 8, 6, 4, 2, 1) ; jetons 30 / 20 / 15 / 5.
-- **Championnat mensuel** : au changement de mois, la saison est archivée avec un titre
-  (Champion du monde dès 300 points, Vice-champion 180, Pilote confirmé 90).
+- **Performance** = ses compétences pondérées par le circuit (somme des poids 0,85) + la course jouée
+  (1,5 par point, max 45) + la voiture + les pneus − 10 s'il est fatigué (énergie < 40) + chance (±8).
+  Après la course, l'écran « Ce qui a compté » montre chaque part.
+- Contre 9 rivaux qui progressent au fil du mois ; points façon F1 (25, 18, 15, 12, 10, 8, 6, 4, 2, 1)
+  pour **les 10 pilotes** ; jetons 30 / 20 / 15 / 5.
+- **Championnat du mois** : classement des 10 pilotes, « rival du moment » (celui juste devant).
+  Au premier passage du mois suivant : place finale, titre (1ᵉʳ Champion du monde, 2ᵉ Vice-champion,
+  3ᵉ Podium du championnat, 4ᵉ–6ᵉ Pilote confirmé) et récompense (150, 100, 70, 40 puis 20 jetons).
+  Les saisons commencées avant cette version retrouvent les points des rivaux en rejouant leurs courses.
+- **Garage** : 4 pièces (moteur, pneus, aileron, fiabilité), niveaux 1 à 5 à 30, 60, 100, 150 et 220 jetons.
+  Chaque niveau donne +0,7 partout, et +1,2 de plus sur les circuits où la pièce est la pièce clé
+  (au maximum +20). Les améliorations se voient sur la voiture (aileron, bandes sur les roues, flamme,
+  numéro doré).
+- **Palmarès** : meilleur résultat sur chaque circuit ; trophées 🔧 premier réglage, 🏎️ voiture complète,
+  ☔ victoire sous la pluie, 👑 champion du monde.
 
 ## 13. Histoire « Le rêve du Mans »
 

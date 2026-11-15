@@ -6,7 +6,21 @@ const raceCv = $('raceCanvas');
 const rx = raceCv.getContext('2d');
 const race = { on: false };
 
-function startRace() {
+// Ce qui change selon le circuit, la météo et les pneus (Grand Prix)
+function raceMods(circuit, weather, tire) {
+  const t = (window.CheriCareer.TIRES[tire]) || { speed: 1 };
+  const wet = weather === 'pluie';
+  return {
+    speed: (circuit ? circuit.speed : 1) * t.speed,
+    grip: wet && tire !== 'pluie' ? 5 : 14,          // sous la pluie sans pneus pluie, ça glisse
+    wet,
+    night: !!(circuit && circuit.night),
+    walls: !!(circuit && circuit.walls),
+    busy: !!(circuit && circuit.busy)
+  };
+}
+
+function startRace(opts) {
   if (!canAct()) return;
   beginGame();
   raceEl.hidden = false;
@@ -15,7 +29,9 @@ function startRace() {
   raceCv.width = W * dpr;
   raceCv.height = H * dpr;
   rx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  Object.assign(race, { on: true, W, H, lane: 1, carX: null, items: [], score: 0, lives: 3, t: 0, speed: 150, spawn: 0, road: 0, last: performance.now(), hit: 0, over: false, gp: null });
+  const o = opts || {};
+  Object.assign(race, { on: true, W, H, lane: 1, carX: null, items: [], score: 0, lives: 3, t: 0, speed: 150, spawn: 0, road: 0, last: performance.now(), hit: 0, over: false,
+    gp: o.gp || null, weather: o.weather || 'sec', tire: o.tire || 'durs', mod: o.gp ? raceMods(o.gp, o.weather, o.tire) : raceMods(null, 'sec', 'durs') });
   race.raf = requestAnimationFrame(raceLoop);
 }
 
@@ -40,14 +56,29 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight') { raceInput(1); e.preventDefault(); }
 });
 
-function drawCar(x, y, blink) {
-  const c = rx;
+// La voiture, avec ses améliorations du garage (aileron, pneus, échappement, numéro doré)
+function drawCar(x, y, blink, ctx) {
+  const c = ctx || rx;
+  const car = state.car || {};
   const w = 30, h = 46;
   c.save();
   c.translate(x - w / 2, y - h / 2);
   if (blink) c.globalAlpha = 0.45;
+  if ((car.moteur || 0) >= 2) {
+    const f = 5 + car.moteur * 1.5 + Math.sin(performance.now() / 55) * 2.5;
+    c.fillStyle = '#FFC233';
+    c.beginPath(); c.moveTo(w / 2 - 5, h - 1); c.lineTo(w / 2 + 5, h - 1); c.lineTo(w / 2, h - 1 + f); c.closePath(); c.fill();
+    c.fillStyle = '#F26A21';
+    c.beginPath(); c.moveTo(w / 2 - 3, h - 1); c.lineTo(w / 2 + 3, h - 1); c.lineTo(w / 2, h - 1 + f * 0.6); c.closePath(); c.fill();
+  }
+  const ww = (car.pneus || 0) >= 3 ? 7 : 6;
+  const wheels = [[-ww / 2, 6], [w - ww / 2, 6], [-ww / 2, h - 16], [w - ww / 2, h - 16]];
   c.fillStyle = '#111';
-  [[-3, 6], [w - 3, 6], [-3, h - 16], [w - 3, h - 16]].forEach(([wx, wy]) => c.fillRect(wx, wy, 6, 11));
+  wheels.forEach(([wx, wy]) => c.fillRect(wx, wy, ww, 11));
+  if ((car.pneus || 0) >= 1) {
+    c.fillStyle = '#F26A21';
+    wheels.forEach(([wx, wy]) => c.fillRect(wx + ww / 2 - 1, wy + 1, 2, 9));
+  }
   c.fillStyle = '#1E3456';
   c.fillRect(0, 2, w, h - 2);
   c.fillStyle = '#A6D2EC';
@@ -59,13 +90,45 @@ function drawCar(x, y, blink) {
   c.fillRect(w / 2 - 5, 3, 10, h - 5);
   c.fillStyle = '#1E3456';
   c.fillRect(5, 9, w - 10, 7);
+  if ((car.aero || 0) >= 1) {
+    c.fillStyle = '#1E3456';
+    c.fillRect(-5, h - 4, w + 10, 4);
+    c.fillStyle = '#F26A21';
+    c.fillRect(-5, h - 4, 3, 4);
+    c.fillRect(w + 2, h - 4, 3, 4);
+  }
+  if ((car.aero || 0) >= 3) { c.fillStyle = '#1E3456'; c.fillRect(-4, 0, w + 8, 3); }
   c.fillStyle = '#fff';
   c.beginPath(); c.arc(w / 2, h - 15, 6, 0, Math.PI * 2); c.fill();
+  if ((car.fiabilite || 0) >= 3) { c.strokeStyle = '#E8B923'; c.lineWidth = 2; c.stroke(); }
   c.fillStyle = '#1E3456';
   c.font = 'bold 9px "Space Mono", monospace';
   c.textAlign = 'center';
   c.textBaseline = 'middle';
   c.fillText(String(Math.min(99, levelFor(state.xp))), w / 2, h - 14.5);
+  c.restore();
+}
+
+// Aperçu de la voiture dans le garage (de profil, vers la droite)
+function drawCarPreview(cv) {
+  const dpr = window.devicePixelRatio || 1;
+  const W = Math.min(300, (cv.parentElement && cv.parentElement.clientWidth) || 260), H = 104;
+  cv.width = W * dpr;
+  cv.height = H * dpr;
+  cv.style.width = W + 'px';
+  cv.style.height = H + 'px';
+  const c = cv.getContext('2d');
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  c.fillStyle = '#3B4452';
+  c.fillRect(0, 0, W, H);
+  for (let x = 0; x < W; x += 24) { c.fillStyle = (x / 24) % 2 ? '#F26A21' : '#A6D2EC'; c.fillRect(x, 0, 24, 6); c.fillRect(x, H - 6, 24, 6); }
+  c.fillStyle = 'rgba(255,255,255,0.45)';
+  for (let x = 6; x < W; x += 30) c.fillRect(x, H / 2 - 1.5, 16, 3);
+  c.save();
+  c.translate(W / 2, H / 2);
+  c.rotate(Math.PI / 2);
+  c.scale(1.6, 1.6);
+  drawCar(0, 0, false, c);
   c.restore();
 }
 
@@ -95,23 +158,26 @@ function raceLoop(ts) {
   const { W, H } = race;
   if (!race.over) {
     race.t += dt;
-    race.speed = 150 + race.t * 6;
+    race.speed = (150 + race.t * 6) * race.mod.speed;
     race.road = (race.road + race.speed * dt) % 40;
     race.spawn -= dt;
     if (race.spawn <= 0) {
-      race.spawn = Math.max(0.42, 0.95 - race.t * 0.015);
+      race.spawn = Math.max(0.42, 0.95 - race.t * 0.015) * (race.mod.busy ? 0.82 : 1);
       const r = Math.random();
-      const k = r < 0.42 ? 'cone' : r < 0.6 ? 'oil' : r < 0.9 ? 'fuel' : 'heart';
+      const oil = race.mod.wet ? 0.66 : 0.6;     // flaques sous la pluie
+      const k = r < 0.42 ? 'cone' : r < oil ? 'oil' : r < 0.9 ? 'fuel' : 'heart';
       race.items.push({ k, lane: Math.floor(Math.random() * 3), y: -20, x: 0 });
     }
   }
-  // route
-  rx.fillStyle = '#3B4452'; rx.fillRect(0, 0, W, H);
-  rx.fillStyle = '#5E8F4E'; rx.fillRect(0, 0, W * 0.12, H); rx.fillRect(W * 0.88, 0, W * 0.12, H);
+  // route (murs gris à Monaco, piste plus sombre sous la pluie)
+  const m = race.mod;
+  rx.fillStyle = m.wet ? '#2E3542' : '#3B4452'; rx.fillRect(0, 0, W, H);
+  rx.fillStyle = m.walls ? '#8E98A5' : (m.wet ? '#4C7A41' : '#5E8F4E'); rx.fillRect(0, 0, W * 0.12, H); rx.fillRect(W * 0.88, 0, W * 0.12, H);
+  const kerbA = m.walls ? '#D9373B' : '#F26A21', kerbB = m.walls ? '#FFFFFF' : '#A6D2EC';
   for (let y = -40 + race.road; y < H; y += 40) {
-    rx.fillStyle = (Math.round((y - race.road) / 40) % 2) ? '#F26A21' : '#A6D2EC';
+    rx.fillStyle = (Math.round((y - race.road) / 40) % 2) ? kerbA : kerbB;
     rx.fillRect(W * 0.12, y, 8, 20); rx.fillRect(W * 0.88 - 8, y, 8, 20);
-    rx.fillStyle = (Math.round((y - race.road) / 40) % 2) ? '#A6D2EC' : '#F26A21';
+    rx.fillStyle = (Math.round((y - race.road) / 40) % 2) ? kerbB : kerbA;
     rx.fillRect(W * 0.12, y + 20, 8, 20); rx.fillRect(W * 0.88 - 8, y + 20, 8, 20);
     rx.fillStyle = 'rgba(255,255,255,0.55)';
     rx.fillRect(laneX(0) + (laneX(1) - laneX(0)) / 2 - 1.5, y + 6, 3, 18);
@@ -119,7 +185,7 @@ function raceLoop(ts) {
   }
   // voiture
   const target = laneX(race.lane);
-  race.carX = race.carX === null ? target : race.carX + (target - race.carX) * Math.min(1, dt * 14);
+  race.carX = race.carX === null ? target : race.carX + (target - race.carX) * Math.min(1, dt * race.mod.grip);
   const carY = H - 40;
   // objets
   for (let i = race.items.length - 1; i >= 0; i--) {
@@ -137,6 +203,31 @@ function raceLoop(ts) {
     }
     if (it.y > H + 30) race.items.splice(i, 1);
   }
+  if (m.wet) {
+    rx.strokeStyle = 'rgba(200, 225, 245, 0.55)';
+    rx.lineWidth = 1.2;
+    rx.beginPath();
+    for (let i = 0; i < 26; i++) {
+      const px = (i * 53 + ts * 0.03) % W, py = (i * 97 + ts * 0.9) % H;
+      rx.moveTo(px, py); rx.lineTo(px - 4, py + 11);
+    }
+    rx.stroke();
+  }
+  if (m.night) {
+    // la nuit : tout est sombre sauf le faisceau des phares
+    rx.save();
+    rx.beginPath();
+    rx.rect(0, 0, W, H);
+    rx.moveTo(race.carX - 12, carY - 22);
+    rx.lineTo(race.carX - 72, carY - 190);
+    rx.lineTo(race.carX + 72, carY - 190);
+    rx.lineTo(race.carX + 12, carY - 22);
+    rx.closePath();
+    rx.fillStyle = 'rgba(8, 12, 30, 0.62)';
+    rx.fill('evenodd');
+    rx.restore();
+  }
+  // sa voiture reste bien visible, même la nuit
   drawCar(race.carX, carY, ts < race.hit && Math.floor(ts / 120) % 2 === 0);
   // tableau de bord
   rx.fillStyle = 'rgba(30,52,86,0.85)';
@@ -153,7 +244,8 @@ function raceLoop(ts) {
     rx.textAlign = 'center';
     rx.font = 'bold 13px "Baloo 2", sans-serif';
     rx.fillText(race.gp ? `Grand Prix de ${race.gp.name} ${race.gp.flag}` : 'Tape à gauche / à droite', W / 2, H / 2 - 12);
-    rx.fillText('Évite les plots, ramasse les ⛽ 💕', W / 2, H / 2 + 8);
+    const tire = race.gp && window.CheriCareer.TIRES[race.tire];
+    rx.fillText(race.gp ? `${race.weather === 'pluie' ? '☔ Pluie' : '☀️ Sec'} · pneus ${tire ? tire.name.toLowerCase() : ''}${race.mod.night ? ' · de nuit' : ''}` : 'Évite les plots, ramasse les ⛽ 💕', W / 2, H / 2 + 8);
   }
   if (!race.over && (race.lives <= 0 || race.t >= 40)) endRace();
   if (race.over) {

@@ -322,6 +322,45 @@ const ok = (name) => { n++; console.log('✓', name); };
     assert.strictEqual(await nt.textContent('#statusText'), '😴 Il dort · réveil vers 7 h 30');
     ok('phrase de la nuit');
 
+    // carrière de pilote : garage, pneus, classement des 10 pilotes
+    const pc = await open('?heure=15', { ...STATE, tutorial: 'done', tokens: 200 });
+    await pc.waitForTimeout(900);          // laisse passer le bonus de série du démarrage
+    await idle(pc);
+    await pc.click('#raceNo');
+    assert.strictEqual(await pc.locator('#careerTabs .tab').count(), 5);
+    await pc.click('#careerTabs .tab[data-ctab="garage"]');
+    const tk = await pc.evaluate(() => state.tokens);
+    await pc.click('.part-buy[data-part="moteur"]');
+    assert.deepStrictEqual(await pc.evaluate((t) => [state.car.moteur, t - state.tokens], tk), [1, 30]);
+    await pc.click('#careerTabs .tab[data-ctab="course"]');
+    await pc.click('.tire[data-tire="durs"]');
+    assert.strictEqual(await pc.getAttribute('.tire[data-tire="durs"]', 'aria-pressed'), 'true');
+    await pc.click('#gpGo');
+    await pc.waitForTimeout(400);
+    assert.deepStrictEqual(await pc.evaluate(() => [race.tire, !!race.gp, race.mod.speed > 0.8]), ['durs', true, true]);
+    await pc.evaluate(() => { race.score = 22; race.t = 39.9; });
+    await pc.waitForFunction(() => Object.keys(state.career.gp).length === 1, null, { timeout: 5000 });
+    assert.strictEqual(await pc.evaluate(() => Career.standings(state).reduce((a, x) => a + x.pts, 0)), 101, 'les rivaux marquent aussi');
+    await pc.waitForFunction(() => !careerModal.hidden, null, { timeout: 8000 });
+    assert.ok((await pc.textContent('#careerBody')).includes('Ce qui a compté'), 'détail du résultat');
+    await pc.click('#careerTabs .tab[data-ctab="classement"]');
+    assert.strictEqual(await pc.locator('.standings tr').count(), 10);
+    assert.strictEqual(await pc.locator('.palm').count(), 7);
+    await pc.evaluate(() => saveNow());
+    await pc.reload();
+    await pc.waitForTimeout(900);
+    assert.deepStrictEqual(await pc.evaluate(() => [state.car.moteur, Object.keys(state.career.season.rivals).length]), [1, 9], 'voiture et rivaux conservés');
+    ok('carrière : garage, pneus, classement');
+
+    // nouveau mois : fin du championnat avec place, titre et récompense
+    const oldSeason = { races: 1, wins: 1, podiums: 1, circuits: { monaco: 1 }, winsAt: { monaco: 1 }, chapters: { c1: 'x', c2: 'x', c3: 'x' }, seasons: [], gp: { '2000-01-05': { circuit: 'monaco', place: 1, points: 25 } }, season: { month: '2000-01', points: 25, races: 1, wins: 1, podiums: 1 } };
+    const se = await open('?heure=15', { ...STATE, tutorial: 'done', career: oldSeason });
+    await se.waitForTimeout(2600);
+    assert.ok(await se.isVisible('#chapterModal'), 'fenêtre de fin de championnat');
+    assert.ok((await se.textContent('#chapterTitle')).includes('1ʳᵉ'));
+    assert.deepStrictEqual(await se.evaluate(() => [state.career.seasons.length, state.career.seasons[0].pos, state.career.season.races, !!state.trophies.champion]), [1, 1, 0, true]);
+    ok('fin de championnat');
+
     assert.deepStrictEqual(errors, [], 'aucune erreur JavaScript');
     ok('aucune erreur JavaScript');
     console.log(`\n${n} tests de bout en bout OK`);
