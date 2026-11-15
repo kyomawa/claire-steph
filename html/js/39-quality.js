@@ -254,7 +254,7 @@ applyPrefs();
   setTimeout(hide, 2500);
 }());
 
-// ---- Journal technique visible dans 💾 (utile pour me signaler un souci) ----
+// ---- Journal technique visible dans ⚙️ (utile pour me signaler un souci) ----
 $('showErrors').addEventListener('click', () => {
   let list = [];
   try { list = JSON.parse(localStorage.getItem(ERR_KEY) || '[]'); } catch (e) { list = []; }

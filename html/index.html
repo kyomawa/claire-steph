@@ -39,14 +39,14 @@
       <span class="brand">⛽ GULF · since 1901</span>
       <div class="topbar-right">
         <button class="icon-btn" id="btnPhoto" aria-label="Prendre une photo souvenir" title="Photo souvenir">📸</button>
-        <button class="icon-btn" id="btnSettings" aria-label="Sauvegarde et réglages" title="Sauvegarde">💾</button>
+        <button class="icon-btn" id="btnSettings" aria-label="Réglages et sauvegarde" title="Réglages et sauvegarde">⚙️</button>
       </div>
     </div>
     <div class="nameplate">
       <span class="race-no" id="raceNo">1</span>
       <h1 class="title" contenteditable="true" spellcheck="false" id="petName">Mon Chéri-o-tchi</h1>
     </div>
-    <div class="subtitle"><span>tape, caresse, chatouille-le 💋</span></div>
+    <div class="subtitle"><button class="status-line" id="statusLine" type="button" aria-live="polite" title="Ce qu'il vit en ce moment"><span id="statusText">tape, caresse, chatouille-le 💋</span></button></div>
 
     <div class="hud" aria-label="Progression">
       <span class="chip" id="hudDays">🗓️ 1</span>
@@ -157,21 +157,25 @@
     </div>
 
     <div class="stats panel">
-      <div class="stat-row">
+      <div class="stat-row" data-gauge="hunger" role="button" tabindex="0" aria-label="Faim : à quoi ça sert">
         <div class="stat-label"><img class="stat-ico" data-ico="icoHunger" alt=""> Faim</div>
         <div class="bar-track"><div class="bar-fill" id="bar-hunger"></div></div>
+        <span class="stat-val" id="val-hunger"></span>
       </div>
-      <div class="stat-row">
+      <div class="stat-row" data-gauge="energy" role="button" tabindex="0" aria-label="Énergie : à quoi ça sert">
         <div class="stat-label"><img class="stat-ico" data-ico="icoTired" alt=""> Énergie</div>
         <div class="bar-track"><div class="bar-fill" id="bar-energy"></div></div>
+        <span class="stat-val" id="val-energy"></span>
       </div>
-      <div class="stat-row">
+      <div class="stat-row" data-gauge="happy" role="button" tabindex="0" aria-label="Bonheur : à quoi ça sert">
         <div class="stat-label"><img class="stat-ico" data-ico="icoHappy" alt=""> Bonheur</div>
         <div class="bar-track"><div class="bar-fill" id="bar-happy"></div></div>
+        <span class="stat-val" id="val-happy"></span>
       </div>
-      <div class="stat-row">
+      <div class="stat-row" data-gauge="love" role="button" tabindex="0" aria-label="Amour : à quoi ça sert">
         <div class="stat-label"><img class="stat-ico" data-ico="icoLove" alt=""> Amour</div>
         <div class="bar-track"><div class="bar-fill" id="bar-love"></div></div>
+        <span class="stat-val" id="val-love"></span>
       </div>
     </div>
 
@@ -287,7 +291,10 @@
         </ul>
         <h3 class="help-h">🍔 Prendre soin de lui</h3>
         <ul class="help-list">
+          <li><span>📝</span><div><b>La phrase sous le titre</b> dit ce qu'il vit et ce qu'il lui faut. Touche-la : le bon bouton clignote</div></li>
           <li><span class="help-dot"></span><div><b>Une pastille sur un bouton</b> : c'est ce dont il a besoin maintenant (rouge = urgent)</div></li>
+          <li><span>📊</span><div><b>Touche une jauge</b> : ce qu'elle veut dire et comment la remonter (barre pleine = bien)</div></li>
+          <li><span>👆</span><div><b>Reste appuyé sur un bouton</b> : ce qu'il fait. Grisé = pas possible pour l'instant</div></li>
           <li><span>🍽️</span><div><b>Manger</b> : choisis un plat puis <b>glisse-le jusqu'à lui</b> (ou tape-le, il va le chercher)</div></li>
           <li><span>🌙</span><div>La nuit il dort : <b>éteins la lumière</b> (bouton Dodo). Dès 21 h, Dodo le couche</div></li>
           <li><span>⚠️</span><div>Quand il t'appelle, réponds vite : un appel ignoré 45 min = un soin oublié</div></li>
@@ -309,7 +316,7 @@
           <li><span>📸</span><div><b>Photo souvenir</b> de la scène, rangée dans le carnet</div></li>
           <li><span>🎾</span><div><b>Lance le ballon</b> à son compagnon : il le rapporte</div></li>
           <li><span>🎄</span><div>En décembre : le <b>calendrier de l'Avent</b> (bouton 🎄 en haut)</div></li>
-          <li><span>💾</span><div>Tout est sauvegardé tout seul · 🔔 notifications dans 💾</div></li>
+          <li><span>💾</span><div>Tout est sauvegardé tout seul · réglages et 🔔 notifications dans ⚙️</div></li>
         </ul>
         <button class="btn wide-btn cloud-main" id="helpOk">C'est parti ! 🏁</button>
       </div>
@@ -333,13 +340,20 @@
         <button class="close" id="newsClose" aria-label="Fermer">✕</button>
       </div>
       <div class="tab-body">
+        <h3 class="help-h">🆕 Plus clair</h3>
+        <ul class="help-list">
+          <li><span>📝</span><div><b>Une phrase sous le titre</b> dit ce qu'il vit et ce qu'il lui faut. Touche-la : le bon bouton clignote</div></li>
+          <li><span>📊</span><div><b>Les jauges ont leur chiffre</b> ; touche-en une pour savoir ce qu'elle veut dire</div></li>
+          <li><span>👆</span><div><b>Reste appuyé sur un bouton</b> pour savoir ce qu'il fait ; grisé = pas possible pour l'instant</div></li>
+          <li><span>⚙️</span><div>Les <b>réglages</b> sont maintenant sous ⚙️ en haut à droite</div></li>
+        </ul>
+        <h3 class="help-h">✨ Et aussi</h3>
         <ul class="help-list">
           <li><span>🐛</span><div><b>3 nouveaux mini-jeux</b> : Chasse aux bugs, Recette à deux et Feux de départ</div></li>
           <li><span class="help-dot"></span><div><b>Les boutons s'allument</b> quand il a besoin de quelque chose</div></li>
-          <li><span>ℹ️</span><div><b>Touche 🗓️ ⭐ 🔥 en haut</b> pour savoir où tu en es et ce qui arrive ensuite</div></li>
+          <li><span>ℹ️</span><div><b>Touche 🗓️ ⭐ 🔥 en haut</b> pour savoir où tu en es</div></li>
           <li><span>🕰️</span><div><b>Un résumé</b> de ce qui s'est passé pendant ton absence</div></li>
-          <li><span>🎄</span><div>Dès le 1er décembre : <b>un calendrier de l'Avent</b>, une surprise par jour</div></li>
-          <li><span>❓</span><div>L'aide est maintenant <b>rangée par thèmes</b></div></li>
+          <li><span>🎄</span><div>Dès le 1er décembre : <b>un calendrier de l'Avent</b></div></li>
         </ul>
         <button class="btn wide-btn cloud-main" id="newsOk">Je découvre ! 🏁</button>
       </div>
@@ -477,7 +491,7 @@
   <div class="modal" id="saveModal" hidden role="dialog" aria-modal="true" aria-labelledby="saveTitle">
     <div class="modal-card">
       <div class="modal-head">
-        <h2 id="saveTitle">💾 Sauvegarde & réglages</h2>
+        <h2 id="saveTitle">⚙️ Réglages & sauvegarde</h2>
         <button class="close" id="saveClose" aria-label="Fermer">✕</button>
       </div>
       <div class="tab-body save-body">

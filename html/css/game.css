@@ -1880,3 +1880,26 @@ body { background: transparent; }
 .reveal-n { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 11px; color: var(--gulf-blue-deep); }
 .reveal-msg { font-weight: 800; color: var(--navy); font-size: 14px; margin: 6px 0 4px; line-height: 1.35; }
 .reveal-gift { font-weight: 700; color: #9A4A12; font-size: 12.5px; margin: 0; }
+
+/* ---- Clarté 2 : la phrase du moment, les jauges chiffrées, les boutons expliqués ---- */
+.status-line { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; cursor: pointer; max-width: 100%; -webkit-tap-highlight-color: transparent; }
+.subtitle .status-line span { max-width: 100%; line-height: 1.35; white-space: normal; transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease; }
+.subtitle .status-line span.lvl-soft { border-color: var(--gulf-orange); background: #FFF6EE; color: #8A3A0C; }
+.subtitle .status-line span.lvl-urgent { border-color: #E23B3B; background: #FFF0EC; color: #9B1C1C; font-weight: 700; animation: urgentGlow 1.6s var(--ease-in-out, ease-in-out) infinite; }
+@keyframes urgentGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(226, 59, 59, 0); } 50% { box-shadow: 0 0 0 4px rgba(226, 59, 59, 0.25); } }
+.subtitle .status-line span.lvl-sleep { border-color: var(--navy); background: var(--navy); color: #EAF4FA; }
+.status-line:active span { transform: translateY(1px); }
+
+.stat-row[data-gauge] { cursor: pointer; border-radius: 10px; }
+.stat-row[data-gauge]:focus-visible { outline: 2px solid var(--gulf-orange); outline-offset: 3px; }
+.stat-val { width: 26px; flex-shrink: 0; text-align: right; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 12px; color: var(--navy); font-variant-numeric: tabular-nums; }
+.stat-val.low { color: #C2410C; }
+
+/* bouton impossible pour l'instant : grisé (on peut toujours le toucher pour savoir pourquoi) */
+.buttons .btn.off { background: #E6EDF2; color: #7D8FA6; border-color: #9AABC0; box-shadow: 0 3px 0 #9AABC0; }
+.buttons .btn.off .emoji { filter: grayscale(1); opacity: 0.5; }
+.buttons .btn.off.need::after { display: none; }
+
+/* le bouton désigné par la phrase du moment clignote */
+.flash-hint { animation: hintFlash 0.55s var(--ease-in-out, ease-in-out) 3 !important; }
+@keyframes hintFlash { 0%, 100% { box-shadow: 0 0 0 0 rgba(242, 106, 33, 0), 0 3px 0 var(--navy); } 50% { box-shadow: 0 0 0 6px rgba(242, 106, 33, 0.65), 0 3px 0 var(--navy); } }

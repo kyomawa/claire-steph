@@ -97,7 +97,7 @@ Les points s'effacent doucement (demi-vie ~1,5 jour). La catégorie dominante de
 - Ambiance : écran d'accueil au lancement, reflet de vitre sur l'écran, nuages qui passent
   dans les décors extérieurs (sauf la nuit et sous la pluie).
 - Tout est coupé si le téléphone demande de réduire les animations, ou si « Animations réduites »
-  est coché dans 💾.
+  est coché dans ⚙️.
 
 ## 11. Carrière de pilote (`html/js/engine/career.js`)
 
@@ -136,10 +136,23 @@ première victoire, Monaco, victoire au Mans…), chacun avec un petit texte et 
 - **Premiers pas** : une bulle guide les 3 gestes de base (repas, câlin, mini-jeu) ; elle se place
   sous le bouton à toucher et disparaît dès que c'est fait. +20 jetons à la fin, « Passer » possible.
   Les joueurs qui ont déjà nourri et câliné ne la voient pas.
-- **Réglages** (💾) : sons, vibrations, animations réduites. Conservés d'une fois sur l'autre.
+- **Réglages** (⚙️) : sons, vibrations, animations réduites. Conservés d'une fois sur l'autre.
 - **Mini-jeux** : « ✕ Quitter » à tout moment, sans récompense ni pénalité.
 - **Pendant une visite** : toucher un bouton affiche « Attends la fin de sa visite » au lieu de ne rien faire.
 - **Fenêtres** : une seule apparition automatique à la fois ; retour / Échap ferme la fenêtre du dessus.
+- **La phrase du moment** (sous le titre) : une seule phrase dit ce qu'il vit et ce qu'il lui faut,
+  dans cet ordre de priorité : malade → il dort (lumière ?) → appel urgent (« Il a faim depuis 12 min ») →
+  bouderie, caprice, question du jour → besoin conseillé → envie → bientôt l'heure du dodo →
+  Grand Prix ouvert → défis du jour → astuce de jeu. Couleur : rouge urgent, orange conseillé, nuit en bleu
+  marine. La toucher fait clignoter le bon bouton (ou ouvre sa fiche s'il n'y a rien à faire).
+- **Jauges chiffrées** : la valeur sur 100 à droite de chaque barre (orange sous 15). Toucher une jauge :
+  ce qu'elle veut dire (barre pleine = bien), sa vitesse de baisse (règles du moteur), comment la remonter
+  et ce qui se passe quand elle est basse.
+- **Boutons expliqués** : appui long = ce que fait le bouton, avec ses effets chiffrés (sans lancer l'action).
+  **Grisé** = impossible pour l'instant (Courir, Coder, Jouer quand il est malade ou épuisé ; Soigner quand
+  il va bien ; Manger quand il n'a plus faim) ; le toucher dit toujours pourquoi.
+- **Fiche de statut** (sa tête en haut à droite) : « À faire maintenant » en tête, avec les gestes en un toucher.
+- **Réglages** sous ⚙️ (au lieu de 💾, qui ressemblait à « sauvegarder »).
 - **Pastilles sur les boutons** : orange = conseillé (faim < 35, caca à ramasser, amour ou bonheur < 35,
   énergie < 25), rouge qui pulse = il t'appelle (soin oublié si rien n'est fait en 45 min).
   Rien n'est conseillé pendant qu'il dort, sauf éteindre la lumière.

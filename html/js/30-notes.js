@@ -38,7 +38,7 @@ function renderNoteModal() {
   $('noteOff').hidden = !!ok;
   $('noteOff').textContent = !cloud.available
     ? 'Les mots doux passent par le serveur : ouvre le jeu depuis son adresse en ligne.'
-    : 'Il faut la même partie sur vos deux téléphones : sur le sien, 💾 → activer la sauvegarde en ligne, puis sur le tien, 💾 → « J’ai un code ».';
+    : 'Il faut la même partie sur vos deux téléphones : sur le sien, ⚙️ → activer la sauvegarde en ligne, puis sur le tien, ⚙️ → « J’ai un code ».';
   $('noteMsg').textContent = '';
   $('noteCount').textContent = `${$('noteText').value.length} / 200`;
 }

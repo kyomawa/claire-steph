@@ -54,9 +54,9 @@ la partie reste sauvegardée sur le téléphone, seule la sauvegarde en ligne es
 ## Comment marche la sauvegarde
 
 - **Sur l'appareil** : enregistrée automatiquement à chaque action (stockage du navigateur),
-  avec une copie de la veille et un export/import manuel (bouton 💾).
-- **En ligne** : bouton 💾 → « Activer la sauvegarde en ligne » donne un code (ex. `ABCD-EF23`).
-  Sur un autre téléphone : 💾 → « J'ai un code ». La partie **jouée le plus récemment** gagne ;
+  avec une copie de la veille et un export/import manuel (bouton ⚙️).
+- **En ligne** : bouton ⚙️ → « Activer la sauvegarde en ligne » donne un code (ex. `ABCD-EF23`).
+  Sur un autre téléphone : ⚙️ → « J'ai un code ». La partie **jouée le plus récemment** gagne ;
   un appareil resté ouvert sans qu'on y touche n'écrase rien.
 - Le code sert de clé : ne le partage qu'avec la personne qui joue.
 
@@ -69,7 +69,7 @@ Les messages sont gardés dans `/data/notes/`.
 
 ## Notifications
 
-- 💾 → « 🔔 Activer » (active aussi la sauvegarde en ligne si besoin).
+- ⚙️ → « 🔔 Activer » (active aussi la sauvegarde en ligne si besoin).
 - **iPhone** : il faut d'abord **ajouter le jeu à l'écran d'accueil** (Partager → « Sur l'écran d'accueil »)
   et l'ouvrir depuis l'icône (iOS 16.4 ou plus récent). Sur Android, ça marche directement dans Chrome.
 - Le serveur vérifie toutes les 10 minutes et prévient quand il a faim, est malade ou attend un câlin,
@@ -84,9 +84,9 @@ Avant chaque mise en ligne, `npm test` doit être tout vert.
 
 - **Contrôles du code** (`tools/check.js`) : erreurs de syntaxe, deux fonctions du même nom,
   élément de la page introuvable, image ou fichier manquant, identifiant en double.
-- **Tests** : règles du moteur, carrière, et 26 parcours dans un vrai navigateur (repas, alertes,
+- **Tests** : règles du moteur, carrière, et 32 parcours dans un vrai navigateur (repas, alertes,
   Grand Prix, nuit, absence, sauvegarde abîmée, rechargement, réglages, les 8 mini-jeux,
-  pastilles, calendrier de l'Avent…).
+  pastilles, phrase du moment, jauges, boutons grisés, calendrier de l’Avent…).
 - **Test singe** : des centaines de tapes au hasard (jour, nuit, malade, boudeur, partie neuve) ;
   il échoue si une erreur apparaît, si une jauge devient « NaN » ou si le jeu reste bloqué.
 
@@ -103,5 +103,5 @@ Dans le jeu lui-même :
   sont retirées pour garder la partie.
 - **Fenêtres** : celles qui s'ouvrent toutes seules (chapitre, bilan…) attendent leur tour ;
   Échap ou le bouton retour d'Android ferme seulement celle du dessus.
-- **Journal technique** : 💾 → « Journal technique » affiche les derniers soucis (date + message),
+- **Journal technique** : ⚙️ → « Journal technique » affiche les derniers soucis (date + message),
   pratique pour me les envoyer.

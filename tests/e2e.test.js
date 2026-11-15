@@ -257,6 +257,7 @@ const ok = (name) => { n++; console.log('✓', name); };
     const nov = await open('?heure=15&date=11-20', STATE);
     assert.ok(!(await nov.isVisible('#btnAdvent')), 'pas de calendrier en novembre');
     const adv = await open('?heure=15&date=12-03', STATE);
+    await adv.waitForTimeout(900);          // laisse passer le bonus de série du démarrage
     assert.ok(await adv.isVisible('#btnAdvent'));
     await adv.click('#btnAdvent');
     const before = await adv.evaluate(() => state.tokens || 0);
@@ -268,6 +269,58 @@ const ok = (name) => { n++; console.log('✓', name); };
     await adv.waitForTimeout(900);
     assert.ok(await adv.evaluate(() => !!adventOpened()[1] && !canOpenDoor(1) && canOpenDoor(3) && !canOpenDoor(4)));
     ok('calendrier de l’Avent');
+
+    // la phrase du moment dit ce qu'il vit, et désigne le bon bouton
+    const c = await open('?heure=14', { ...STATE, tutorial: 'done' });
+    await idle(c);
+    await c.evaluate(() => { state.hunger = 28; renderStats(); });
+    assert.deepStrictEqual([await c.textContent('#statusText'), await c.getAttribute('#statusText', 'class')], ['🍔 Il commence à avoir faim → 🍽️ Manger', 'lvl-soft']);
+    await c.evaluate(() => { state.hunger = 10; state.alerts = { hunger: { since: Date.now() - 5 * 60000, counted: false } }; renderStats(); });
+    assert.ok((await c.textContent('#statusText')).includes('depuis 5 min'));
+    await c.click('#statusLine');
+    assert.ok(await c.evaluate(() => $('btnCoffee').classList.contains('flash-hint')), 'le bon bouton clignote');
+    ok('phrase du moment');
+
+    // jauges : chiffre affiché, explication au toucher
+    await c.evaluate(() => { state.alerts = {}; state.hunger = 64; renderStats(); });
+    assert.strictEqual(await c.textContent('#val-hunger'), '64');
+    await c.click('.stat-row[data-gauge="energy"]');
+    assert.ok((await c.textContent('#hudTip')).startsWith('⚡ Énergie'));
+    ok('jauges expliquées');
+
+    // boutons impossibles grisés, avec la raison
+    await c.evaluate(() => { state.sick = true; renderStats(); });
+    assert.deepStrictEqual(await c.evaluate(() => [...document.querySelectorAll('.buttons .btn.off')].map((x) => x.id)), ['btnRun', 'btnCode', 'btnGame']);
+    assert.strictEqual(await c.textContent('#statusText'), '🤒 Il est malade → 💊 Soigner');
+    await c.evaluate(() => { state.sick = false; renderStats(); });
+    assert.deepStrictEqual(await c.evaluate(() => [...document.querySelectorAll('.buttons .btn.off')].map((x) => x.id)), ['btnHeal']);
+    ok('boutons grisés');
+
+    // appui long sur un bouton : l'explication, sans lancer l'action
+    await c.mouse.click(5, 5);
+    const rb = await c.locator('#btnRun').boundingBox();
+    await c.mouse.move(rb.x + rb.width / 2, rb.y + rb.height / 2);
+    await c.mouse.down(); await c.waitForTimeout(800); await c.mouse.up();
+    await c.waitForTimeout(200);
+    assert.ok((await c.textContent('#hudTip')).startsWith('🏃 Courir'));
+    assert.deepStrictEqual(await c.evaluate(() => [state.counters.runs || 0, busy]), [0, false], 'pas de course lancée');
+    ok('appui long = explication');
+
+    // fiche de statut : les gestes utiles en un toucher
+    await c.evaluate(() => { state.hunger = 25; renderStats(); });
+    await c.click('#mood');
+    assert.ok((await c.textContent('#statusBody')).includes('À faire maintenant'));
+    await c.click('#statusBody .away-chip >> nth=0');
+    await c.waitForTimeout(300);
+    assert.ok(await c.isVisible('#food'), 'le geste conseillé s’ouvre');
+    ok('statut avec gestes conseillés');
+
+    // la nuit : la phrase parle de la lumière, puis du réveil
+    const nt = await open('?heure=23', { ...STATE, lights: true });
+    assert.ok((await nt.textContent('#statusText')).startsWith('💡'));
+    await nt.click('#btnSleep');
+    assert.strictEqual(await nt.textContent('#statusText'), '😴 Il dort · réveil vers 7 h 30');
+    ok('phrase de la nuit');
 
     assert.deepStrictEqual(errors, [], 'aucune erreur JavaScript');
     ok('aucune erreur JavaScript');

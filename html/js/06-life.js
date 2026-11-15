@@ -199,11 +199,15 @@ function renderStatus() {
   bar.appendChild(fill);
   wis.append(el('div', 'd-title', `🎓 Sagesse : ${Math.round(state.discipline)} / 100`), bar);
   const al = el('div', 'alerts-list');
-  if (!alerts.length) al.appendChild(el('p', 'ok-line', '✅ Tout va bien, rien à faire pour l’instant'));
+  if (!alerts.length && !(typeof needsNow === 'function' && needsNow().length)) al.appendChild(el('p', 'ok-line', '✅ Tout va bien, rien à faire pour l’instant'));
   for (const k of alerts) {
     const def = Sim.ALERTS[k];
     const mins = Math.floor((nowMs - state.alerts[k].since) / 60000);
     al.appendChild(el('p', 'alert-line', `${def.icon} ${def.label} · depuis ${mins} min${state.alerts[k].counted ? ' (soin oublié)' : ''}`));
+  }
+  if (typeof todoRow === 'function') {
+    const row = todoRow(() => { statusModal.hidden = true; });
+    if (row) al.append(el('p', 'away-h', 'À faire maintenant :'), row);
   }
   const wk = el('button', 'btn wide-btn', '📈 Voir son bien-être de la semaine');
   wk.addEventListener('click', () => { statusModal.hidden = true; openWeek(false); });

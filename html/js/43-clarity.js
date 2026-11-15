@@ -29,6 +29,180 @@ function renderNeeds() {
     b.classList.toggle('need', !!hit);
     b.classList.toggle('need-urgent', !!(hit && hit.urgent));
   }
+  if (typeof renderButtonsState === 'function') renderButtonsState();
+  if (typeof renderStatusLine === 'function') renderStatusLine();
+}
+
+// ---- Boutons : ce qu'ils font (appui long), grisés quand c'est impossible ----
+const BTN_INFO = {
+  btnCoffee: ['🍽️ Manger', 'Choisis un plat : Faim ↑ (café et smoothie : Énergie ↑ aussi)', 'Les plats copieux font prendre un peu de poids', 'Un caca arrive 1 à 2 h après le repas'],
+  btnRun: ['🏃 Courir', 'Bonheur +22 · Énergie −12 · Faim −14', 'Poids −0,5 kg · entraîne l’endurance'],
+  btnCode: ['💻 Coder', 'Énergie −10 à −14 · Faim −6', 'Bonheur selon le résultat : bug 😩 ou tests verts ✅', 'Entraîne le code'],
+  btnSleep: ['😴 Dodo', 'Le jour : une sieste, Énergie +32', 'Dès 21 h : au lit, lumière éteinte', 'Quand il dort : allume ou éteint la lumière'],
+  btnGame: ['🎮 Jouer', '8 mini-jeux : Bonheur et Amour ↑, Énergie ↓', 'Chacun entraîne une compétence de pilote'],
+  btnWash: ['🧼 Laver', 'Ramasse tous les cacas + petite douche', 'Bonheur +8, et +4 par caca'],
+  btnHeal: ['💊 Soigner', 'Seulement quand il est malade 🤒', 'Le guérit et remonte ses jauges', 'Avec peu de sagesse 🎓, il peut refuser'],
+  btnBook: ['📖 Carnet', 'Vos souvenirs, ses trophées et ses statistiques'],
+  btnStyle: ['👕 Garde-robe', 'Accessoires, compagnon et décor', 'De nouveaux arrivent avec les niveaux, les trophées et les saisons'],
+  btnDuo: ['💑 À deux', 'Des moments à deux : Amour et Bonheur ↑', 'Et les mots doux vers l’autre téléphone'],
+  btnHug: ['🥰 Câlin de ta copine', 'Tu viens le câliner : Amour +26 · Bonheur +18', 'Entraîne le charme']
+};
+// pourquoi un bouton ne peut pas servir maintenant (mêmes règles que les boutons eux-mêmes)
+function offReason(id) {
+  if (id === 'btnRun') return state.sick ? 'Trop malade pour courir' : (state.energy < 10 ? 'Trop fatigué pour courir' : null);
+  if (id === 'btnCode') return state.sick ? 'Pas de code quand il est malade' : null;
+  if (id === 'btnGame') return state.sick ? 'Trop malade pour jouer' : (state.energy < 15 ? 'Trop fatigué pour jouer' : null);
+  if (id === 'btnHeal') return state.sick ? null : 'Il n’est pas malade';
+  if (id === 'btnCoffee') return state.hunger > 92 ? 'Il n’a plus faim' : null;
+  return null;
+}
+function btnTip(id) {
+  const why = offReason(id);
+  return [...BTN_INFO[id], why ? `⛔ Pour l’instant : ${why}` : null];
+}
+function renderButtonsState() {
+  for (const id of Object.keys(BTN_INFO)) {
+    const b = $(id);
+    const why = offReason(id);
+    b.classList.toggle('off', !!why);
+    const title = why ? `${BTN_INFO[id][0]} : ${why}` : BTN_INFO[id].join(' · ');
+    if (b.title !== title) b.title = title;
+  }
+}
+// appui long sur un bouton : l'explication, sans déclencher l'action
+const btnBox = document.querySelector('.buttons');
+const press = { timer: 0, shown: false, x: 0, y: 0 };
+btnBox.addEventListener('pointerdown', (e) => {
+  const b = e.target.closest('.btn');
+  press.shown = false;
+  clearTimeout(press.timer);
+  if (!b || !BTN_INFO[b.id]) return;
+  press.x = e.clientX;
+  press.y = e.clientY;
+  press.timer = setTimeout(() => { press.shown = true; showHudTip(b, btnTip(b.id)); buzz(15); }, 550);
+});
+const cancelPress = () => clearTimeout(press.timer);
+btnBox.addEventListener('pointerup', cancelPress);
+btnBox.addEventListener('pointercancel', cancelPress);
+btnBox.addEventListener('pointerleave', cancelPress);
+btnBox.addEventListener('pointermove', (e) => { if (Math.hypot(e.clientX - press.x, e.clientY - press.y) > 10) cancelPress(); });
+btnBox.addEventListener('click', (e) => {
+  if (!press.shown) return;
+  press.shown = false;
+  e.stopImmediatePropagation();
+  e.preventDefault();
+}, true);
+btnBox.addEventListener('contextmenu', (e) => e.preventDefault());
+
+// ---- Jauges : leur chiffre, et ce qu'elles veulent dire au toucher ----
+const GAUGE_INFO = {
+  hunger: { ico: '🍔', n: 'Faim', full: 'Barre pleine = ventre plein', how: '🍽️ Manger', alert: 'Sous 15, il a faim et t’appelle' },
+  energy: { ico: '⚡', n: 'Énergie', full: 'Barre pleine = en pleine forme', how: '😴 Dodo, ☕ café, 🥤 smoothie', alert: 'Il récupère en dormant (moitié moins lumière allumée)' },
+  happy: { ico: '😊', n: 'Bonheur', full: 'Barre pleine = aux anges', how: '🎮 Jouer, 🏃 Courir, bisous, chatouilles', alert: 'Chaque caca laissé par terre le rend triste' },
+  love: { ico: '💗', n: 'Amour', full: 'Barre pleine = comblé', how: '🥰 Câlin, 💑 À deux, caresses, mots doux', alert: 'Sous 20, il boude (jusqu’à 35)' }
+};
+const gaugeWord = (v) => (v >= 70 ? 'au top' : (v >= 40 ? 'ça va' : (v >= 15 ? 'bas' : 'très bas !')));
+const frNum = (x) => String(x).replace('.', ',');
+function gaugeTip(k) {
+  const g = GAUGE_INFO[k];
+  const v = Math.round(state[k]);
+  const night = Sim.RULES.asleep[k];
+  return [
+    `${g.ico} ${g.n} : ${v} / 100 · ${gaugeWord(v)}`,
+    g.full,
+    `Baisse d’environ ${frNum(Math.abs(Sim.RULES.awake[k]))} par heure éveillé (${night > 0 ? '+' + frNum(night) + ' par heure en dormant' : frNum(Math.abs(night)) + ' la nuit'})`,
+    `Remonte avec ${g.how}`,
+    g.alert
+  ];
+}
+function renderGaugeValues() {
+  for (const k of Object.keys(GAUGE_INFO)) {
+    const v = $('val-' + k);
+    const n = String(Math.round(state[k]));
+    if (v.textContent !== n) v.textContent = n;
+    v.classList.toggle('low', state[k] < 15);
+  }
+}
+document.querySelectorAll('.stat-row[data-gauge]').forEach((row) => {
+  const open = (e) => { e.stopPropagation(); showHudTip(row, gaugeTip(row.dataset.gauge)); };
+  row.addEventListener('click', open);
+  row.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(e); } });
+});
+
+// ---- La phrase du moment, sous le titre : ce qu'il vit et ce qu'il lui faut ----
+const fmtHour = (h) => `${Math.floor(h)} h${h % 1 ? ' ' + String(Math.round((h % 1) * 60)).padStart(2, '0') : ''}`;
+const TIPS_OK = ['💕 Tout va bien · tape-le pour un bisou', '🤲 Frotte-le du doigt : des caresses', '😂 Tape 3 fois vite : chatouilles', '🫂 Reste appuyé sur lui : un câlin', '👆 Tape par terre : il y va'];
+const URGENT_TXT = { hunger: ['🍔 Il a faim', 'btnCoffee', '🍽️ Manger'], dirty: ['💩 C’est sale', 'btnWash', '🧼 Laver'], love: ['💌 Tu lui manques', 'btnHug', '🥰 Câlin'], happy: ['😢 Il est triste', 'btnGame', '🎮 Jouer'] };
+const SOFT_TXT = { btnCoffee: '🍔 Il commence à avoir faim → 🍽️ Manger', btnWash: '💩 Un caca à ramasser → tape dessus', btnSleep: '🥱 Il est fatigué → 😴 Dodo', btnHug: '🥺 Un câlin lui ferait du bien → 🥰', btnGame: '🙁 Il s’ennuie → 🎮 Jouer' };
+function statusNow() {
+  if (game.active) return { t: '🎮 Partie en cours · ✕ Quitter sous l’écran', lvl: 'ok' };
+  if (girlBusy) return { t: '💕 Elle est là ! Profite du moment', lvl: 'ok' };
+  const mode = himMode();
+  const alerts = state.alerts || {};
+  if (state.sick) return { t: '🤒 Il est malade → 💊 Soigner', lvl: 'urgent', btn: 'btnHeal' };
+  if (mode === 'sleep') {
+    if (state.lights !== false) return { t: '💡 Il dort lumière allumée → éteins (Dodo)', lvl: alerts.lights ? 'urgent' : 'soft', btn: 'btnSleep' };
+    return { t: `😴 Il dort · réveil vers ${fmtHour(Sim.RULES.wakeup)}`, lvl: 'sleep' };
+  }
+  for (const k of Object.keys(URGENT_TXT)) {
+    if (!alerts[k]) continue;
+    const [txt, btn, what] = URGENT_TXT[k];
+    const mins = Math.max(0, Math.floor((Date.now() - alerts[k].since) / 60000));
+    return { t: `${txt}${mins ? ` depuis ${mins} min` : ''} → ${what}`, lvl: 'urgent', btn };
+  }
+  if (state.sulk) return { t: '😤 Il boude → un câlin pour vous réconcilier', lvl: 'soft', btn: 'btnHug' };
+  if (caprice) return { t: '😤 Un caprice : céder ou lui expliquer ?', lvl: 'soft' };
+  if (!$('ask').hidden) return { t: '💬 Question du jour : réponds sur l’écran', lvl: 'ok' };
+  const soft = needsNow().filter((n) => !n.urgent && SOFT_TXT[n.btn]);
+  if (soft.length) return { t: SOFT_TXT[soft[0].btn], lvl: 'soft', btn: soft[0].btn };
+  if (isNight() && state.awakeUntil > Date.now()) return { t: '😪 Réveillé en pleine nuit… il se rendort vite', lvl: 'soft' };
+  if (wish) return { t: `💭 Il a une envie : ${wish.e} (touche sa bulle)`, lvl: 'soft' };
+  const h = now().getHours() + now().getMinutes() / 60;
+  if (h >= 21 && h < Sim.RULES.bedtime) return { t: '🌙 Bientôt l’heure du dodo → 😴 Dodo', lvl: 'ok', btn: 'btnSleep' };
+  const gp = gpStatus();
+  if (!gp.done && !gp.why) return { t: `🏁 GP de ${gp.circuit.name} ouvert → touche son n° ${$('raceNo').textContent}`, lvl: 'ok', btn: 'raceNo' };
+  if (state.daily && !state.daily.all) {
+    const d = state.daily.picks.filter((id) => state.daily.done[id]).length;
+    return { t: `🎯 Défis du jour : ${d}/${state.daily.picks.length} → touche 🎯`, lvl: 'ok', btn: 'hudDaily' };
+  }
+  return { t: TIPS_OK[Math.floor(Date.now() / 12000) % TIPS_OK.length], lvl: 'ok' };
+}
+let statusKey = '';
+function renderStatusLine() {
+  const s = statusNow();
+  const key = `${s.lvl}|${s.t}|${s.btn || ''}`;
+  if (key === statusKey) return;
+  statusKey = key;
+  const span = $('statusText');
+  span.textContent = s.t;
+  span.className = 'lvl-' + s.lvl;
+  $('statusLine').dataset.btn = s.btn || '';
+}
+// toucher la phrase : le bon bouton clignote (sinon, la fiche de statut)
+$('statusLine').addEventListener('click', (e) => {
+  e.stopPropagation();
+  const target = $('statusLine').dataset.btn && $($('statusLine').dataset.btn);
+  if (!target) { openStatus(); return; }
+  try { target.scrollIntoView({ block: 'nearest', behavior: state.reduceMotion ? 'auto' : 'smooth' }); } catch (err) { /* ignoré */ }
+  target.classList.remove('flash-hint');
+  void target.offsetWidth;
+  target.classList.add('flash-hint');
+  setTimeout(() => target.classList.remove('flash-hint'), 1700);
+  sfx.tap();
+});
+setInterval(guard(() => { renderGaugeValues(); renderNeeds(); }, 'phrase du moment'), 1500);
+
+// actions conseillées en un toucher (résumé d'absence, fiche de statut)
+function todoRow(onPick) {
+  const todo = needsNow();
+  if (!todo.length) return null;
+  const row = el('div', 'away-actions');
+  for (const n of todo.slice(0, 3)) {
+    const b = el('button', 'chip away-chip' + (n.urgent ? ' urgent' : ''), n.label);
+    b.addEventListener('click', () => { onPick(); setTimeout(() => $(n.btn).click(), 120); });
+    row.appendChild(b);
+  }
+  return row;
 }
 
 // ---- Bulle d'explication des pastilles du haut (🗓️ ⭐ 🔥) ----
@@ -140,16 +314,10 @@ function openAway(hours, events, before) {
     tr.append(el('td', '', `${ico} ${name}`), el('td', 'away-val' + (d < -10 ? ' down' : (d > 0 ? ' up' : '')), `${a} → ${b}`));
     t.appendChild(tr);
   }
-  const todo = needsNow();
   const box = el('div', 'away-todo');
-  box.appendChild(el('p', 'away-h', todo.length ? 'À faire maintenant :' : 'Tout va bien, profite de lui 💕'));
-  const row = el('div', 'away-actions');
-  for (const n of todo.slice(0, 3)) {
-    const b = el('button', 'chip away-chip' + (n.urgent ? ' urgent' : ''), n.label);
-    b.addEventListener('click', () => { awayModal.hidden = true; setTimeout(() => $(n.btn).click(), 120); });
-    row.appendChild(b);
-  }
-  if (todo.length) box.appendChild(row);
+  const row = todoRow(() => { awayModal.hidden = true; });
+  box.appendChild(el('p', 'away-h', row ? 'À faire maintenant :' : 'Tout va bien, profite de lui 💕'));
+  if (row) box.appendChild(row);
   const ok = el('button', 'btn wide-btn cloud-main', 'Je m’occupe de lui 💪');
   ok.addEventListener('click', () => { awayModal.hidden = true; });
   $('awayTitle').textContent = `🕰️ ${absent} sans toi`;
@@ -162,7 +330,7 @@ $('awayClose').addEventListener('click', () => { awayModal.hidden = true; });
 awayModal.addEventListener('click', (e) => { if (e.target === awayModal) awayModal.hidden = true; });
 
 // ---- Quoi de neuf ? (une fois par mise à jour) ----
-const NEWS_V = '2026-11-jeux';
+const NEWS_V = '2026-11-clarte';
 const newsModal = $('newsModal');
 function closeNews() { newsModal.hidden = true; state.newsSeen = NEWS_V; saveState(); }
 $('newsOk').addEventListener('click', closeNews);
@@ -173,4 +341,5 @@ newsModal.addEventListener('click', (e) => { if (e.target === newsModal) closeNe
 if (preAbsence.from && away.hours >= 3) queuePopup(() => openAway(away.hours, away.events, preAbsence.gauges));
 if (!state.seenHelp) state.newsSeen = NEWS_V;            // nouveau joueur : l'aide suffit
 else if (state.newsSeen !== NEWS_V && !window.__noHelp) queuePopup(() => { newsModal.hidden = false; });
+renderGaugeValues();
 renderNeeds();
