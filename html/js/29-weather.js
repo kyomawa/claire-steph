@@ -16,6 +16,9 @@ function applyWeather() {
   const ph = phase();
   screenEl.classList.toggle('rain', w === 'rain');
   $('sun').hidden = !(w === 'sun' && ph === 'day');
+  // nuages qui passent, seulement dans les décors d'extérieur
+  const outdoor = ['parc', 'plage', 'ville', 'neige'].includes(typeof currentDecor === 'function' ? currentDecor() : '');
+  $('clouds').hidden = !(outdoor && ph !== 'night' && w !== 'rain');
   if (w === 'rain' && !rainTimer) {
     rainTimer = setInterval(() => {
       if (document.hidden) return;

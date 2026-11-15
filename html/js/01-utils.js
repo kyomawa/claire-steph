@@ -20,7 +20,8 @@ function now() {
 const pad = (n) => String(n).padStart(2, '0');
 const dayKey = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const mdKey = (d) => `${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-const clamp = (v) => Math.max(0, Math.min(100, v));
+// jauges toujours entre 0 et 100, même si un calcul renvoie une valeur invalide
+const clamp = (v) => (Number.isFinite(v) ? Math.max(0, Math.min(100, v)) : 0);
 const rand = (a, b) => a + Math.random() * (b - a);
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 

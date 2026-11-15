@@ -61,6 +61,9 @@ function handleSimEvents(events, offline) {
 
 // ---- La boucle ----
 function tick() {
+  try { tickInner(); } catch (e) { if (typeof logError === 'function') logError('tick : ' + e.message); }
+}
+function tickInner() {
   const t = Date.now();
   applyPhase();
   if (busy || game.active) return;            // le temps est rattrapé au tick suivant

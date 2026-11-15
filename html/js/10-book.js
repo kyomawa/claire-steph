@@ -110,5 +110,4 @@ function renderBook() {
 $('btnBook').addEventListener('click', () => { renderBook(); book.hidden = false; $('bookClose').focus(); });
 $('bookClose').addEventListener('click', () => { book.hidden = true; });
 book.addEventListener('click', (e) => { if (e.target === book) book.hidden = true; });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') book.hidden = true; });
 document.querySelectorAll('.tab').forEach((t) => t.addEventListener('click', () => { bookTab = t.dataset.tab; renderBook(); }));

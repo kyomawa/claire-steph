@@ -233,13 +233,10 @@ let lastFrame = performance.now();
 function frame(ts) {
   const dt = Math.min(0.05, (ts - lastFrame) / 1000);
   lastFrame = ts;
-  syncWear();
-  syncPet(dt);
-  syncWish();
-  syncOverlays();
-  syncShadows();
-  syncFood();
-  syncBall(dt);
+  // chaque système est isolé : si l'un plante, les autres continuent
+  for (const step of [syncWear, () => syncPet(dt), syncWish, syncOverlays, syncShadows, syncFood, () => syncBall(dt)]) {
+    try { step(); } catch (e) { if (typeof logError === 'function' && !frame.logged) { frame.logged = true; logError('animation : ' + e.message); } }
+  }
   requestAnimationFrame(frame);
 }
 
@@ -336,4 +333,3 @@ function equip(slot, id) {
 $('btnStyle').addEventListener('click', () => { renderCloset(); closet.hidden = false; $('closetClose').focus(); });
 $('closetClose').addEventListener('click', () => { closet.hidden = true; });
 closet.addEventListener('click', (e) => { if (e.target === closet) closet.hidden = true; });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closet.hidden = true; });

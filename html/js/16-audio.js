@@ -36,7 +36,7 @@ const sfx = (() => {
   };
 })();
 function buzz(pattern) {
-  try { if (state.sound !== false && navigator.vibrate) navigator.vibrate(pattern); } catch (e) { /* ignoré */ }
+  try { if (state.vibrate !== false && navigator.vibrate) navigator.vibrate(pattern); } catch (e) { /* ignoré */ }
 }
 function renderSoundBtn() {
   $('btnSound').textContent = state.sound === false ? '🔇' : '🔊';

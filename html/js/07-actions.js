@@ -7,6 +7,13 @@ const actionEmoji = $('actionEmoji');
 const actionCaption = $('actionCaption');
 
 function canAct() { return !busy && !girlBusy && !game.active; }
+// quand un bouton est touché pendant sa visite : on le dit au lieu de ne rien faire
+function busyHint() {
+  if (!girlBusy) return false;
+  const t = Date.now();
+  if (t - (busyHint.at || 0) > 2500) { busyHint.at = t; toast('Attends la fin de sa visite 😍'); }
+  return false;
+}
 
 function afterCare() {
   if (isNight()) {
@@ -19,7 +26,7 @@ function afterCare() {
 const COUNTER_CAT = { meals: 'food', runs: 'sport', codes: 'geek', moments: 'love' };
 
 function doAction({ img, emoji, caption, delta, duration, xp, counter, after, scene, weight, cat, pts }) {
-  if (!canAct()) return;
+  if (!canAct()) return busyHint();
   busy = true;
   stopHim();
   bubbleEl.classList.remove('show');
@@ -65,13 +72,13 @@ function doAction({ img, emoji, caption, delta, duration, xp, counter, after, sc
 }
 
 function refuse(text) {
-  if (!canAct()) return;
+  if (!canAct()) return busyHint();
   sfx.bad();
   showBubble(text, 2200);
 }
 
 $('btnCoffee').addEventListener('click', () => {
-  if (!canAct()) return;
+  if (!canAct()) return busyHint();
   renderFood();
   foodModal.hidden = false;
 });
@@ -97,7 +104,7 @@ $('btnCode').addEventListener('click', () => {
 });
 
 $('btnSleep').addEventListener('click', () => {
-  if (!canAct()) return;
+  if (!canAct()) return busyHint();
   // il dort : le bouton sert d'interrupteur
   if (himMode() === 'sleep') return toggleLights();
   const night = isNight() || now().getHours() >= 21;   // dès 21 h : on le couche

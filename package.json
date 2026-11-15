@@ -5,10 +5,14 @@
   "description": "Le tamagotchi de Stéphane, aux couleurs Gulf",
   "scripts": {
     "start": "node server/server.js",
-    "test": "node tests/sim.test.js && node tests/career.test.js && node tests/e2e.test.js",
+    "test": "node tools/check.js && node tests/sim.test.js && node tests/career.test.js && node tests/e2e.test.js",
     "test:unit": "node tests/sim.test.js && node tests/career.test.js",
     "build:single": "python3 tools/build-single-file.py",
-    "build:artifact": "python3 tools/build-single-file.py --artifact"
+    "build:artifact": "python3 tools/build-single-file.py --artifact",
+    "lint": "node tools/check.js",
+    "test:monkey": "node tests/monkey.test.js 30"
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  }
 }

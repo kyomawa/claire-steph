@@ -14,7 +14,7 @@ let isNewDay = false;
 function scheduleGirlVisit(firstDelay) {
   const delay = firstDelay || rand(7000, 16000) * (1 + (5 - Sim.bond(state, Date.now())) * 0.3);
   setTimeout(() => {
-    if (canAct() && himMode() !== 'sleep' && (!firstVisitDone || Math.random() < 0.8)) startGirlVisit();
+    if (!window.__noVisits && canAct() && himMode() !== 'sleep' && (!firstVisitDone || Math.random() < 0.8)) startGirlVisit();
     scheduleGirlVisit();
   }, delay);
 }
@@ -157,7 +157,7 @@ const hugVisual = $('hugVisual');
 const HUG_CAPTIONS = ['Câlin de ta copine 🥰', 'Un gros bisou rien que pour toi 💋', 'Team pour la vie 💕⛽'];
 
 $('btnHug').addEventListener('click', () => {
-  if (!canAct()) return;
+  if (!canAct()) return busyHint();
   busy = true;
   girlBusy = true;
   stopHim();

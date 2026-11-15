@@ -19,6 +19,7 @@ function freshState() {
     bestGuess: 0, bestMemory: 0, bestMemoryStars: 0, bestDance: 0, bestDanceStars: 0, bestRace: 0, tokens: 0, postcards: {},
     trophies: {}, journal: [], name: null,
     album: {}, decor: 'auto', playedAt: 0, sound: true, seenHelp: false, lastAsk: null, daily: null,
+    tutorial: null, vibrate: true, reduceMotion: false,
     owned: {}, wear: { tete: null, yeux: null, visage: null, cou: null, dos: null, compagnon: null }
   };
 }
@@ -52,7 +53,10 @@ function writeState() {
   state.lastSeen = Date.now();
   state.name = petNameEl.textContent;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    if (typeof sanitize === 'function') sanitize(state);
+    const data = JSON.stringify(state);
+    if (typeof saveWithRoom === 'function') { if (!saveWithRoom(STORAGE_KEY, data)) throw new Error('stockage plein'); }
+    else localStorage.setItem(STORAGE_KEY, data);
     if (typeof scheduleCloudPush === 'function') scheduleCloudPush();
     if (Date.now() - saveInfoAt > 4000 && !(cloud && cloud.code && cloud.lastPush)) {
       saveInfoAt = Date.now();

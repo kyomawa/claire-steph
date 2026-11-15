@@ -80,4 +80,3 @@ $('hudTokens').addEventListener('click', () => { renderShop(); shopModal.hidden 
 $('shopClose').addEventListener('click', () => { shopModal.hidden = true; });
 shopModal.addEventListener('click', (e) => { if (e.target === shopModal) shopModal.hidden = true; });
 document.querySelectorAll('#shop .tab').forEach((t) => t.addEventListener('click', () => { shopTab = t.dataset.shop; renderShop(); }));
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') shopModal.hidden = true; });

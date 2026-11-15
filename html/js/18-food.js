@@ -45,4 +45,3 @@ function feed(f) {
 
 $('foodClose').addEventListener('click', () => { foodModal.hidden = true; });
 foodModal.addEventListener('click', (e) => { if (e.target === foodModal) foodModal.hidden = true; });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') foodModal.hidden = true; });

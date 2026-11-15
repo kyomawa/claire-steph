@@ -94,7 +94,10 @@ Les points s'effacent doucement (demi-vie ~1,5 jour). La catégorie dominante de
   posture affaissée quand il va mal.
 - Transitions : ouverture en iris pour les scènes, fenêtres qui « rebondissent » à l'ouverture,
   jauges qui pulsent quand elles sont critiques, confettis au passage de niveau.
-- Tout est coupé si le téléphone demande de réduire les animations.
+- Ambiance : écran d'accueil au lancement, reflet de vitre sur l'écran, nuages qui passent
+  dans les décors extérieurs (sauf la nuit et sous la pluie).
+- Tout est coupé si le téléphone demande de réduire les animations, ou si « Animations réduites »
+  est coché dans 💾.
 
 ## 11. Carrière de pilote (`html/js/engine/career.js`)
 
@@ -126,3 +129,13 @@ première victoire, Monaco, victoire au Mans…), chacun avec un petit texte et 
 - Tous les 7 jours : note **S / A / B / C / D** (bien-être moyen + soins oubliés), graphique
   des 7 jours, récompense de 40 à 5 jetons.
 - Série de jours d'affilée : 5, 5, 10, 10, 15, 15 puis **40 jetons** le 7ᵉ jour, en boucle.
+
+## 15. Prise en main et confort
+
+- **Premiers pas** : une bulle guide les 3 gestes de base (repas, câlin, mini-jeu) ; elle se place
+  sous le bouton à toucher et disparaît dès que c'est fait. +20 jetons à la fin, « Passer » possible.
+  Les joueurs qui ont déjà nourri et câliné ne la voient pas.
+- **Réglages** (💾) : sons, vibrations, animations réduites. Conservés d'une fois sur l'autre.
+- **Mini-jeux** : « ✕ Quitter » à tout moment, sans récompense ni pénalité.
+- **Pendant une visite** : toucher un bouton affiche « Attends la fin de sa visite » au lieu de ne rien faire.
+- **Fenêtres** : une seule apparition automatique à la fois ; retour / Échap ferme la fenêtre du dessus.

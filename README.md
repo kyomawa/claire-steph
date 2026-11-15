@@ -12,15 +12,19 @@ Un tamagotchi perso aux couleurs Gulf.
 - `server/` : petit serveur Node **sans dépendance** (jeu + sauvegarde en ligne + notifications)
 - `docs/GAME_DESIGN.md` : **les règles du jeu** (besoins, sommeil, appels, maladie, poids,
   sagesse, personnalité, économie, motion design)
-- `tests/` : `sim.test.js` (moteur) et `e2e.test.js` (navigateur réel)
+- `tests/` : `sim.test.js` (moteur), `career.test.js` (carrière), `e2e.test.js` (navigateur réel)
+  et `monkey.test.js` (des centaines de tapes au hasard pour traquer les blocages)
 - `source/` : les planches de dessins d'origine
 - `tools/build-single-file.py` : assemble un HTML autonome (ou un artefact avec `--artifact`)
+- `tools/check.js` : contrôles automatiques du code (voir « Fiabilité »)
 
 ## Lancer en local
 
 ```bash
 npm start                    # puis http://localhost:3000
-npm test                     # tests du moteur + tests navigateur (Playwright)
+npm test                     # contrôles + tests du moteur + tests navigateur (Playwright)
+npm run lint                 # contrôles seuls (rapide)
+npm run test:monkey          # test « singe » : 30 s de tapes au hasard
 npm run build:single         # cheriotchi-autonome.html, à ouvrir sans serveur
 ```
 
@@ -71,3 +75,28 @@ Les messages sont gardés dans `/data/notes/`.
   ni pendant qu'il joue.
 - Les clés de notification (`vapid.json`) sont créées toutes seules dans `/data` : garde le volume,
   sinon il faudra réactiver les notifications.
+
+## Fiabilité (pour éviter les bugs)
+
+Avant chaque mise en ligne, `npm test` doit être tout vert.
+
+- **Contrôles du code** (`tools/check.js`) : erreurs de syntaxe, deux fonctions du même nom,
+  élément de la page introuvable, image ou fichier manquant, identifiant en double.
+- **Tests** : règles du moteur, carrière, et 17 parcours dans un vrai navigateur (repas, alertes,
+  Grand Prix, nuit, absence, sauvegarde abîmée, rechargement, réglages…).
+- **Test singe** : des centaines de tapes au hasard (jour, nuit, malade, boudeur, partie neuve) ;
+  il échoue si une erreur apparaît, si une jauge devient « NaN » ou si le jeu reste bloqué.
+
+Dans le jeu lui-même :
+
+- **Filet de sécurité** : une erreur imprévue est notée mais ne fige plus le jeu
+  (la boucle de vie et la garde-robe continuent).
+- **Chien de garde** : une action bloquée depuis 25 s se débloque toute seule, un mini-jeu
+  oublié est fermé au bout de 6 min. Bouton « ✕ Quitter » pendant les mini-jeux.
+- **Sauvegarde protégée** : valeurs remises d'aplomb au chargement et à chaque écriture,
+  écritures regroupées (≤ 1 par seconde), et si le téléphone est plein, les vieilles photos
+  sont retirées pour garder la partie.
+- **Fenêtres** : celles qui s'ouvrent toutes seules (chapitre, bilan…) attendent leur tour ;
+  Échap ou le bouton retour d'Android ferme seulement celle du dessus.
+- **Journal technique** : 💾 → « Journal technique » affiche les derniers soucis (date + message),
+  pratique pour me les envoyer.

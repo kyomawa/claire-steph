@@ -103,3 +103,8 @@
   *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
   .action-visual, .hug-visual { clip-path: none; }
 }
+
+/* ---- Réglage « animations réduites » choisi dans le jeu ---- */
+.reduce-motion *, .reduce-motion *::before, .reduce-motion *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
+.reduce-motion .action-visual, .reduce-motion .hug-visual { clip-path: none; }
+.reduce-motion .clouds, .reduce-motion .confetti, .reduce-motion .falling, .reduce-motion .drop { display: none !important; }

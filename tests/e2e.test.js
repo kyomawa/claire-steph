@@ -21,7 +21,7 @@ const ok = (name) => { n++; console.log('✓', name); };
   const errors = [];
   const open = async (query, state) => {
     const ctx = await browser.newContext({ viewport: { width: 400, height: 1000 } });
-    await ctx.addInitScript('window.__noHelp = true');
+    await ctx.addInitScript('window.__noHelp = true; window.__noVisits = true;');
     if (state) await ctx.addInitScript(`if(!sessionStorage.x){sessionStorage.x=1;localStorage.setItem('cheriotchi_state', ${JSON.stringify(JSON.stringify(state))})}`);
     const p = await ctx.newPage();
     p.on('pageerror', (e) => errors.push(e.message));
@@ -118,11 +118,68 @@ const ok = (name) => { n++; console.log('✓', name); };
     assert.ok(await away.evaluate(() => state.hunger < 5 && state.mistakes.some((m) => m.k === 'hunger')));
     ok('rattrapage d’absence');
 
+    // sauvegarde abîmée (valeurs impossibles) : le jeu la répare au chargement
+    const broken = await open('?heure=15', { ...STATE, hunger: null, energy: 'abc', happy: 999, weight: -5, poops: [1, 'x', null] });
+    assert.deepStrictEqual(await broken.evaluate(() => [Number.isFinite(state.hunger), Number.isFinite(state.energy), state.happy, state.weight, state.poops.length]), [true, true, 100, 45, 1]);
+    ok('sauvegarde abîmée réparée');
+
+    // quitter un mini-jeu sans le finir
+    const q = await open('?heure=15', STATE);
+    await idle(q);
+    await q.click('#btnGame');
+    await q.click('#pickMemory');
+    await q.waitForTimeout(1200);
+    assert.ok(await q.isVisible('#quitGame'));
+    await q.click('#quitGame');
+    assert.deepStrictEqual(await q.evaluate(() => [game.active, busy, memEl.hidden]), [false, false, true]);
+    ok('quitter un mini-jeu');
+
+    // chien de garde : une action figée se débloque toute seule
+    await q.evaluate(() => { busy = true; actionVisual.classList.add('show'); });
+    await q.evaluate(() => { busySince = Date.now() - 26000; });
+    await q.waitForTimeout(1300);
+    assert.strictEqual(await q.evaluate(() => busy), false);
+    ok('chien de garde');
+
+    // Échap ferme seulement la fenêtre du dessus
+    await q.click('#btnBook');
+    await q.evaluate(() => { statusModal.hidden = false; });
+    await q.waitForTimeout(100);
+    await q.keyboard.press('Escape');
+    assert.deepStrictEqual(await q.evaluate(() => [statusModal.hidden, book.hidden]), [true, false]);
+    await q.keyboard.press('Escape');
+    assert.strictEqual(await q.evaluate(() => book.hidden), true);
+    ok('Échap ferme la fenêtre du dessus');
+
+    // tutoriel : avance quand on fait l'action demandée
+    const t = await open('?heure=15', { ...STATE, xp: 0 });
+    await t.waitForTimeout(900);
+    assert.ok((await t.textContent('#coachText')).startsWith('1/3'));
+    await idle(t);
+    await t.evaluate(() => feed(MENU[1]));
+    await t.waitForTimeout(2600);
+    assert.ok((await t.textContent('#coachText')).startsWith('2/3'));
+    ok('tutoriel des premiers pas');
+
+    // réglages et tutoriel passé : conservés après rechargement
+    await t.click('#coachSkip');
+    await t.click('#btnSettings');
+    await t.click('#prefVibrate');
+    await t.click('#prefMotion');
+    await t.click('#saveClose');
+    await t.evaluate(() => saveNow());
+    await t.reload();
+    await t.waitForTimeout(900);
+    assert.deepStrictEqual(await t.evaluate(() => [state.tutorial, state.vibrate, state.reduceMotion, document.documentElement.classList.contains('reduce-motion')]), ['done', false, true, true]);
+    assert.ok(!(await t.isVisible('#coachTip')), 'tutoriel passé : plus de bulle');
+    ok('réglages conservés');
+
     assert.deepStrictEqual(errors, [], 'aucune erreur JavaScript');
     ok('aucune erreur JavaScript');
     console.log(`\n${n} tests de bout en bout OK`);
   } catch (e) {
-    console.error('✗', e.message);
+    console.error('✗', e.message.split('\n').slice(0, 14).join('\n'));
+    console.error((e.stack || '').split('\n').find((l) => l.includes('e2e.test.js')));
     process.exitCode = 1;
   } finally {
     await browser.close();

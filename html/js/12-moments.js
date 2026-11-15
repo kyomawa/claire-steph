@@ -70,14 +70,13 @@ function doMoment(m) {
 }
 
 $('btnDuo').addEventListener('click', () => {
-  if (!canAct()) return;
+  if (!canAct()) return busyHint();
   renderDuo();
   duo.hidden = false;
   $('duoClose').focus();
 });
 $('duoClose').addEventListener('click', () => { duo.hidden = true; });
 duo.addEventListener('click', (e) => { if (e.target === duo) duo.hidden = true; });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') duo.hidden = true; });
 
 // ---- Décor de fond ----
 const DECORS = [

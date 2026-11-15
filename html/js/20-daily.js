@@ -74,4 +74,3 @@ function renderDaily() {
 $('hudDaily').addEventListener('click', () => { renderDaily(); dailyModal.hidden = false; });
 $('dailyClose').addEventListener('click', () => { dailyModal.hidden = true; });
 dailyModal.addEventListener('click', (e) => { if (e.target === dailyModal) dailyModal.hidden = true; });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') dailyModal.hidden = true; });

@@ -10,4 +10,3 @@ $('btnHelp').addEventListener('click', () => { helpModal.hidden = false; });
 $('helpClose').addEventListener('click', closeHelp);
 $('helpOk').addEventListener('click', closeHelp);
 helpModal.addEventListener('click', (e) => { if (e.target === helpModal) closeHelp(); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !helpModal.hidden) closeHelp(); });

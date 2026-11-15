@@ -3,7 +3,7 @@
 // =====================================================================
 const gamesModal = $('games');
 $('btnGame').addEventListener('click', () => {
-  if (!canAct()) return;
+  if (!canAct()) return busyHint();
   if (state.sick) return refuse('Trop malade pour jouer 🤒');
   if (state.energy < 15) return refuse('Trop fatigué pour jouer 😪');
   $('bestCatch').textContent = `Record : ${state.bestScore}`;
@@ -15,7 +15,6 @@ $('btnGame').addEventListener('click', () => {
 });
 $('gamesClose').addEventListener('click', () => { gamesModal.hidden = true; });
 gamesModal.addEventListener('click', (e) => { if (e.target === gamesModal) gamesModal.hidden = true; });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') gamesModal.hidden = true; });
 $('pickCatch').addEventListener('click', () => { gamesModal.hidden = true; if (!canAct()) return toast('Attends la fin de sa visite 😍'); startCatchGame(); });
 $('pickGuess').addEventListener('click', () => { gamesModal.hidden = true; if (!canAct()) return toast('Attends la fin de sa visite 😍'); startGuessGame(); });
 

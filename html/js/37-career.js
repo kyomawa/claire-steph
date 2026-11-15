@@ -157,7 +157,9 @@ function checkChapters(force) {
     state.career.chapters[ch.id] = dayKey(now());
     chapterQueue.push(ch);
   }
-  if (chapterQueue.length && chapterModal.hidden) showNextChapter();
+  if (chapterQueue.length && chapterModal.hidden) {
+    if (typeof queuePopup === 'function') queuePopup(showNextChapter); else showNextChapter();
+  }
 }
 function showNextChapter() {
   const ch = chapterQueue.shift();

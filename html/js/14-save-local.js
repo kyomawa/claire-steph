@@ -46,7 +46,6 @@ function renderSaveModal() {
 $('btnSettings').addEventListener('click', () => { saveState(); renderSaveModal(); renderCloudBox(); renderPushBox(); saveModal.hidden = false; });
 $('saveClose').addEventListener('click', () => { saveModal.hidden = true; });
 saveModal.addEventListener('click', (e) => { if (e.target === saveModal) saveModal.hidden = true; });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') saveModal.hidden = true; });
 
 $('exportFile').addEventListener('click', () => {
   saveState();

@@ -69,7 +69,8 @@ function maybeWeeklyReport() {
   const days = Math.round((new Date(today) - new Date(state.lastReport)) / DAY_MS);
   if (days < 7) return;
   state.lastReport = today;
-  const r = openWeek(true);
+  const r = weekReportNow();
+  queuePopup(() => { renderWeek(r, true); weekModal.hidden = false; });
   earn(r.reward, 'bilan de la semaine');
   if (r.grade === 'S') state.bestGrade = 'S';
   addMemory(`📈 Bilan de la semaine : ${r.grade} (${r.avg}/100)`, 'special');

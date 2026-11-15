@@ -1,5 +1,6 @@
 // Service worker : jeu utilisable hors ligne + réception des notifications
-const CACHE = 'cheriotchi-v1';
+// changer ce numéro à chaque mise à jour importante des images
+const CACHE = 'cheriotchi-v3';
 
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (e) => {

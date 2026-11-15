@@ -21,6 +21,13 @@
 
 <body>
 
+  <div class="splash" id="splash" aria-hidden="true">
+    <div class="splash-stripe"></div>
+    <div class="splash-badge"><img id="splashFace" alt=""></div>
+    <div class="splash-title">Chéri-o-tchi</div>
+    <div class="splash-sub">⛽ GULF · since 1901</div>
+  </div>
+
   <div class="device">
     <div class="stripe"></div>
 
@@ -55,6 +62,8 @@
         <img class="backdrop" id="backdrop" alt="" hidden>
         <div class="sky" id="sky"><div class="moon">🌙</div></div>
         <div class="sun" id="sun" hidden>☀️</div>
+        <div class="clouds" id="clouds" hidden><span>☁️</span><span>☁️</span></div>
+        <div class="glass" aria-hidden="true"></div>
         <div class="scanlines"></div>
         <div class="floor" style="pointer-events:none"></div>
         <img class="mood" id="mood" alt="humeur" title="Son statut">
@@ -120,6 +129,12 @@
           <div class="action-caption" id="hugCaption"></div>
         </div>
       </div>
+      <button class="quit-game" id="quitGame" hidden aria-label="Quitter le mini-jeu">✕ Quitter</button>
+    </div>
+
+    <div class="coach-tip" id="coachTip" hidden role="status">
+      <span id="coachText"></span>
+      <button id="coachSkip" aria-label="Passer le tutoriel">Passer</button>
     </div>
 
     <div class="stats panel">
@@ -382,7 +397,7 @@
   <div class="modal" id="saveModal" hidden role="dialog" aria-modal="true" aria-labelledby="saveTitle">
     <div class="modal-card">
       <div class="modal-head">
-        <h2 id="saveTitle">💾 Sauvegarde</h2>
+        <h2 id="saveTitle">💾 Sauvegarde & réglages</h2>
         <button class="close" id="saveClose" aria-label="Fermer">✕</button>
       </div>
       <div class="tab-body save-body">
@@ -419,6 +434,11 @@
             <button class="btn" id="pushOff" hidden><span class="emoji">🔕</span>Désactiver</button>
           </div>
         </div>
+        <div class="prefs">
+          <label class="pref"><input type="checkbox" id="prefSound"> 🔊 Sons</label>
+          <label class="pref"><input type="checkbox" id="prefVibrate"> 📳 Vibrations</label>
+          <label class="pref"><input type="checkbox" id="prefMotion"> 🐢 Animations réduites</label>
+        </div>
         <p class="tip">📱 Astuce : ajoute le jeu à l'écran d'accueil (Partager → « Sur l'écran d'accueil »). Évite la navigation privée, qui efface tout.</p>
         <details class="manual">
         <summary>📦 Sauvegarde manuelle (fichier ou code)</summary>
@@ -433,6 +453,8 @@
         </details>
         <p class="save-msg" id="saveMsg" role="status"></p>
         <button class="btn wide-btn" id="restoreBackup" hidden>↩️ Revenir à la sauvegarde d'hier</button>
+        <button class="btn wide-btn" id="showErrors">🛠️ Journal technique</button>
+        <pre class="errors-box" id="errorsBox" hidden></pre>
         <button class="btn wide-btn danger" id="resetGame">🗑️ Recommencer à zéro</button>
       </div>
     </div>
@@ -490,6 +512,7 @@
   <script src="js/36-boot.js"></script>
   <script src="js/37-career.js"></script>
   <script src="js/38-week.js"></script>
+  <script src="js/39-quality.js"></script>
 
 </body>
 
